@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/contexts/" />
+  <Folder Name="/src/contexts/iam/">
+    <Project Path="src/contexts/iam/FlowTrack.Iam.csproj" />
+  </Folder>
+</Solution>
