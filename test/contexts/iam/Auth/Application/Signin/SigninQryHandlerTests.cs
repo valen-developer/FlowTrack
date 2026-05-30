@@ -1,26 +1,31 @@
+using System.Collections.Immutable;
 using FlowTrack.Iam.Auth.Application.Signin;
 using FlowTrack.Iam.Test.User;
 using FlowTrack.Iam.User.Domain;
 using FlowTrack.Shared.Domain;
 using Moq;
+using DomainUser = FlowTrack.Iam.User.Domain.User;
 
 namespace FlowTrack.Iam.Test.Auth.Application.Signin;
 
 public class SigninQryHandlerTests
 {
-    private readonly string ACCESS_JWT_SECRET_KEY = "ACCESS_TOKEN_SECRET";
+    private const string ACCESS_JWT_EXPIRE_MINUTES_KEY = "ACCESS_TOKEN_EXPIRE_MINUTES";
+    private const string ACCESS_JWT_SECRET_KEY = "ACCESS_TOKEN_SECRET";
 
     private readonly SigninQryHandler handler;
     private readonly Mock<IUserRepository> userRepositoryMock = new();
     private readonly Mock<IBcrypt> bcryptMock = new();
     private readonly Mock<IEnvStore> envStoreMock = new();
+    private readonly Mock<IJWTService> jwtServiceMock = new();
 
     public SigninQryHandlerTests()
     {
         handler = new SigninQryHandler(
             userRepositoryMock.Object,
             bcryptMock.Object,
-            envStoreMock.Object
+            envStoreMock.Object,
+            jwtServiceMock.Object
         );
     }
 
@@ -63,4 +68,68 @@ public class SigninQryHandlerTests
 
         envStoreMock.Verify(e => e.Get(ACCESS_JWT_SECRET_KEY), Times.Once);
     }
+
+    [Fact]
+    public async Task Should_Extract_Access_Token_ExpireMinutes_From_Env()
+    {
+        var query = new SigninQry("testuser", "password123");
+        var user = UserMother.Random();
+
+        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
+        bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(true);
+
+        await handler.Handle(query);
+
+        envStoreMock.Verify(e => e.Get(ACCESS_JWT_EXPIRE_MINUTES_KEY), Times.Once);
+    }
+
+    [Fact]
+    public async Task Should_Generate_Access_Token()
+    {
+        var accessTokenSecret = "secret";
+        var accessTokenExpireMinutes = "60";
+        var query = new SigninQry("testuser", "password123");
+        var user = UserMother.Random();
+
+        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
+        bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(true);
+        envStoreMock.Setup(e => e.Get(ACCESS_JWT_SECRET_KEY)).Returns(accessTokenSecret);
+        envStoreMock
+            .Setup(e => e.Get(ACCESS_JWT_EXPIRE_MINUTES_KEY))
+            .Returns(accessTokenExpireMinutes);
+
+        await handler.Handle(query);
+
+        var expectedPayload = ExpectedPayload(user);
+        var expectedAccessJwtOptions = new JWTOptions(
+            accessTokenSecret,
+            int.Parse(accessTokenExpireMinutes)
+        );
+
+        jwtServiceMock.Verify(
+            j =>
+                j.Generate(
+                    It.Is<JWTPayload>(p => HaveSameJwtPayload(p, expectedPayload)),
+                    It.Is<JWTOptions>(o => HaveSameJWTOptions(o, expectedAccessJwtOptions))
+                ),
+            Times.Once
+        );
+    }
+
+    private static bool HaveSameJWTOptions(JWTOptions actual, JWTOptions expected)
+    {
+        return actual.Secret == expected.Secret
+            && actual.ExpirationMinutes == expected.ExpirationMinutes;
+    }
+
+    private static bool HaveSameJwtPayload(JWTPayload actual, JWTPayload expected) =>
+        actual.Claims.Count == expected.Claims.Count
+        && actual.Claims.All(kvp =>
+            expected.Claims.TryGetValue(kvp.Key, out var value) && value == kvp.Value
+        );
+
+    private JWTPayload ExpectedPayload(DomainUser user) =>
+        new(
+            new Dictionary<string, string> { { "id", user.Id.ToString() } }.ToImmutableDictionary()
+        );
 }
