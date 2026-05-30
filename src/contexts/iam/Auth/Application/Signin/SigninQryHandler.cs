@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using FlowTrack.Iam.Auth.Domain;
 using FlowTrack.Iam.User.Domain;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Bus.Query;
@@ -10,7 +11,7 @@ public sealed class SigninQryHandler(
     IBcrypt bcrypt,
     IEnvStore envStore,
     IJWTService jWTService
-) : IQueryHandler<SigninQry, Object>
+) : IQueryHandler<SigninQry, SigninSuccess>
 {
     private readonly IUserRepository _repository = repository;
     private readonly IBcrypt _bcrypt = bcrypt;
@@ -18,7 +19,7 @@ public sealed class SigninQryHandler(
 
     private readonly IJWTService _jWTService = jWTService;
 
-    public async Task<Object> Handle(SigninQry qry)
+    public async Task<SigninSuccess> Handle(SigninQry qry)
     {
         var user = await _repository.FindByEmail(qry.Email);
         _bcrypt.Compare(qry.Password, user.Password);
@@ -35,16 +36,16 @@ public sealed class SigninQryHandler(
             int.Parse(accessTokenExpireIn ?? "10")
         );
 
-        _jWTService.Generate(payload, accessTokenOptions);
+        var accessToken = _jWTService.Generate(payload, accessTokenOptions);
 
         var refreshTokenSecret = _envStore.Get("REFRESH_TOKEN_SECRET");
         var refreshTokenExpireIn = _envStore.Get("REFRESH_TOKEN_EXPIRE_MINUTES");
 
-        _jWTService.Generate(
+        var refreshToken = _jWTService.Generate(
             payload,
             new JWTOptions(refreshTokenSecret ?? "", int.Parse(refreshTokenExpireIn ?? "10"))
         );
 
-        return new Object();
+        return new SigninSuccess(accessToken, refreshToken);
     }
 }

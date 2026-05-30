@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using FlowTrack.Iam.Auth.Application.Signin;
+using FlowTrack.Iam.Auth.Domain;
 using FlowTrack.Iam.Test.User;
 using FlowTrack.Iam.User.Domain;
 using FlowTrack.Shared.Domain;
@@ -177,6 +178,67 @@ public class SigninQryHandlerTests
                 ),
             Times.Once
         );
+    }
+
+    [Fact]
+    public async Task Should_Return_Singin_Successfully()
+    {
+        var accessToken = "accessToken";
+        var refreshToken = "refreshToken";
+
+        var accessTokenSecret = "secret";
+        var accessTokenExpireMinutes = "60";
+
+        var refreshTokenSecret = "refreshSecret";
+        var refreshTokenExpireMinutes = "120";
+
+        var query = new SigninQry("testuser", "password123");
+        var user = UserMother.Random();
+
+        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
+        bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(true);
+        envStoreMock.Setup(e => e.Get(ACCESS_JWT_SECRET_KEY)).Returns(accessTokenSecret);
+        envStoreMock
+            .Setup(e => e.Get(ACCESS_JWT_EXPIRE_MINUTES_KEY))
+            .Returns(accessTokenExpireMinutes);
+        envStoreMock.Setup(e => e.Get(REFRESH_JWT_SECRET_KEY)).Returns(refreshTokenSecret);
+        envStoreMock
+            .Setup(e => e.Get(REFRESH_JWT_EXPIRE_MINUTES_KEY))
+            .Returns(refreshTokenExpireMinutes);
+
+        jwtServiceMock
+            .Setup(j =>
+                j.Generate(
+                    It.IsAny<JWTPayload>(),
+                    It.Is<JWTOptions>(o =>
+                        HaveSameJWTOptions(
+                            o,
+                            new JWTOptions(accessTokenSecret, int.Parse(accessTokenExpireMinutes))
+                        )
+                    )
+                )
+            )
+            .Returns(accessToken);
+
+        jwtServiceMock
+            .Setup(j =>
+                j.Generate(
+                    It.IsAny<JWTPayload>(),
+                    It.Is<JWTOptions>(o =>
+                        HaveSameJWTOptions(
+                            o,
+                            new JWTOptions(refreshTokenSecret, int.Parse(refreshTokenExpireMinutes))
+                        )
+                    )
+                )
+            )
+            .Returns(refreshToken);
+
+        var expectedResult = new SigninSuccess(accessToken, refreshToken);
+
+        var result = await handler.Handle(query);
+
+        Assert.Equal(expectedResult, result);
     }
 
     private static bool HaveSameJWTOptions(JWTOptions actual, JWTOptions expected)
