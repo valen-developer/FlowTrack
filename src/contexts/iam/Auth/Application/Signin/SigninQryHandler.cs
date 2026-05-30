@@ -50,11 +50,12 @@ public sealed class SigninQryHandler(
         var refreshTokenSecret =
             _envStore.Get("REFRESH_TOKEN_SECRET")
             ?? throw new EnvVariableMissed("REFRESH_TOKEN_SECRET");
-        var refreshTokenExpireIn = _envStore.Get("REFRESH_TOKEN_EXPIRE_MINUTES");
+        var refreshTokenExpireIn =
+            _envStore.Get("REFRESH_TOKEN_EXPIRE_MINUTES") ?? (60 * 24 * 30).ToString();
 
         var refreshToken = _jWTService.Generate(
             payload,
-            new JWTOptions(refreshTokenSecret ?? "", int.Parse(refreshTokenExpireIn ?? "10"))
+            new JWTOptions(refreshTokenSecret ?? "", int.Parse(refreshTokenExpireIn))
         );
 
         return new SigninSuccess(accessToken, refreshToken);
