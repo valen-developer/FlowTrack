@@ -14,14 +14,6 @@ public class SigninQryHandlerTests
     }
 
     [Fact]
-    public async Task Should_Have_Handle_Method()
-    {
-        var query = new SigninQry("testuser", "password123");
-
-        await handler.Handle(query);
-    }
-
-    [Fact]
     public async Task Should_Find_User_In_Repository()
     {
         var query = new SigninQry("testuser", "password123");
