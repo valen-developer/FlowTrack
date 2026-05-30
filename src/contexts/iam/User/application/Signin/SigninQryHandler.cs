@@ -1,14 +1,18 @@
-namespace iam.User.application.Signin;
+using Shared.Domain.Bus.Query;
+
+namespace Iam.User.application.Signin;
 
 
 
-public sealed class SigninQryHandler
+public sealed class SigninQryHandler : IQueryHandler<SigninQry, Object>
 {
 
 
 
-  public async Task Handle(SigninQry qry)
+  public async Task<Object> Handle(SigninQry qry)
   {
+
+    return new Object();
 
   }
 
