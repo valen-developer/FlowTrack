@@ -3,6 +3,7 @@ using FlowTrack.Iam.Auth.Domain;
 using FlowTrack.Iam.User.Domain;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Bus.Query;
+using FlowTrack.Shared.Domain.Exception;
 
 namespace FlowTrack.Iam.Auth.Application.Signin;
 
@@ -33,17 +34,16 @@ public sealed class SigninQryHandler(
             throw new SigninFailed();
         }
 
-        var accessTokenSecret = _envStore.Get("ACCESS_TOKEN_SECRET");
-        var accessTokenExpireIn = _envStore.Get("ACCESS_TOKEN_EXPIRE_MINUTES");
+        var accessTokenSecret =
+            _envStore.Get("ACCESS_TOKEN_SECRET")
+            ?? throw new EnvVariableMissed("ACCESS_TOKEN_SECRET");
+        var accessTokenExpireIn = _envStore.Get("ACCESS_TOKEN_EXPIRE_MINUTES") ?? "10";
 
         var payload = new JWTPayload(
             new Dictionary<string, string> { { "id", user.Id.ToString() } }.ToImmutableDictionary()
         );
 
-        var accessTokenOptions = new JWTOptions(
-            accessTokenSecret ?? "",
-            int.Parse(accessTokenExpireIn ?? "10")
-        );
+        var accessTokenOptions = new JWTOptions(accessTokenSecret, int.Parse(accessTokenExpireIn));
 
         var accessToken = _jWTService.Generate(payload, accessTokenOptions);
 

@@ -4,6 +4,7 @@ using FlowTrack.Iam.Auth.Domain;
 using FlowTrack.Iam.Test.User;
 using FlowTrack.Iam.User.Domain;
 using FlowTrack.Shared.Domain;
+using FlowTrack.Shared.Domain.Exception;
 using Moq;
 using DomainUser = FlowTrack.Iam.User.Domain.User;
 
@@ -265,6 +266,25 @@ public class SigninQryHandlerTests
 
         var exception = await Assert.ThrowsAsync<SigninFailed>(() => handler.Handle(query));
         Assert.True(IsSigninFailedException(exception));
+    }
+
+    [Fact]
+    public async Task Should_Throw_Exception_When_Access_Token_Secret_Not_Found_In_Env()
+    {
+        var query = new SigninQry("testuser", "password123");
+        var user = UserMother.Random();
+
+        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
+        bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(true);
+        envStoreMock.Setup(e => e.Get(ACCESS_JWT_SECRET_KEY)).Returns<string?>(null);
+
+        var exception = await Assert.ThrowsAsync<EnvVariableMissed>(() => handler.Handle(query));
+        Assert.IsType<InternalException>(exception, exactMatch: false);
+        Assert.Equal("exception.internal.env_variable_missed", exception.Code);
+        Assert.Equal(
+            $"Environment variable {ACCESS_JWT_SECRET_KEY} is required",
+            exception.Message
+        );
     }
 
     private static Boolean IsSigninFailedException(Exception ex) =>
