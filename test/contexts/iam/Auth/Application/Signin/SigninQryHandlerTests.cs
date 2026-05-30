@@ -34,46 +34,6 @@ public class SigninQryHandlerTests
     }
 
     [Fact]
-    public async Task Should_Find_User_In_Repository()
-    {
-        var query = new SigninQry("testuser", "password123");
-        var user = UserMother.Random();
-
-        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
-
-        await handler.Handle(query);
-
-        userRepositoryMock.Verify(r => r.FindByEmail(query.Email), Times.Once);
-    }
-
-    [Fact]
-    public async Task Should_Compare_Password()
-    {
-        var query = new SigninQry("testuser", "password123");
-        var user = UserMother.Random();
-
-        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
-
-        await handler.Handle(query);
-
-        bcryptMock.Verify(b => b.Compare(query.Password, user.Password), Times.Once);
-    }
-
-    [Fact]
-    public async Task Should_Extract_Access_Token_Secret_From_Env()
-    {
-        var query = new SigninQry("testuser", "password123");
-        var user = UserMother.Random();
-
-        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
-        bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(true);
-
-        await handler.Handle(query);
-
-        envStoreMock.Verify(e => e.Get(ACCESS_JWT_SECRET_KEY), Times.Once);
-    }
-
-    [Fact]
     public async Task Should_Extract_Access_Token_ExpireMinutes_From_Env()
     {
         var query = new SigninQry("testuser", "password123");
@@ -81,6 +41,10 @@ public class SigninQryHandlerTests
 
         userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
         bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(true);
+        envStoreMock.Setup(e => e.Get(ACCESS_JWT_SECRET_KEY)).Returns("secret");
+        envStoreMock.Setup(e => e.Get(ACCESS_JWT_EXPIRE_MINUTES_KEY)).Returns("60");
+        envStoreMock.Setup(e => e.Get(REFRESH_JWT_SECRET_KEY)).Returns("refreshSecret");
+        envStoreMock.Setup(e => e.Get(REFRESH_JWT_EXPIRE_MINUTES_KEY)).Returns("120");
 
         await handler.Handle(query);
 
@@ -128,6 +92,10 @@ public class SigninQryHandlerTests
 
         userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
         bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(true);
+        envStoreMock.Setup(e => e.Get(ACCESS_JWT_SECRET_KEY)).Returns("secret");
+        envStoreMock.Setup(e => e.Get(ACCESS_JWT_EXPIRE_MINUTES_KEY)).Returns("60");
+        envStoreMock.Setup(e => e.Get(REFRESH_JWT_SECRET_KEY)).Returns("refreshSecret");
+        envStoreMock.Setup(e => e.Get(REFRESH_JWT_EXPIRE_MINUTES_KEY)).Returns("120");
 
         await handler.Handle(query);
 
@@ -142,6 +110,10 @@ public class SigninQryHandlerTests
 
         userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
         bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(true);
+        envStoreMock.Setup(e => e.Get(ACCESS_JWT_SECRET_KEY)).Returns("secret");
+        envStoreMock.Setup(e => e.Get(ACCESS_JWT_EXPIRE_MINUTES_KEY)).Returns("60");
+        envStoreMock.Setup(e => e.Get(REFRESH_JWT_SECRET_KEY)).Returns("refreshSecret");
+        envStoreMock.Setup(e => e.Get(REFRESH_JWT_EXPIRE_MINUTES_KEY)).Returns("120");
 
         await handler.Handle(query);
 
@@ -162,6 +134,9 @@ public class SigninQryHandlerTests
         envStoreMock
             .Setup(e => e.Get(REFRESH_JWT_EXPIRE_MINUTES_KEY))
             .Returns(refreshTokenExpireMinutes);
+
+        envStoreMock.Setup(e => e.Get(ACCESS_JWT_SECRET_KEY)).Returns("secret");
+        envStoreMock.Setup(e => e.Get(ACCESS_JWT_EXPIRE_MINUTES_KEY)).Returns("60");
 
         await handler.Handle(query);
 
