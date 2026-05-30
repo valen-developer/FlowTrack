@@ -255,6 +255,20 @@ public class SigninQryHandlerTests
         Assert.Equal("exception.iam.auth.signin_failed", exception.Code);
     }
 
+    [Fact]
+    public async Task Should_Throw_Exception_When_Password_Does_Not_Match()
+    {
+        var query = new SigninQry("testuser", "wrongpassword");
+        var user = UserMother.Random();
+
+        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
+        bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(false);
+
+        var exception = await Assert.ThrowsAsync<SigninFailed>(() => handler.Handle(query));
+        Assert.Equal("Invalid Signin credentials.", exception.Message);
+        Assert.Equal("exception.iam.auth.signin_failed", exception.Code);
+    }
+
     private static bool HaveSameJWTOptions(JWTOptions actual, JWTOptions expected)
     {
         return actual.Secret == expected.Secret

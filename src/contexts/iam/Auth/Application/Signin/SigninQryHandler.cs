@@ -27,7 +27,11 @@ public sealed class SigninQryHandler(
             throw new SigninFailed();
         }
 
-        _bcrypt.Compare(qry.Password, user.Password);
+        var isValidPassword = _bcrypt.Compare(qry.Password, user.Password);
+        if (!isValidPassword)
+        {
+            throw new SigninFailed();
+        }
 
         var accessTokenSecret = _envStore.Get("ACCESS_TOKEN_SECRET");
         var accessTokenExpireIn = _envStore.Get("ACCESS_TOKEN_EXPIRE_MINUTES");
