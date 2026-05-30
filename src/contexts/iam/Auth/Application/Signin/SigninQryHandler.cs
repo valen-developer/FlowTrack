@@ -37,7 +37,7 @@ public sealed class SigninQryHandler(
         var accessTokenSecret =
             _envStore.Get("ACCESS_TOKEN_SECRET")
             ?? throw new EnvVariableMissed("ACCESS_TOKEN_SECRET");
-        var accessTokenExpireIn = _envStore.Get("ACCESS_TOKEN_EXPIRE_MINUTES") ?? "10";
+        var accessTokenExpireIn = _envStore.Get("ACCESS_TOKEN_EXPIRE_MINUTES") ?? "60";
 
         var payload = new JWTPayload(
             new Dictionary<string, string> { { "id", user.Id.ToString() } }.ToImmutableDictionary()
