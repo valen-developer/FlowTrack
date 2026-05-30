@@ -285,33 +285,20 @@ public class SigninQryHandlerTests
     [Fact]
     public async Task Should_Set_Default_Access_Token_Expiration_Time()
     {
-        var expectedAccessTokenExpireMinutes = "60";
+        var expectedAccessTokenExpireMinutes = 60;
+
+        var to = new SigninQryHandlerTestObject()
+            .DefaultMocks()
+            .WithAccessTokenExpirationMinutesEnv(null);
 
         var query = new SigninQry("testuser", "password123");
-        var user = UserMother.Random();
-
-        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
-        bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(true);
-        envStoreMock.Setup(e => e.Get(ACCESS_JWT_SECRET_KEY)).Returns("secret");
-        envStoreMock.Setup(e => e.Get(ACCESS_JWT_EXPIRE_MINUTES_KEY)).Returns<string?>(null);
-        envStoreMock.Setup(e => e.Get(REFRESH_JWT_SECRET_KEY)).Returns("refreshSecret");
-        envStoreMock.Setup(e => e.Get(REFRESH_JWT_EXPIRE_MINUTES_KEY)).Returns("120");
+        var handler = to.handler;
 
         await handler.Handle(query);
 
-        var expectedPayload = ExpectedPayload(user);
-        var expectedAccessJwtOptions = new JWTOptions(
-            "secret",
-            int.Parse(expectedAccessTokenExpireMinutes)
-        );
-
-        jwtServiceMock.Verify(
-            j =>
-                j.Generate(
-                    It.Is<JWTPayload>(p => HaveSameJwtPayload(p, expectedPayload)),
-                    It.Is<JWTOptions>(o => HaveSameJWTOptions(o, expectedAccessJwtOptions))
-                ),
-            Times.Once
+        to.AssertJWTServiceCalledWith(
+            _ => true,
+            options => options.ExpirationMinutes == expectedAccessTokenExpireMinutes
         );
     }
 
@@ -323,7 +310,7 @@ public class SigninQryHandlerTests
 
         var to = new SigninQryHandlerTestObject()
             .DefaultMocks()
-            .WithRefreshTokenExpirationMinutes(null);
+            .WithRefreshTokenExpirationMinutesEnv(null);
 
         var handler = to.handler;
 

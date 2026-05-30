@@ -42,14 +42,14 @@ internal sealed class SigninQryHandlerTestObject
         return this;
     }
 
-    public SigninQryHandlerTestObject WithAccessTokenExpirationMinutes(int? minutes)
+    public SigninQryHandlerTestObject WithAccessTokenExpirationMinutesEnv(int? minutes)
     {
         envStoreMock.Setup(e => e.Get(ACCESS_JWT_EXPIRE_MINUTES_KEY)).Returns(minutes?.ToString());
 
         return this;
     }
 
-    public SigninQryHandlerTestObject WithRefreshTokenExpirationMinutes(int? minutes)
+    public SigninQryHandlerTestObject WithRefreshTokenExpirationMinutesEnv(int? minutes)
     {
         envStoreMock.Setup(e => e.Get(REFRESH_JWT_EXPIRE_MINUTES_KEY)).Returns(minutes?.ToString());
 
