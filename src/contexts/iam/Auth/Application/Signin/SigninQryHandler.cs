@@ -37,6 +37,9 @@ public sealed class SigninQryHandler(
 
         _jWTService.Generate(payload, accessTokenOptions);
 
+        _envStore.Get("REFRESH_TOKEN_SECRET");
+        _envStore.Get("REFRESH_TOKEN_EXPIRE_MINUTES");
+
         return new Object();
     }
 }
