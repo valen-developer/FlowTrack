@@ -251,8 +251,7 @@ public class SigninQryHandlerTests
             .Returns(Task.FromResult<DomainUser?>(null));
 
         var exception = await Assert.ThrowsAsync<SigninFailed>(() => handler.Handle(query));
-        Assert.Equal("Invalid Signin credentials.", exception.Message);
-        Assert.Equal("exception.iam.auth.signin_failed", exception.Code);
+        Assert.True(IsSigninFailedException(exception));
     }
 
     [Fact]
@@ -265,9 +264,13 @@ public class SigninQryHandlerTests
         bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(false);
 
         var exception = await Assert.ThrowsAsync<SigninFailed>(() => handler.Handle(query));
-        Assert.Equal("Invalid Signin credentials.", exception.Message);
-        Assert.Equal("exception.iam.auth.signin_failed", exception.Code);
+        Assert.True(IsSigninFailedException(exception));
     }
+
+    private static Boolean IsSigninFailedException(Exception ex) =>
+        ex is SigninFailed signinFailed
+        && signinFailed.Code == "exception.iam.auth.signin_failed"
+        && signinFailed.Message == "Invalid Signin credentials.";
 
     private static bool HaveSameJWTOptions(JWTOptions actual, JWTOptions expected)
     {
