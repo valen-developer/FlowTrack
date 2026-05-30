@@ -47,7 +47,9 @@ public sealed class SigninQryHandler(
 
         var accessToken = _jWTService.Generate(payload, accessTokenOptions);
 
-        var refreshTokenSecret = _envStore.Get("REFRESH_TOKEN_SECRET");
+        var refreshTokenSecret =
+            _envStore.Get("REFRESH_TOKEN_SECRET")
+            ?? throw new EnvVariableMissed("REFRESH_TOKEN_SECRET");
         var refreshTokenExpireIn = _envStore.Get("REFRESH_TOKEN_EXPIRE_MINUTES");
 
         var refreshToken = _jWTService.Generate(

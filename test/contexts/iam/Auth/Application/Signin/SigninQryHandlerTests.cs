@@ -262,7 +262,27 @@ public class SigninQryHandlerTests
         );
     }
 
-    private static Boolean IsSigninFailedException(Exception ex) =>
+    [Fact]
+    public async Task Should_Throw_Exception_When_Refresh_Token_Secret_Not_Found_In_Env()
+    {
+        var query = new SigninQry("testuser", "password123");
+        var user = UserMother.Random();
+
+        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
+        bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(true);
+        envStoreMock.Setup(e => e.Get(ACCESS_JWT_SECRET_KEY)).Returns("secret");
+        envStoreMock.Setup(e => e.Get(ACCESS_JWT_EXPIRE_MINUTES_KEY)).Returns("60");
+
+        var exception = await Assert.ThrowsAsync<EnvVariableMissed>(() => handler.Handle(query));
+        Assert.IsType<InternalException>(exception, exactMatch: false);
+        Assert.Equal("exception.internal.env_variable_missed", exception.Code);
+        Assert.Equal(
+            $"Environment variable {REFRESH_JWT_SECRET_KEY} is required",
+            exception.Message
+        );
+    }
+
+    private static bool IsSigninFailedException(Exception ex) =>
         ex is SigninFailed signinFailed
         && signinFailed.Code == "exception.iam.auth.signin_failed"
         && signinFailed.Message == "Invalid Signin credentials.";
