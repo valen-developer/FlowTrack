@@ -146,6 +146,39 @@ public class SigninQryHandlerTests
         envStoreMock.Verify(e => e.Get(REFRESH_JWT_EXPIRE_MINUTES_KEY), Times.Once);
     }
 
+    [Fact]
+    public async Task Should_Generate_Refresh_Token()
+    {
+        var refreshTokenSecret = "refreshSecret";
+        var refreshTokenExpireMinutes = "120";
+        var query = new SigninQry("testuser", "password123");
+        var user = UserMother.Random();
+
+        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
+        bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(true);
+        envStoreMock.Setup(e => e.Get(REFRESH_JWT_SECRET_KEY)).Returns(refreshTokenSecret);
+        envStoreMock
+            .Setup(e => e.Get(REFRESH_JWT_EXPIRE_MINUTES_KEY))
+            .Returns(refreshTokenExpireMinutes);
+
+        await handler.Handle(query);
+
+        var expectedPayload = ExpectedPayload(user);
+        var expectedRefreshJwtOptions = new JWTOptions(
+            refreshTokenSecret,
+            int.Parse(refreshTokenExpireMinutes)
+        );
+
+        jwtServiceMock.Verify(
+            j =>
+                j.Generate(
+                    It.Is<JWTPayload>(p => HaveSameJwtPayload(p, expectedPayload)),
+                    It.Is<JWTOptions>(o => HaveSameJWTOptions(o, expectedRefreshJwtOptions))
+                ),
+            Times.Once
+        );
+    }
+
     private static bool HaveSameJWTOptions(JWTOptions actual, JWTOptions expected)
     {
         return actual.Secret == expected.Secret
