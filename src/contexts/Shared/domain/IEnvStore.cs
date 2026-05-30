@@ -1,0 +1,6 @@
+namespace Shared.Domain;
+
+public interface IEnvStore
+{
+    string? Get(string key, string? fallback);
+}
