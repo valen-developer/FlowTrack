@@ -26,7 +26,7 @@ public class SigninQryHandlerTests
     {
         var query = new SigninQry("testuser", "password123");
         await handler.Handle(query);
-        // Verify with Moq
+
         userRepositoryMock.Verify(r => r.FindByEmail(query.Email), Times.Once);
     }
 }
