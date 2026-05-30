@@ -19,7 +19,7 @@ public class SigninQryHandlerTests
     public async Task Should_Find_User_In_Repository()
     {
         var query = new SigninQry("testuser", "password123");
-        var user = new Iam.User.Domain.User(
+        var user = new Domain.User(
             id: Guid.NewGuid(),
             email: query.Email,
             password: "hashedpassword"
@@ -36,7 +36,7 @@ public class SigninQryHandlerTests
     public async Task Should_Compare_Password()
     {
         var query = new SigninQry("testuser", "password123");
-        var user = new Iam.User.Domain.User(
+        var user = new Domain.User(
             id: Guid.NewGuid(),
             email: query.Email,
             password: "hashedpassword"
