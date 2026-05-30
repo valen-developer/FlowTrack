@@ -49,8 +49,25 @@ internal sealed class SigninQryHandlerTestObject
         return this;
     }
 
-    public void AssertJWTServiceCalledWith(Expression<Func<IJWTService, string>> verifyExpression)
+    public SigninQryHandlerTestObject WithRefreshTokenExpirationMinutes(int? minutes)
     {
-        jwtServiceMock.Verify(verifyExpression, Times.Once);
+        envStoreMock.Setup(e => e.Get(REFRESH_JWT_EXPIRE_MINUTES_KEY)).Returns(minutes?.ToString());
+
+        return this;
+    }
+
+    public void AssertJWTServiceCalledWith(
+        Func<JWTPayload, bool> payloadPredicate,
+        Func<JWTOptions, bool> optionsPredicate
+    )
+    {
+        jwtServiceMock.Verify(
+            s =>
+                s.Generate(
+                    It.Is<JWTPayload>(p => payloadPredicate(p)),
+                    It.Is<JWTOptions>(o => optionsPredicate(o))
+                ),
+            Times.Once
+        );
     }
 }

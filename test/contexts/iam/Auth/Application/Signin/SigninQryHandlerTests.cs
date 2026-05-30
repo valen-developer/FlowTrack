@@ -323,17 +323,15 @@ public class SigninQryHandlerTests
 
         var to = new SigninQryHandlerTestObject()
             .DefaultMocks()
-            .WithAccessTokenExpirationMinutes(null);
+            .WithRefreshTokenExpirationMinutes(null);
 
         var handler = to.handler;
 
         await handler.Handle(query);
 
-        to.AssertJWTServiceCalledWith(j =>
-            j.Generate(
-                It.IsAny<JWTPayload>(),
-                It.Is<JWTOptions>(o => o.ExpirationMinutes == expectedRefreshTokenExpireMinutes)
-            )
+        to.AssertJWTServiceCalledWith(
+            _ => true,
+            options => options.ExpirationMinutes == expectedRefreshTokenExpireMinutes
         );
     }
 
