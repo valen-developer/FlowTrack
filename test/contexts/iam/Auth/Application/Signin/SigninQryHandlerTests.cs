@@ -241,6 +241,20 @@ public class SigninQryHandlerTests
         Assert.Equal(expectedResult, result);
     }
 
+    [Fact]
+    public async Task Should_Throw_Exception_When_User_Not_Found()
+    {
+        var query = new SigninQry("nonexistentuser", "password123");
+
+        userRepositoryMock
+            .Setup(r => r.FindByEmail(query.Email))
+            .Returns(Task.FromResult<DomainUser?>(null));
+
+        var exception = await Assert.ThrowsAsync<SigninFailed>(() => handler.Handle(query));
+        Assert.Equal("Invalid Signin credentials.", exception.Message);
+        Assert.Equal("exception.iam.auth.signin_failed", exception.Code);
+    }
+
     private static bool HaveSameJWTOptions(JWTOptions actual, JWTOptions expected)
     {
         return actual.Secret == expected.Secret
