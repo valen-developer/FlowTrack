@@ -2,5 +2,5 @@ namespace FlowTrack.Shared.Domain;
 
 public interface IEnvStore
 {
-    string? Get(string key, string? fallback);
+    string? Get(string key, string? fallback = null);
 }

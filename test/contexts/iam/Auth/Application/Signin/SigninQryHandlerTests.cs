@@ -8,13 +8,20 @@ namespace FlowTrack.Iam.Test.Auth.Application.Signin;
 
 public class SigninQryHandlerTests
 {
+    private readonly string ACCESS_JWT_SECRET_KEY = "ACCESS_TOKEN_SECRET";
+
     private readonly SigninQryHandler handler;
     private readonly Mock<IUserRepository> userRepositoryMock = new();
     private readonly Mock<IBcrypt> bcryptMock = new();
+    private readonly Mock<IEnvStore> envStoreMock = new();
 
     public SigninQryHandlerTests()
     {
-        handler = new SigninQryHandler(userRepositoryMock.Object, bcryptMock.Object);
+        handler = new SigninQryHandler(
+            userRepositoryMock.Object,
+            bcryptMock.Object,
+            envStoreMock.Object
+        );
     }
 
     [Fact]
@@ -41,5 +48,19 @@ public class SigninQryHandlerTests
         await handler.Handle(query);
 
         bcryptMock.Verify(b => b.Compare(query.Password, user.Password), Times.Once);
+    }
+
+    [Fact]
+    public async Task Should_Extract_Access_Token_Secret_From_Env()
+    {
+        var query = new SigninQry("testuser", "password123");
+        var user = UserMother.Random();
+
+        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
+        bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(true);
+
+        await handler.Handle(query);
+
+        envStoreMock.Verify(e => e.Get(ACCESS_JWT_SECRET_KEY), Times.Once);
     }
 }
