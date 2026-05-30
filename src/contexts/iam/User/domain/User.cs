@@ -1,8 +1,8 @@
-namespace Iam.User.Domain;
+namespace FlowTrack.Iam.User.Domain;
 
-public class User(Guid id, String email, String password)
+public class User(Guid id, string email, string password)
 {
     public Guid Id { get; } = id;
-    public String Email { get; } = email;
-    public String Password { get; } = password;
+    public string Email { get; } = email;
+    public string Password { get; } = password;
 }

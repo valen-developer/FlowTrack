@@ -1,4 +1,4 @@
-namespace Iam.User.Domain;
+namespace FlowTrack.Iam.User.Domain;
 
 public interface IUserRepository
 {

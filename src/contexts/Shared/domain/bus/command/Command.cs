@@ -1,5 +1,3 @@
-
-namespace Shared.Domain.Bus.Command;
-
+namespace FlowTrack.Shared.domain.bus.command;
 
 public interface ICommand { }

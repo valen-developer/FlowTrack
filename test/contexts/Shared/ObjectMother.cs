@@ -1,4 +1,4 @@
-namespace Shared;
+namespace FlowTrack.Shared.Test;
 
 public abstract class ObjectMother
 {

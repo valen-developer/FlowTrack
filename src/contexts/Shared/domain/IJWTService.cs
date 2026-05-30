@@ -1,4 +1,4 @@
-namespace Shared.Domain;
+namespace FlowTrack.Shared.Domain;
 
 public record JWTPayload
 {

@@ -1,8 +1,10 @@
-using Iam.User.Domain;
+using FlowTrack.Iam.Auth.Application.Signin;
+using FlowTrack.Iam.Test.User;
+using FlowTrack.Iam.User.Domain;
+using FlowTrack.Shared.Domain;
 using Moq;
-using Shared.domain;
 
-namespace Iam.User.application.Signin;
+namespace FlowTrack.Iam.Test.Auth.Application.Signin;
 
 public class SigninQryHandlerTests
 {
@@ -19,11 +21,7 @@ public class SigninQryHandlerTests
     public async Task Should_Find_User_In_Repository()
     {
         var query = new SigninQry("testuser", "password123");
-        var user = new Domain.User(
-            id: Guid.NewGuid(),
-            email: query.Email,
-            password: "hashedpassword"
-        );
+        var user = UserMother.Random();
 
         userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
 
@@ -36,11 +34,7 @@ public class SigninQryHandlerTests
     public async Task Should_Compare_Password()
     {
         var query = new SigninQry("testuser", "password123");
-        var user = new Domain.User(
-            id: Guid.NewGuid(),
-            email: query.Email,
-            password: "hashedpassword"
-        );
+        var user = UserMother.Random();
 
         userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
 

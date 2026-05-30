@@ -1,8 +1,8 @@
-using Iam.User.Domain;
-using Shared.domain;
-using Shared.Domain.Bus.Query;
+using FlowTrack.Iam.User.Domain;
+using FlowTrack.Shared.Domain;
+using FlowTrack.Shared.Domain.Bus.Query;
 
-namespace Iam.User.application.Signin;
+namespace FlowTrack.Iam.Auth.Application.Signin;
 
 public sealed class SigninQryHandler(IUserRepository repository, IBcrypt bcrypt)
     : IQueryHandler<SigninQry, Object>

@@ -1,4 +1,4 @@
-namespace Shared.domain;
+namespace FlowTrack.Shared.Domain;
 
 public interface IBcrypt
 {
