@@ -10,6 +10,7 @@ namespace FlowTrack.Iam.Test.Auth.Application.Signin;
 
 internal sealed class SigninQryHandlerTestObject
 {
+    private const string REFRESH_JWT_SECRET_KEY = "REFRESH_TOKEN_SECRET";
     private const string REFRESH_JWT_EXPIRE_MINUTES_KEY = "REFRESH_TOKEN_EXPIRE_MINUTES";
     private const string ACCESS_JWT_EXPIRE_MINUTES_KEY = "ACCESS_TOKEN_EXPIRE_MINUTES";
 
@@ -38,6 +39,13 @@ internal sealed class SigninQryHandlerTestObject
 
         envStoreMock.Setup(e => e.Get(ACCESS_JWT_EXPIRE_MINUTES_KEY)).Returns("10"); // 1 hour
         envStoreMock.Setup(e => e.Get(REFRESH_JWT_EXPIRE_MINUTES_KEY)).Returns("10"); // 30 days
+
+        return this;
+    }
+
+    internal SigninQryHandlerTestObject WithRefreshTokenSecretEnv(string? secret)
+    {
+        envStoreMock.Setup(e => e.Get(REFRESH_JWT_SECRET_KEY)).Returns(secret);
 
         return this;
     }

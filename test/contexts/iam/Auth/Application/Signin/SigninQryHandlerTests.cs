@@ -266,12 +266,11 @@ public class SigninQryHandlerTests
     public async Task Should_Throw_Exception_When_Refresh_Token_Secret_Not_Found_In_Env()
     {
         var query = new SigninQry("testuser", "password123");
-        var user = UserMother.Random();
 
-        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
-        bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(true);
-        envStoreMock.Setup(e => e.Get(ACCESS_JWT_SECRET_KEY)).Returns("secret");
-        envStoreMock.Setup(e => e.Get(ACCESS_JWT_EXPIRE_MINUTES_KEY)).Returns("60");
+        var to = new SigninQryHandlerTestObject().DefaultMocks().WithRefreshTokenSecretEnv(null);
+
+        var user = UserMother.Random();
+        var handler = to.handler;
 
         var exception = await Assert.ThrowsAsync<EnvVariableMissed>(() => handler.Handle(query));
         Assert.IsType<InternalException>(exception, exactMatch: false);
