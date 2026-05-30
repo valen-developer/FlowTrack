@@ -9,5 +9,6 @@
   <Folder Name="/test/" />
   <Folder Name="/test/contexts/">
     <Project Path="test/contexts/Iam/FlowTrack.Iam.Test.csproj" />
+    <Project Path="test/contexts/Shared/FlowTrack.Shared.Test.csproj" />
   </Folder>
 </Solution>
