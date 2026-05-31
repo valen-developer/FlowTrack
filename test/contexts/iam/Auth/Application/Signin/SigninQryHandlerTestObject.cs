@@ -1,16 +1,14 @@
-using System.Linq.Expressions;
 using FlowTrack.Iam.Auth.Application;
 using FlowTrack.Iam.Auth.Application.Signin;
 using FlowTrack.Iam.Auth.Domain;
 using FlowTrack.Iam.Test.User;
 using FlowTrack.Iam.User.Domain;
 using FlowTrack.Shared.Domain;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using DomainUser = FlowTrack.Iam.User.Domain.User;
 
 namespace FlowTrack.Iam.Test.Auth.Application.Signin;
-
-internal record SigninQryHandlerTestObjectDefaults { }
 
 internal sealed class SigninQryHandlerTestObject
 {
@@ -27,11 +25,16 @@ internal sealed class SigninQryHandlerTestObject
 
     public SigninQryHandlerTestObject()
     {
-        handler = new SigninQryHandler(
-            userRepositoryMock.Object,
-            new AuthTokenGenerator(envStoreMock.Object, jwtServiceMock.Object),
-            bcryptMock.Object
-        );
+        var services = new ServiceCollection();
+        services.AddSingleton(userRepositoryMock.Object);
+        services.AddSingleton(bcryptMock.Object);
+        services.AddSingleton(envStoreMock.Object);
+        services.AddSingleton(jwtServiceMock.Object);
+        services.AddTransient<AuthTokenGenerator>();
+        services.AddTransient<SigninQryHandler>();
+
+        var serviceProvider = services.BuildServiceProvider();
+        handler = serviceProvider.GetRequiredService<SigninQryHandler>();
     }
 
     public SigninQryHandlerTestObject DefaultMocks()
