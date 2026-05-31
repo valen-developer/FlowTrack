@@ -26,8 +26,8 @@ internal sealed class SigninQryHandlerTestObject
         services.AddSingleton(bcryptMock.Object);
         services.AddSingleton(envStoreMock.Object);
         services.AddSingleton(jwtServiceMock.Object);
-        services.AddTransient<AuthTokenGenerator>();
-        services.AddTransient<SigninQryHandler>();
+        services.AddScoped<AuthTokenGenerator>();
+        services.AddScoped<SigninQryHandler>();
 
         var serviceProvider = services.BuildServiceProvider();
         handler = serviceProvider.GetRequiredService<SigninQryHandler>();
