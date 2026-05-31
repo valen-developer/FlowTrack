@@ -2,7 +2,6 @@ using System.Collections.Immutable;
 using FlowTrack.Iam.Auth.Application.Signin;
 using FlowTrack.Iam.Auth.Domain;
 using FlowTrack.Iam.Test.User;
-using FlowTrack.Iam.User.Domain;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Exception;
 using Moq;
