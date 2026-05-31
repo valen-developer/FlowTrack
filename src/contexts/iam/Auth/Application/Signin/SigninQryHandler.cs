@@ -29,9 +29,11 @@ public sealed class SigninQryHandler(
             throw new SigninFailed();
 
         var accessTokenSecret =
-            _envStore.Get("ACCESS_TOKEN_SECRET")
-            ?? throw new EnvVariableMissed("ACCESS_TOKEN_SECRET");
-        var accessTokenExpireIn = _envStore.Get("ACCESS_TOKEN_EXPIRE_MINUTES") ?? "60";
+            _envStore.Get(IamEnvironmentKeysEnum.ACCESS_TOKEN_SECRET.ToString())
+            ?? throw new EnvVariableMissed(IamEnvironmentKeysEnum.ACCESS_TOKEN_SECRET.ToString());
+        var accessTokenExpireIn =
+            _envStore.Get(IamEnvironmentKeysEnum.ACCESS_TOKEN_EXPIRE_MINUTES.ToString())
+            ?? 60.ToString();
 
         var payload = new JWTPayload(
             new Dictionary<string, string> { { "id", user.Id.ToString() } }.ToImmutableDictionary()
@@ -42,10 +44,11 @@ public sealed class SigninQryHandler(
         var accessToken = _jWTService.Generate(payload, accessTokenOptions);
 
         var refreshTokenSecret =
-            _envStore.Get("REFRESH_TOKEN_SECRET")
-            ?? throw new EnvVariableMissed("REFRESH_TOKEN_SECRET");
+            _envStore.Get(IamEnvironmentKeysEnum.REFRESH_TOKEN_SECRET.ToString())
+            ?? throw new EnvVariableMissed(IamEnvironmentKeysEnum.REFRESH_TOKEN_SECRET.ToString());
         var refreshTokenExpireIn =
-            _envStore.Get("REFRESH_TOKEN_EXPIRE_MINUTES") ?? (60 * 24 * 30).ToString();
+            _envStore.Get(IamEnvironmentKeysEnum.REFRESH_TOKEN_EXPIRE_MINUTES.ToString())
+            ?? (60 * 24 * 30).ToString();
 
         var refreshToken = _jWTService.Generate(
             payload,

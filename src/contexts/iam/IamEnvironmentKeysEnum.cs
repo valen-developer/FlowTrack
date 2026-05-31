@@ -1,0 +1,9 @@
+namespace FlowTrack.Iam;
+
+public enum IamEnvironmentKeysEnum
+{
+    ACCESS_TOKEN_SECRET,
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    REFRESH_TOKEN_SECRET,
+    REFRESH_TOKEN_EXPIRE_MINUTES,
+}
