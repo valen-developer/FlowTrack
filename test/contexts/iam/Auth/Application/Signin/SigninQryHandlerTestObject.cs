@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using FlowTrack.Iam.Auth.Application;
 using FlowTrack.Iam.Auth.Application.Signin;
 using FlowTrack.Iam.Auth.Domain;
 using FlowTrack.Iam.Test.User;
@@ -28,9 +29,8 @@ internal sealed class SigninQryHandlerTestObject
     {
         handler = new SigninQryHandler(
             userRepositoryMock.Object,
-            bcryptMock.Object,
-            envStoreMock.Object,
-            jwtServiceMock.Object
+            new AuthTokenGenerator(envStoreMock.Object, jwtServiceMock.Object),
+            bcryptMock.Object
         );
     }
 
