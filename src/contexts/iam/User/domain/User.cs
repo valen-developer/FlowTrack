@@ -1,4 +1,4 @@
-namespace FlowTrack.Iam.User.Domain;
+namespace FlowTrack.Iam.Domain;
 
 public class User(Guid id, string email, string password)
 {

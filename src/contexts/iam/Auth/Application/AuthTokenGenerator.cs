@@ -1,17 +1,16 @@
 using System.Collections.Immutable;
-using FlowTrack.Iam.Auth.Domain;
+using FlowTrack.Iam.Domain;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Exception;
-using DomainUser = FlowTrack.Iam.User.Domain.User;
 
-namespace FlowTrack.Iam.Auth.Application;
+namespace FlowTrack.Iam.Application;
 
 public sealed class AuthTokenGenerator(IEnvStore envStore, IJWTService jwtService)
 {
     private const int DefaultAccessTokenExpireInMinutes = 60;
     private const int DefaultRefreshTokenExpireInMinutes = 60 * 24 * 30;
 
-    public SigninSuccess Generate(DomainUser user)
+    public SigninSuccess Generate(User user)
     {
         var payload = GeneratePayload(user);
         var accessTokenOptions = GenerateAccessTokenOptions();
@@ -23,7 +22,7 @@ public sealed class AuthTokenGenerator(IEnvStore envStore, IJWTService jwtServic
         return new SigninSuccess(accessToken, refreshToken);
     }
 
-    private JWTPayload GeneratePayload(DomainUser user)
+    private JWTPayload GeneratePayload(User user)
     {
         return new JWTPayload(
             new Dictionary<string, string> { { "id", user.Id.ToString() } }.ToImmutableDictionary()

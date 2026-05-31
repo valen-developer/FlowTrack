@@ -1,14 +1,10 @@
-using FlowTrack.Iam.Auth.Application;
-using FlowTrack.Iam.Auth.Application.Signin;
-using FlowTrack.Iam.Auth.Domain;
-using FlowTrack.Iam.Test.User;
-using FlowTrack.Iam.User.Domain;
+using FlowTrack.Iam.Application;
+using FlowTrack.Iam.Domain;
 using FlowTrack.Shared.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using DomainUser = FlowTrack.Iam.User.Domain.User;
 
-namespace FlowTrack.Iam.Test.Auth.Application.Signin;
+namespace FlowTrack.Iam.Test.Application.Signin;
 
 internal sealed class SigninQryHandlerTestObject
 {
@@ -55,7 +51,7 @@ internal sealed class SigninQryHandlerTestObject
         return this;
     }
 
-    internal SigninQryHandlerTestObject WithUserByEmail(string email, DomainUser? value)
+    internal SigninQryHandlerTestObject WithUserByEmail(string email, User? value)
     {
         userRepositoryMock.Setup(r => r.FindByEmail(email)).Returns(Task.FromResult(value));
 

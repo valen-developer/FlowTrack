@@ -1,9 +1,8 @@
-using FlowTrack.Iam.Auth.Domain;
-using FlowTrack.Iam.User.Domain;
+using FlowTrack.Iam.Domain;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Bus.Query;
 
-namespace FlowTrack.Iam.Auth.Application.Signin;
+namespace FlowTrack.Iam.Application;
 
 public sealed class SigninQryHandler(
     IUserRepository repository,

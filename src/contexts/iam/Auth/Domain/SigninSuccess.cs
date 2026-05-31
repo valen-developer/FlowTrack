@@ -1,3 +1,3 @@
-namespace FlowTrack.Iam.Auth.Domain;
+namespace FlowTrack.Iam.Domain;
 
 public record SigninSuccess(string AccessToken, string RefreshToken);

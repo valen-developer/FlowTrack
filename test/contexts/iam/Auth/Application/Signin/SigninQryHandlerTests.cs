@@ -1,13 +1,10 @@
 using System.Collections.Immutable;
-using FlowTrack.Iam.Auth.Application.Signin;
-using FlowTrack.Iam.Auth.Domain;
-using FlowTrack.Iam.Test.User;
+using FlowTrack.Iam.Application;
+using FlowTrack.Iam.Domain;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Exception;
-using Moq;
-using DomainUser = FlowTrack.Iam.User.Domain.User;
 
-namespace FlowTrack.Iam.Test.Auth.Application.Signin;
+namespace FlowTrack.Iam.Test.Application.Signin;
 
 public class SigninQryHandlerTests
 {
@@ -209,7 +206,7 @@ public class SigninQryHandlerTests
             expected.Claims.TryGetValue(kvp.Key, out var value) && value == kvp.Value
         );
 
-    private JWTPayload ExpectedPayload(DomainUser user) =>
+    private JWTPayload ExpectedPayload(User user) =>
         new(
             new Dictionary<string, string> { { "id", user.Id.ToString() } }.ToImmutableDictionary()
         );
