@@ -22,17 +22,11 @@ public sealed class SigninQryHandler(
 
     public async Task<SigninSuccess> Handle(SigninQry qry)
     {
-        var user = await _repository.FindByEmail(qry.Email);
-        if (user is null)
-        {
-            throw new SigninFailed();
-        }
+        var user = await _repository.FindByEmail(qry.Email) ?? throw new SigninFailed();
 
         var isValidPassword = _bcrypt.Compare(qry.Password, user.Password);
         if (!isValidPassword)
-        {
             throw new SigninFailed();
-        }
 
         var accessTokenSecret =
             _envStore.Get("ACCESS_TOKEN_SECRET")
