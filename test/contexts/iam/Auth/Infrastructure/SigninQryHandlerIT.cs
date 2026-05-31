@@ -126,6 +126,6 @@ public class SigninQryHandlerIT : IntegrationTestCase, IAsyncLifetime
 
         var result = await handler.Handle(qry);
 
-        Assert.Equal(expectedResult.AccessToken, result.AccessToken);
+        Assert.Equivalent(expectedResult, result);
     }
 }
