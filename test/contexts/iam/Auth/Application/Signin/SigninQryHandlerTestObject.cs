@@ -8,8 +8,18 @@ using DomainUser = FlowTrack.Iam.User.Domain.User;
 
 namespace FlowTrack.Iam.Test.Auth.Application.Signin;
 
+internal record SigninQryHandlerTestObjectDefaults
+{
+    public const string AccessTokenSecret = "test_access_secret";
+    public const string RefreshTokenSecret = "test_refresh_secret";
+    public const string AccessTokenExpireMinutes = "10";
+    public const string RefreshTokenExpireMinutes = "10";
+    public DomainUser User = UserMother.Random();
+}
+
 internal sealed class SigninQryHandlerTestObject
 {
+    private const string ACCESS_JWT_SECRET_KEY = "ACCESS_TOKEN_SECRET";
     private const string REFRESH_JWT_SECRET_KEY = "REFRESH_TOKEN_SECRET";
     private const string REFRESH_JWT_EXPIRE_MINUTES_KEY = "REFRESH_TOKEN_EXPIRE_MINUTES";
     private const string ACCESS_JWT_EXPIRE_MINUTES_KEY = "ACCESS_TOKEN_EXPIRE_MINUTES";
@@ -39,6 +49,27 @@ internal sealed class SigninQryHandlerTestObject
 
         envStoreMock.Setup(e => e.Get(ACCESS_JWT_EXPIRE_MINUTES_KEY)).Returns("10"); // 1 hour
         envStoreMock.Setup(e => e.Get(REFRESH_JWT_EXPIRE_MINUTES_KEY)).Returns("10"); // 30 days
+
+        return this;
+    }
+
+    internal SigninQryHandlerTestObject WithUserByEmail(string email, DomainUser? value)
+    {
+        userRepositoryMock.Setup(r => r.FindByEmail(email)).Returns(Task.FromResult(value));
+
+        return this;
+    }
+
+    internal SigninQryHandlerTestObject WithInvalidPassword(string password)
+    {
+        bcryptMock.Setup(b => b.Compare(password, It.IsAny<string>())).Returns(false);
+
+        return this;
+    }
+
+    internal SigninQryHandlerTestObject WithAccessTokenEnv(string? secret)
+    {
+        envStoreMock.Setup(e => e.Get(ACCESS_JWT_SECRET_KEY)).Returns(secret);
 
         return this;
     }

@@ -125,19 +125,17 @@ public class SigninQryHandlerTests
     {
         var refreshTokenSecret = "refreshSecret";
         var refreshTokenExpireMinutes = "120";
-        var query = new SigninQry("testuser", "password123");
         var user = UserMother.Random();
 
-        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
-        bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(true);
-        envStoreMock.Setup(e => e.Get(REFRESH_JWT_SECRET_KEY)).Returns(refreshTokenSecret);
-        envStoreMock
-            .Setup(e => e.Get(REFRESH_JWT_EXPIRE_MINUTES_KEY))
-            .Returns(refreshTokenExpireMinutes);
+        var query = new SigninQry("testuser", "password123");
 
-        envStoreMock.Setup(e => e.Get(ACCESS_JWT_SECRET_KEY)).Returns("secret");
-        envStoreMock.Setup(e => e.Get(ACCESS_JWT_EXPIRE_MINUTES_KEY)).Returns("60");
+        var to = new SigninQryHandlerTestObject()
+            .DefaultMocks()
+            .WithUserByEmail(query.Email, user)
+            .WithRefreshTokenSecretEnv(refreshTokenSecret)
+            .WithRefreshTokenExpirationMinutesEnv(int.Parse(refreshTokenExpireMinutes));
 
+        var handler = to.handler;
         await handler.Handle(query);
 
         var expectedPayload = ExpectedPayload(user);
@@ -146,13 +144,9 @@ public class SigninQryHandlerTests
             int.Parse(refreshTokenExpireMinutes)
         );
 
-        jwtServiceMock.Verify(
-            j =>
-                j.Generate(
-                    It.Is<JWTPayload>(p => HaveSameJwtPayload(p, expectedPayload)),
-                    It.Is<JWTOptions>(o => HaveSameJWTOptions(o, expectedRefreshJwtOptions))
-                ),
-            Times.Once
+        to.AssertJWTServiceCalledWith(
+            p => HaveSameJwtPayload(p, expectedPayload),
+            o => HaveSameJWTOptions(o, expectedRefreshJwtOptions)
         );
     }
 
@@ -171,16 +165,15 @@ public class SigninQryHandlerTests
         var query = new SigninQry("testuser", "password123");
         var user = UserMother.Random();
 
-        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
-        bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(true);
-        envStoreMock.Setup(e => e.Get(ACCESS_JWT_SECRET_KEY)).Returns(accessTokenSecret);
-        envStoreMock
-            .Setup(e => e.Get(ACCESS_JWT_EXPIRE_MINUTES_KEY))
-            .Returns(accessTokenExpireMinutes);
-        envStoreMock.Setup(e => e.Get(REFRESH_JWT_SECRET_KEY)).Returns(refreshTokenSecret);
-        envStoreMock
-            .Setup(e => e.Get(REFRESH_JWT_EXPIRE_MINUTES_KEY))
-            .Returns(refreshTokenExpireMinutes);
+        var to = new SigninQryHandlerTestObject()
+            .DefaultMocks()
+            .WithUserByEmail(query.Email, user)
+            .WithAccessTokenEnv(accessTokenSecret)
+            .WithAccessTokenExpirationMinutesEnv(int.Parse(accessTokenExpireMinutes))
+            .WithRefreshTokenSecretEnv(refreshTokenSecret)
+            .WithRefreshTokenExpirationMinutesEnv(int.Parse(refreshTokenExpireMinutes));
+
+        var handler = to.handler;
 
         jwtServiceMock
             .Setup(j =>
@@ -222,9 +215,8 @@ public class SigninQryHandlerTests
     {
         var query = new SigninQry("nonexistentuser", "password123");
 
-        userRepositoryMock
-            .Setup(r => r.FindByEmail(query.Email))
-            .Returns(Task.FromResult<DomainUser?>(null));
+        var to = new SigninQryHandlerTestObject().DefaultMocks().WithUserByEmail(query.Email, null);
+        var handler = to.handler;
 
         var exception = await Assert.ThrowsAsync<SigninFailed>(() => handler.Handle(query));
         Assert.True(IsSigninFailedException(exception));
@@ -234,10 +226,12 @@ public class SigninQryHandlerTests
     public async Task Should_Throw_Exception_When_Password_Does_Not_Match()
     {
         var query = new SigninQry("testuser", "wrongpassword");
-        var user = UserMother.Random();
 
-        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
-        bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(false);
+        var to = new SigninQryHandlerTestObject()
+            .DefaultMocks()
+            .WithInvalidPassword(query.Password);
+
+        var handler = to.handler;
 
         var exception = await Assert.ThrowsAsync<SigninFailed>(() => handler.Handle(query));
         Assert.True(IsSigninFailedException(exception));
@@ -247,11 +241,9 @@ public class SigninQryHandlerTests
     public async Task Should_Throw_Exception_When_Access_Token_Secret_Not_Found_In_Env()
     {
         var query = new SigninQry("testuser", "password123");
-        var user = UserMother.Random();
 
-        userRepositoryMock.Setup(r => r.FindByEmail(query.Email)).Returns(Task.FromResult(user));
-        bcryptMock.Setup(b => b.Compare(query.Password, user.Password)).Returns(true);
-        envStoreMock.Setup(e => e.Get(ACCESS_JWT_SECRET_KEY)).Returns<string?>(null);
+        var to = new SigninQryHandlerTestObject().DefaultMocks().WithAccessTokenEnv(null);
+        var handler = to.handler;
 
         var exception = await Assert.ThrowsAsync<EnvVariableMissed>(() => handler.Handle(query));
         Assert.IsType<InternalException>(exception, exactMatch: false);
