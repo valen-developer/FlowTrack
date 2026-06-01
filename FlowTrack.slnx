@@ -11,7 +11,7 @@
   </Folder>
   <Folder Name="/test/" />
   <Folder Name="/test/apps/">
-    <Project Path="test/apps/FlowtrackApi/FlowtrackApi.csproj" />
+    <Project Path="test/apps/FlowtrackApi/FlowtrackApiTest.csproj" />
   </Folder>
   <Folder Name="/test/contexts/">
     <Project Path="test/contexts/Iam/FlowTrack.Iam.Test.csproj" />

@@ -45,6 +45,24 @@ app.MapGet(
     )
     .WithName("GetWeatherForecast");
 
+app.MapPost(
+    "/auth/signin",
+    (handler) =>
+    {
+        handler.Response.Cookies.Append(
+            "access_token",
+            "fake_access_token",
+            new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+            }
+        );
+
+        return Task.FromResult(Results.Ok());
+    }
+);
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
