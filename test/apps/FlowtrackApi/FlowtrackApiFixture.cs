@@ -1,9 +1,11 @@
 using System.Net.Sockets;
 using dotenv.net;
 using FlowTrack.Iam;
+using FlowTrack.Shared;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Npgsql;
 using Testcontainers.PostgreSql;
 
@@ -13,6 +15,7 @@ public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetim
 {
     private PostgreSqlContainer? _postgresContainer;
     public HttpClient HttpClient { get; private set; } = null!;
+    private readonly Mock<IDateTimeProvider> _dateTimeProviderMock = new();
 
     public async Task InitializeAsync()
     {
@@ -31,7 +34,13 @@ public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetim
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        _dateTimeProviderMock.SetupGet(m => m.Now).Returns(new DateTime(2024, 1, 1));
+
         builder.UseEnvironment("Testing");
+        builder.ConfigureServices(services =>
+        {
+            services.AddSingleton(_dateTimeProviderMock.Object);
+        });
     }
 
     public override async ValueTask DisposeAsync()

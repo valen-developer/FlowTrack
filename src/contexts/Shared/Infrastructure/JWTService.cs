@@ -6,7 +6,7 @@ using System.Text;
 using FlowTrack.Shared.Domain;
 using Microsoft.IdentityModel.Tokens;
 
-public class JWTService : IJWTService
+public class JWTService(IDateTimeProvider datetimeProvider) : IJWTService
 {
     public string Generate(JWTPayload payload, JWTOptions options)
     {
@@ -15,7 +15,7 @@ public class JWTService : IJWTService
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.Secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var expires = DateTime.UtcNow.AddMinutes(options.ExpirationMinutes);
+        var expires = datetimeProvider.Now.AddMinutes(options.ExpirationMinutes);
 
         var token = new JwtSecurityToken(
             claims: claims,

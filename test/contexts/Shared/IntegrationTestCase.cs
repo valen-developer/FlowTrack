@@ -1,5 +1,7 @@
 using dotenv.net;
+using FlowTrack.Shared.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace FlowTrack.Shared.Test;
 
@@ -8,6 +10,8 @@ public abstract class IntegrationTestCase
     protected readonly ServiceCollection serviceCollection = new();
     private ServiceProvider? serviceProvider;
     private IServiceScope? serviceScope;
+
+    private readonly Mock<IDateTimeProvider> datetimeProviderMock = new();
 
     public IntegrationTestCase()
     {
@@ -18,6 +22,9 @@ public abstract class IntegrationTestCase
 
         DotEnvOptions options = new(envFilePaths: [envPath]);
         DotEnv.Load(options);
+
+        datetimeProviderMock.SetupGet(m => m.Now).Returns(new DateTime(2024, 1, 1));
+        serviceCollection.AddSingleton<IDateTimeProvider>(datetimeProviderMock.Object);
     }
 
     public T GetService<T>()

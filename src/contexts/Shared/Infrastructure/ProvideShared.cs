@@ -11,6 +11,7 @@ public static class SharedServiceCollectionExtensions
         var queryHandlerInformation = new QueryHandlerInformation();
 
         services.AddSingleton<IBcrypt, Bcrypt>();
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddSingleton<IJWTService, JWTService>();
         services.AddSingleton<IEnvStore, EnvStore>();
         services.AddSingleton(queryHandlerInformation);
