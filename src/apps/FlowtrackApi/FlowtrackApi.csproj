@@ -8,4 +8,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../contexts/Iam/FlowTrack.Iam.csproj" />
+  </ItemGroup>
 </Project>

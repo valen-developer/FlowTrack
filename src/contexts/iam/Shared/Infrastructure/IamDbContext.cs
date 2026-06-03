@@ -1,7 +1,6 @@
-using FlowTrack.Iam.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
-namespace FlowTrack.Shared.Infrastructure;
+namespace FlowTrack.Iam.Infrastructure;
 
 public class IamDbContext(DbContextOptions<IamDbContext> options) : DbContext(options)
 {

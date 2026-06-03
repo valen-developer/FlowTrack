@@ -1,6 +1,9 @@
 using System.Net;
-using System.Net.Http.Json;
+using FlowTrack.Iam.Application;
+using FlowTrack.Iam.Infrastructure;
 using FlowTrack.Iam.Test;
+using FlowTrack.Shared.Domain;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowtrackApi.Iam;
 
@@ -9,19 +12,40 @@ public class SinginControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(
     [Fact]
     public async Task Should_Set_Auth_Cookies()
     {
-        var user = UserMother.Random();
+        var bcrypt =
+            Services.GetService<IBcrypt>()
+            ?? throw new InvalidOperationException("BCrypt service not found");
 
-        var response = await HttpClient.PostAsJsonAsync(
+        var userDao =
+            Services.GetService<UserDao>()
+            ?? throw new InvalidOperationException("UserDao service not found");
+
+        var user = UserMother.Random();
+        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(user.Password);
+        var userEntity = UserEntity.FromDomain(user);
+        userEntity.Password = hashedPassword;
+
+        await userDao.Insert(userEntity);
+
+        var authTokenGenerator =
+            Services.GetService<AuthTokenGenerator>()
+            ?? throw new InvalidOperationException("AuthTokenGenerator service not found");
+
+        var signinSuccess = authTokenGenerator.Generate(user);
+
+        var response = await HttpClient.PostAsync(
             "/auth/signin",
-            new { email = user.Email, password = user.Password }
+            new FormUrlEncodedContent([new("email", user.Email), new("password", user.Password)])
         );
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var cookies = response.Headers.GetValues("Set-Cookie");
         Assert.NotNull(cookies);
 
-        // Make a request to /auth/signin with valid credentials
-        // Get a 200 status code
-        // Get the access token and refresh token from the response cookies
+        var expectedAccessTokenCookie = $"ACCESS_TOKEN={signinSuccess.AccessToken}";
+        var expectedRefreshTokenCookie = $"REFRESH_TOKEN={signinSuccess.RefreshToken}";
+
+        Assert.Contains(cookies, cookie => cookie.StartsWith(expectedAccessTokenCookie));
+        Assert.Contains(cookies, cookie => cookie.StartsWith(expectedRefreshTokenCookie));
     }
 }

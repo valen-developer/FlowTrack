@@ -1,7 +1,9 @@
 using System.Net.Sockets;
 using dotenv.net;
+using FlowTrack.Iam;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Testcontainers.PostgreSql;
 
@@ -16,6 +18,7 @@ public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetim
     {
         ChargeEnv();
         await RunPostgreSqlContainer();
+        await SetConnectionStrings();
 
         var httpClientOptions = new WebApplicationFactoryClientOptions
         {
@@ -51,6 +54,20 @@ public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetim
 
         await _postgresContainer.StartAsync();
         await WaitUntilPostgresIsReady(_postgresContainer.GetConnectionString());
+    }
+
+    private Task SetConnectionStrings()
+    {
+        if (_postgresContainer is null)
+            throw new InvalidOperationException("PostgreSQL container is not initialized");
+
+        var connectionString = _postgresContainer.GetConnectionString();
+        Environment.SetEnvironmentVariable(
+            IamEnvironmentKeysEnum.IAM_DB_CONNECTION_STRING.ToString(),
+            connectionString
+        );
+
+        return Task.CompletedTask;
     }
 
     private static async Task WaitUntilPostgresIsReady(string connectionString)

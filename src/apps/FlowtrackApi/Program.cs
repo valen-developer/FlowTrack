@@ -1,8 +1,16 @@
+using FlowTrack.Iam.Application;
+using FlowTrack.Iam.Domain;
+using FlowTrack.Iam.Infrastructure;
+using FlowTrack.Shared;
+using FlowTrack.Shared.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.ProvideShared();
+builder.Services.ProvideIam();
 
 var app = builder.Build();
 
@@ -47,20 +55,46 @@ app.MapGet(
 
 app.MapPost(
     "/auth/signin",
-    (handler) =>
+    async (HttpContext context) =>
     {
-        handler.Response.Cookies.Append(
-            "access_token",
-            "fake_access_token",
-            new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-            }
-        );
+        var queryBus = context.RequestServices.GetRequiredService<IQueryBus>();
+        var email = context.Request.Form["email"].ToString();
+        var password = context.Request.Form["password"].ToString();
+        var query = new SigninQry(Email: email, Password: password);
 
-        return Task.FromResult(Results.Ok());
+        var signinSuccess = await queryBus.Ask<SigninQry, SigninSuccess>(query);
+        if (signinSuccess is not null)
+        {
+            context.Response.Cookies.Append(
+                "ACCESS_TOKEN",
+                signinSuccess.AccessToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddHours(1),
+                }
+            );
+
+            context.Response.Cookies.Append(
+                "REFRESH_TOKEN",
+                signinSuccess.RefreshToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddDays(7),
+                }
+            );
+
+            context.Response.StatusCode = StatusCodes.Status200OK;
+        }
+        else
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        }
     }
 );
 app.Run();
