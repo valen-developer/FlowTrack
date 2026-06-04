@@ -5,8 +5,6 @@ namespace FlowTrack.Iam.Infrastructure;
 
 public class UserDao(IamDbContext iamDbContext)
 {
-    private IamDbContext iamDbContext = iamDbContext;
-
     public async Task Insert(UserEntity userEntity)
     {
         iamDbContext.Users.Add(userEntity);
