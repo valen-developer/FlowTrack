@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Json;
 using FlowTrack.Iam.Application;
 using FlowTrack.Iam.Infrastructure;
 using FlowTrack.Iam.Test;
@@ -33,10 +34,8 @@ public class SinginControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(
 
         var signinSuccess = authTokenGenerator.Generate(user);
 
-        var response = await HttpClient.PostAsync(
-            "/auth/signin",
-            new FormUrlEncodedContent([new("email", user.Email), new("password", user.Password)])
-        );
+        var request = new { Email = user.Email, Password = user.Password };
+        var response = await HttpClient.PostAsJsonAsync("/auth/signin", request);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var cookies = response.Headers.GetValues("Set-Cookie");
