@@ -17,4 +17,16 @@ public class EfUserRepository(UserDao userDao) : IUserRepository
         var user = userEntity.ToDomain();
         return user;
     }
+
+    public async Task<User?> FindById(Guid id)
+    {
+        var userEntity = await userDao.FindById(id);
+        if (userEntity is null)
+        {
+            return null;
+        }
+
+        var user = userEntity.ToDomain();
+        return user;
+    }
 }

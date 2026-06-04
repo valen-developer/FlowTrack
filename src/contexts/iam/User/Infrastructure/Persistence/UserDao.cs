@@ -15,4 +15,9 @@ public class UserDao(IamDbContext iamDbContext)
     {
         return await iamDbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
     }
+
+    public async Task<UserEntity?> FindById(Guid id)
+    {
+        return await iamDbContext.Users.FindAsync(id);
+    }
 }
