@@ -1,3 +1,34 @@
 {
-  "explorer.excludeGitIgnore": true
+  "explorer.excludeGitIgnore": false,
+  "files.exclude": {
+    // Objetos de compilación
+    "**/bin": true,
+    "**/obj": true,
+    "**/*.dll": true,
+    "**/*.exe": true,
+    "**/*.pdb": true,
+    "**/*.deps.json": true,
+    "**/*.runtimeconfig.json": true,
+    // Archivos de NuGet
+    "**/*.nupkg": true,
+    "**/*.nuget.props": true,
+    "**/*.nuget.targets": true,
+    // Archivos de usuario/IDE
+    "**/*.user": true,
+    "**/*.userosscache": true,
+    "**/*.sln.docstates": true,
+    "**/.[Tt]emp": true,
+    // Logs y diagnóstico
+    "**/*.log": true,
+    "**/logs": true,
+    "**/*.appboy": true,
+    // Carpeta de git y VS Code
+    "**/.git": true,
+    // Coverage y pruebas
+    "**/coverage": true,
+    "**/TestResults": true,
+    // Archivos temporales
+    "**/*.tmp": true,
+    "**/temp": true
+  }
 }

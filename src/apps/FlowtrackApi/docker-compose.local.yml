@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: flowtrack-db
+    environment:
+      POSTGRES_USER: flowtrack
+      POSTGRES_PASSWORD: flowtrack
+      POSTGRES_DB: flowtrack
+    ports:
+      - '5432:5432'
+    networks:
+      flowtrack:
+        aliases:
+          - flowtrack-db
+    volumes:
+      - flowtrack:/var/lib/postgresql
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    networks:
+      flowtrack:
+        aliases:
+          - adminer
+    ports:
+      - '8081:8080'
+
+networks:
+  flowtrack:
+    driver: bridge
+    name: flowtrack
+
+volumes:
+  flowtrack:
+    driver: local

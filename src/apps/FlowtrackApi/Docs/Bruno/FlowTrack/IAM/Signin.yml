@@ -1,0 +1,20 @@
+info:
+  name: Signin
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}/auth/signin"
+  auth: inherit
+
+runtime:
+  variables:
+    - name: base_url
+      value: http://localhost:5001
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

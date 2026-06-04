@@ -1,8 +1,12 @@
+using dotenv.net;
 using FlowTrack.Iam.Infrastructure;
 using FlowTrack.Iam.Services;
 using FlowTrack.Shared.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+DotEnvOptions options = new(envFilePaths: ["../../../.env"]);
+DotEnv.Load(options);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
