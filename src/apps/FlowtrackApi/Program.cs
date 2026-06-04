@@ -51,6 +51,11 @@ app.UseExceptionHandler(handler =>
             context.Response.StatusCode = statusCode;
             await context.Response.WriteAsJsonAsync(httpErrorException);
         }
+
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsJsonAsync(
+            new HttpErrorResponse("Internal Server Error", "exception.internal.server")
+        );
     });
 });
 
