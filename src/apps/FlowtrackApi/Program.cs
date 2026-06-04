@@ -1,7 +1,10 @@
 using dotenv.net;
 using FlowTrack.Iam.Infrastructure;
 using FlowTrack.Iam.Services;
+using FlowTrack.Shared;
+using FlowTrack.Shared.Domain.Exception;
 using FlowTrack.Shared.Infrastructure;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +24,36 @@ builder.Services.ProvideShared();
 builder.Services.ProvideIam();
 
 var app = builder.Build();
+app.UseExceptionHandler(handler =>
+{
+    handler.Run(async context =>
+    {
+        var feature = context.Features.Get<IExceptionHandlerFeature>();
+        var exception = feature?.Error;
+        if (exception == null)
+            return;
+
+        if (exception is ActionHandlerExecutionException actionHandlerExecutionException)
+        {
+            var cause = actionHandlerExecutionException.GetCause();
+            if (cause is DomainException ex)
+            {
+                var (statusCode, httpErrorException) = DomainToHttpExceptionMapper.Map(ex);
+                context.Response.StatusCode = statusCode;
+                await context.Response.WriteAsJsonAsync(httpErrorException);
+                return;
+            }
+        }
+
+        if (exception is DomainException domainException)
+        {
+            var (statusCode, httpErrorException) = DomainToHttpExceptionMapper.Map(domainException);
+            context.Response.StatusCode = statusCode;
+            await context.Response.WriteAsJsonAsync(httpErrorException);
+        }
+    });
+});
+
 app.MapControllers();
 
 // Configure the HTTP request pipeline.
