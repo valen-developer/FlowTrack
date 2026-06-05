@@ -5,6 +5,7 @@ using FlowTrack.Shared;
 using FlowTrack.Shared.Domain.Exception;
 using FlowTrack.Shared.Infrastructure;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +33,15 @@ builder
         options.DefaultChallengeScheme = "IamCookie";
     })
     .AddScheme<AuthenticationSchemeOptions, IamAuthenticationHandler>("IamCookie", options => { });
+
+builder
+    .Services.AddAuthorizationBuilder()
+    .SetFallbackPolicy(
+        new AuthorizationPolicyBuilder()
+            .AddAuthenticationSchemes("IamCookie")
+            .RequireAuthenticatedUser()
+            .Build()
+    );
 
 var app = builder.Build();
 app.UseAuthentication();

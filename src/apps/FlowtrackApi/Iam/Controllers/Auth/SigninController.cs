@@ -3,13 +3,14 @@ using FlowTrack.Iam.Domain;
 using FlowTrack.Iam.Schemas;
 using FlowTrack.Iam.Services;
 using FlowTrack.Shared;
-using FlowTrack.Shared.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlowTrack.Iam.Controllers;
 
 public class SigninController(IQueryBus queryBus, AuthCookieSetter cookieSetter) : AuthController
 {
+    [AllowAnonymous]
     [HttpPost("signin")]
     public async Task<IActionResult> Execute([FromBody] SigninRequestDto requestDto)
     {
