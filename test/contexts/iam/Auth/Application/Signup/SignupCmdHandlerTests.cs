@@ -1,5 +1,6 @@
 using FlowTrack.Iam.Application;
 using FlowTrack.Iam.Domain;
+using FlowTrack.Shared.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
@@ -48,5 +49,13 @@ public class SignupCmdHandlerTests
         var cmd = new SignupCmd(Guid.NewGuid().ToString(), "valid@email.com", invalidPassword);
 
         await Assert.ThrowsAsync<InvalidPassword>(() => _handler.Handle(cmd));
+    }
+
+    [Fact]
+    public async Task Should_Throw_Invalid_Email_Exception()
+    {
+        var cmd = new SignupCmd(Guid.NewGuid().ToString(), "invalid-email", "ValidPass123");
+
+        await Assert.ThrowsAsync<InvalidEmail>(() => _handler.Handle(cmd));
     }
 }
