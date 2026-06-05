@@ -34,7 +34,7 @@ public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetim
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        _dateTimeProviderMock.SetupGet(m => m.Now).Returns(new DateTime(2024, 1, 1));
+        _dateTimeProviderMock.SetupGet(m => m.Now).Returns(DateTime.UtcNow);
 
         builder.UseEnvironment("Testing");
         builder.ConfigureServices(services =>

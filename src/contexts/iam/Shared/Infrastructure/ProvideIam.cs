@@ -22,6 +22,9 @@ public static class IamServiceCollectionExtensions
         services.AddScoped<AuthTokenGenerator>();
 
         services.AddScoped<SigninQryHandler>();
+        services.AddScoped<FindUserByIdQryHandler>();
+
+        services.AddScoped<AuthValidator>();
 
         var queryHandlerInformation =
             services
@@ -30,6 +33,7 @@ public static class IamServiceCollectionExtensions
             ?? throw new InvalidOperationException("QueryHandlerInformation service not found");
 
         queryHandlerInformation.Add<SigninQry, SigninQryHandler, SigninSuccess>();
+        queryHandlerInformation.Add<FindUserByIdQry, FindUserByIdQryHandler, User>();
 
         return services;
     }

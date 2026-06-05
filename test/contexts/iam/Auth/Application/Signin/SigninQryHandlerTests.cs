@@ -8,8 +8,6 @@ namespace FlowTrack.Iam.Test.Application.Signin;
 
 public class SigninQryHandlerTests
 {
-    public SigninQryHandlerTests() { }
-
     [Fact]
     public async Task Should_Generate_Access_Token()
     {

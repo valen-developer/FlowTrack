@@ -4,6 +4,7 @@ using FlowTrack.Iam.Services;
 using FlowTrack.Shared;
 using FlowTrack.Shared.Domain.Exception;
 using FlowTrack.Shared.Infrastructure;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,7 @@ DotEnv.Load(options);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 
@@ -23,7 +25,17 @@ builder.Services.AddScoped<AuthCookieSetter>();
 builder.Services.ProvideShared();
 builder.Services.ProvideIam();
 
+builder
+    .Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = "IamCookie";
+        options.DefaultChallengeScheme = "IamCookie";
+    })
+    .AddScheme<AuthenticationSchemeOptions, IamAuthenticationHandler>("IamCookie", options => { });
+
 var app = builder.Build();
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseExceptionHandler(handler =>
 {
     handler.Run(async context =>

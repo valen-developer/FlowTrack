@@ -8,6 +8,21 @@ using Microsoft.IdentityModel.Tokens;
 
 public class JWTService(IDateTimeProvider datetimeProvider) : IJWTService
 {
+    public JWTPayload? Decode(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+
+        if (jwtToken == null)
+        {
+            return null;
+        }
+
+        var claims = jwtToken.Claims.ToDictionary(x => x.Type, x => x.Value);
+
+        return new JWTPayload(claims);
+    }
+
     public string Generate(JWTPayload payload, JWTOptions options)
     {
         var claims = payload.Claims.Select(x => new Claim(x.Key, x.Value)).ToList();
@@ -24,5 +39,38 @@ public class JWTService(IDateTimeProvider datetimeProvider) : IJWTService
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public bool Verify(string token, string secret)
+    {
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        try
+        {
+            tokenHandler.ValidateToken(
+                token,
+                new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = key,
+
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+
+                    ValidateLifetime = true,
+                    RequireExpirationTime = true,
+                    ClockSkew = TimeSpan.Zero,
+                },
+                out SecurityToken validatedToken
+            );
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Token validation failed: {ex.Message}");
+            return false;
+        }
     }
 }

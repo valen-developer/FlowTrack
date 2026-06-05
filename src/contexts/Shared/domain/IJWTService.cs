@@ -24,5 +24,8 @@ public record JWTOptions
 
 public interface IJWTService
 {
+    // Decode which have Claims
+    JWTPayload? Decode(string token);
     string Generate(JWTPayload payload, JWTOptions options);
+    bool Verify(string token, string secret);
 }
