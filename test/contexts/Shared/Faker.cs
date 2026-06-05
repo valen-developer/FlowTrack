@@ -1,3 +1,6 @@
+using System.Text.RegularExpressions;
+using Fare;
+
 namespace FlowTrack.Shared.Test;
 
 public class Faker
@@ -6,6 +9,9 @@ public class Faker
 
     public string Email() => $"{Guid.NewGuid()}@email.com";
 
-    public string FromRegex(string pattern) =>
-        System.Text.RegularExpressions.Regex.Replace(pattern, @"\w", "x");
+    public string FromRegex(Regex pattern)
+    {
+        var xeger = new Xeger(pattern.ToString());
+        return xeger.Generate();
+    }
 }

@@ -37,4 +37,16 @@ public class SignupCmdHandlerTests
         Assert.Equivalent(expectedUser, user);
         Assert.False(expectedUser!.IsActive);
     }
+
+    [Theory]
+    [InlineData("Short12")]
+    [InlineData("Nonumber")]
+    [InlineData("nouppercase1")]
+    [InlineData("NOLOWERCASE1")]
+    public async Task Should_Throw_Invalid_Password_Exception(string invalidPassword)
+    {
+        var cmd = new SignupCmd(Guid.NewGuid().ToString(), "valid@email.com", invalidPassword);
+
+        await Assert.ThrowsAsync<InvalidPassword>(() => _handler.Handle(cmd));
+    }
 }

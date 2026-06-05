@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using FlowTrack.Iam.Domain;
 using FlowTrack.Shared.Test;
 
@@ -5,8 +6,7 @@ namespace FlowTrack.Iam.Test;
 
 public class UserMother : ObjectMother
 {
-    private static readonly string PasswordPattern =
-        @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
+    private static readonly Regex PasswordPattern = InvalidPassword.Regex;
 
     public static User Random()
     {
@@ -25,6 +25,11 @@ public class UserMother : ObjectMother
 
     public static User Inactive()
     {
-        return new User(Guid.NewGuid(), faker.Email(), faker.FromRegex(PasswordPattern), false);
+        return new User(
+            Guid.NewGuid(),
+            faker.Email(),
+            faker.FromRegex(InvalidPassword.Regex),
+            false
+        );
     }
 }

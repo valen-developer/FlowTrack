@@ -7,7 +7,9 @@ public sealed class SignupCmdHandler(IUserRepository repository) : ICommandHandl
 {
     public async Task Handle(SignupCmd command)
     {
-        var user = User.Create(command.Id, command.Email, command.Password, false);
+        Password password = Password.EnsurePassword(command.Password);
+
+        var user = User.Create(command.Id, command.Email, password.Value, false);
         await repository.Create(user);
     }
 }
