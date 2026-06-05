@@ -8,6 +8,12 @@ public sealed class SignupCmdHandler(IUserRepository repository) : ICommandHandl
 {
     public async Task Handle(SignupCmd command)
     {
+        var currentUser = await repository.FindByEmail(command.Email);
+        if (currentUser is not null)
+        {
+            return;
+        }
+
         Password password = Password.EnsurePassword(command.Password);
         Email email = new(command.Email);
 

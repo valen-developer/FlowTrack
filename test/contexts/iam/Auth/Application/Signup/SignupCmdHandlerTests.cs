@@ -58,4 +58,19 @@ public class SignupCmdHandlerTests
 
         await Assert.ThrowsAsync<InvalidEmail>(() => _handler.Handle(cmd));
     }
+
+    [Fact]
+    public async Task Should_Not_Throw_For_Already_Existing_Email()
+    {
+        User user = UserMother.Inactive();
+
+        _userRepositoryMock.Setup(x => x.FindByEmail(It.IsAny<string>())).ReturnsAsync(user);
+
+        var cmd = new SignupCmd(Guid.NewGuid().ToString(), user.Email, "ValidPass123");
+
+        var exception = await Record.ExceptionAsync(() => _handler.Handle(cmd));
+        Assert.Null(exception);
+
+        _userRepositoryMock.Verify(x => x.Create(It.IsAny<User>()), Times.Never);
+    }
 }
