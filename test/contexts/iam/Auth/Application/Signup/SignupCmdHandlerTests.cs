@@ -10,12 +10,14 @@ public class SignupCmdHandlerTests
 {
     private readonly SignupCmdHandler _handler;
     private readonly Mock<IUserRepository> _userRepositoryMock = new();
+    private readonly Mock<IDomainEventBus> _eventBus = new();
 
     public SignupCmdHandlerTests()
     {
         var services = new ServiceCollection();
 
         services.AddSingleton(_userRepositoryMock.Object);
+        services.AddSingleton(_eventBus.Object);
         services.AddScoped<SignupCmdHandler>();
 
         _handler = services.BuildServiceProvider().GetRequiredService<SignupCmdHandler>();
@@ -37,6 +39,40 @@ public class SignupCmdHandlerTests
         _userRepositoryMock.Verify(x => x.Create(It.IsAny<User>()), Times.Once);
         Assert.Equivalent(expectedUser, user);
         Assert.False(expectedUser!.IsActive);
+    }
+
+    [Fact]
+    public async Task Should_Emit_User_Created_Event()
+    {
+        IEnumerable<DomainEvent>? capturedEvents = null;
+
+        _eventBus
+            .Setup(x => x.Publish(It.IsAny<List<DomainEvent>>()))
+            .Callback<IEnumerable<DomainEvent>>(events => capturedEvents = events)
+            .Verifiable();
+
+        User user = UserMother.Inactive();
+        SignupCmd cmd = new(Id: user.Id.ToString(), Email: user.Email, Password: user.Password);
+
+        UserCreated expectedEvent = new(
+            UserId: user.Id,
+            Email: user.Email,
+            IsActive: user.IsActive
+        );
+
+        await _handler.Handle(cmd);
+
+        _eventBus.Verify(x => x.Publish(It.IsAny<List<DomainEvent>>()), Times.Once);
+
+        Assert.NotNull(capturedEvents);
+        Assert.Single(capturedEvents);
+
+        UserCreated userCreatedEvent = (UserCreated)capturedEvents!.First();
+        Assert.NotNull(userCreatedEvent);
+        Assert.IsType<UserCreated>(userCreatedEvent);
+        Assert.Equal(expectedEvent.UserId, userCreatedEvent.UserId);
+        Assert.Equal(expectedEvent.Email, userCreatedEvent.Email);
+        Assert.Equal(expectedEvent.IsActive, userCreatedEvent.IsActive);
     }
 
     [Theory]

@@ -4,7 +4,8 @@ using FlowTrack.Shared.Domain.Bus.Command;
 
 namespace FlowTrack.Iam.Application;
 
-public sealed class SignupCmdHandler(IUserRepository repository) : ICommandHandler<SignupCmd>
+public sealed class SignupCmdHandler(IUserRepository repository, IDomainEventBus eventBus)
+    : ICommandHandler<SignupCmd>
 {
     public async Task Handle(SignupCmd command)
     {
@@ -19,5 +20,7 @@ public sealed class SignupCmdHandler(IUserRepository repository) : ICommandHandl
 
         var user = User.Create(command.Id, email.Value, password.Value, false);
         await repository.Create(user);
+
+        eventBus.Publish(user.PullDomainEvents());
     }
 }
