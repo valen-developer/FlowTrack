@@ -29,4 +29,10 @@ public class EfUserRepository(UserDao userDao) : IUserRepository
         var user = userEntity.ToDomain();
         return user;
     }
+
+    public Task Create(User user)
+    {
+        var userEntity = UserEntity.FromDomain(user);
+        return userDao.Insert(userEntity);
+    }
 }

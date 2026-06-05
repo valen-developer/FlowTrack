@@ -4,7 +4,7 @@ using FlowTrack.Shared.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace FlowTrack.Iam.Test.Application.Signin;
+namespace FlowTrack.Iam.Test;
 
 internal sealed class SigninQryHandlerTestObject
 {
@@ -35,7 +35,7 @@ internal sealed class SigninQryHandlerTestObject
 
     public SigninQryHandlerTestObject DefaultMocks()
     {
-        var defaultUser = UserMother.Random();
+        var defaultUser = UserMother.Active();
         userRepositoryMock.Setup(r => r.FindByEmail(It.IsAny<string>())).ReturnsAsync(defaultUser);
         bcryptMock.Setup(b => b.Compare(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
 

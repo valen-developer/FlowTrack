@@ -3,7 +3,6 @@ using FlowTrack.Iam;
 using FlowTrack.Iam.Application;
 using FlowTrack.Iam.Domain;
 using FlowTrack.Iam.Infrastructure;
-using FlowTrack.Iam.Test;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Infrastructure;
 using FlowTrack.Shared.Test;
@@ -12,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Testcontainers.PostgreSql;
 
-namespace FlowTrack.Test.Iam.Infrastructure;
+namespace FlowTrack.Iam.Test.Infrastructure;
 
 public class SigninQryHandlerIT : IntegrationTestCase, IAsyncLifetime
 {
@@ -90,7 +89,7 @@ public class SigninQryHandlerIT : IntegrationTestCase, IAsyncLifetime
     [Fact]
     public async Task Should_Signin_User()
     {
-        var user = UserMother.Random();
+        var user = UserMother.Active();
 
         var userDao = GetService<UserDao>();
         var userEntity = UserEntity.FromDomain(user);

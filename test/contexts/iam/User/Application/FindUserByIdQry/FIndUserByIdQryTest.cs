@@ -1,10 +1,9 @@
 using FlowTrack.Iam.Application;
 using FlowTrack.Iam.Domain;
-using FlowTrack.Iam.Test;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace FlowTrack.Test.Iam;
+namespace FlowTrack.Iam.Test;
 
 public class FindUserByIdQryTest
 {

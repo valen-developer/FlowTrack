@@ -23,7 +23,7 @@ public class SinginControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(
             Services.GetService<UserDao>()
             ?? throw new InvalidOperationException("UserDao service not found");
 
-        var user = UserMother.Random();
+        var user = UserMother.Active();
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(user.Password);
         var userEntity = UserEntity.FromDomain(user);
         userEntity.Password = hashedPassword;

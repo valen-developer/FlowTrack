@@ -4,7 +4,7 @@ using FlowTrack.Iam.Domain;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Exception;
 
-namespace FlowTrack.Iam.Test.Application.Signin;
+namespace FlowTrack.Iam.Test;
 
 public class SigninQryHandlerTests
 {
@@ -14,7 +14,7 @@ public class SigninQryHandlerTests
         var accessTokenSecret = "secret";
         var accessTokenExpireMinutes = "60";
         var query = new SigninQry("testuser", "password123");
-        var user = UserMother.Random();
+        var user = UserMother.Active();
 
         var to = new SigninQryHandlerTestObject()
             .DefaultMocks()
@@ -43,7 +43,7 @@ public class SigninQryHandlerTests
     {
         var refreshTokenSecret = "refreshSecret";
         var refreshTokenExpireMinutes = "120";
-        var user = UserMother.Random();
+        var user = UserMother.Active();
 
         var query = new SigninQry("testuser", "password123");
 
@@ -140,7 +140,7 @@ public class SigninQryHandlerTests
 
         var to = new SigninQryHandlerTestObject().DefaultMocks().WithRefreshTokenSecretEnv(null);
 
-        var user = UserMother.Random();
+        var user = UserMother.Active();
         var handler = to.handler;
 
         var exception = await Assert.ThrowsAsync<EnvVariableMissed>(() => handler.Handle(query));
