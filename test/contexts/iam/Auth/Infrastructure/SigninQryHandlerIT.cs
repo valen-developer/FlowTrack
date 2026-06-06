@@ -6,7 +6,7 @@ using FlowTrack.Shared.Infrastructure;
 
 namespace FlowTrack.Iam.Test.Infrastructure;
 
-public class SigninQryHandlerIT : IamIntegrationTestCase
+public class SigninQryHandlerIT : IamIntegrationFixture
 {
     public SigninQryHandlerIT()
         : base()

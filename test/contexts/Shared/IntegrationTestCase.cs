@@ -41,6 +41,13 @@ public abstract class IntegrationTestCase
         serviceCollection.AddScoped<TService, TImplementation>();
     }
 
+    public void AddTransient<TService, TImplementation>()
+        where TService : class
+        where TImplementation : class, TService
+    {
+        serviceCollection.AddTransient<TService, TImplementation>();
+    }
+
     private void EnsureProviderBuilt()
     {
         if (serviceProvider is not null)

@@ -3,7 +3,10 @@ using FlowTrack.Shared.Domain;
 
 namespace FlowTrack.Shared.Infrastructure;
 
-public class DomainEventDispatcher(DomainEventSubscriberScanner scanner)
+public class DomainEventDispatcher(
+    DomainEventSubscriberScanner scanner,
+    IServiceProvider serviceProvider
+)
 {
     private readonly List<DomainEventSubscriberInfo> _subscribers = [];
 
@@ -20,7 +23,11 @@ public class DomainEventDispatcher(DomainEventSubscriberScanner scanner)
 
         foreach (var handler in handlers)
         {
-            var instance = Activator.CreateInstance(handler.SubscriberType);
+            var instance =
+                serviceProvider.GetService(handler.SubscriberType)
+                ?? throw new InvalidOperationException(
+                    $"Unable to resolve an instance of {handler.SubscriberType.FullName} for handling domain event {eventType.FullName}."
+                );
             var result = handler.HandlerMethod.Invoke(instance, new object[] { domainEvent });
 
             if (result is Task taskResult)

@@ -27,6 +27,12 @@ public class DomainEventSubscriberScanner
 
             foreach (var subscriberType in subscriberTypes)
             {
+                var subscriberAttribute =
+                    subscriberType.GetCustomAttribute<DomainEventSubscriberAttribute>()
+                    ?? throw new InvalidOperationException(
+                        $"Type {subscriberType.FullName} is marked as a domain event subscriber but does not have the DomainEventSubscriberAttribute."
+                    );
+
                 var handlerMethods = subscriberType
                     .GetMethods(
                         BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
@@ -34,6 +40,9 @@ public class DomainEventSubscriberScanner
                     .Where(m =>
                         m.GetParameters().Length == 1
                         && typeof(DomainEvent).IsAssignableFrom(m.GetParameters()[0].ParameterType)
+                        && subscriberAttribute.EventType.IsAssignableFrom(
+                            m.GetParameters()[0].ParameterType
+                        )
                         && m.IsDefined(typeof(DomainEventListenerAttribute), inherit: false)
                         && m.IsStatic == false
                         && m.ContainsGenericParameters == false
