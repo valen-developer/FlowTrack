@@ -2,7 +2,7 @@ using dotenv.net;
 using FlowTrack.Iam.Infrastructure;
 using FlowTrack.Iam.Services;
 using FlowTrack.Shared;
-using FlowTrack.Shared.Domain.Exception;
+using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Infrastructure;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;

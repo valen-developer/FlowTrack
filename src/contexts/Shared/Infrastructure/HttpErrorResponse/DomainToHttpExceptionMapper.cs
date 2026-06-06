@@ -1,5 +1,4 @@
 using FlowTrack.Shared.Domain;
-using FlowTrack.Shared.Domain.Exception;
 
 namespace FlowTrack.Shared.Infrastructure;
 

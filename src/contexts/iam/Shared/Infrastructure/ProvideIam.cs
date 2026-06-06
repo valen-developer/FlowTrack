@@ -1,5 +1,6 @@
 using FlowTrack.Iam.Application;
 using FlowTrack.Iam.Domain;
+using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Bus.Query;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,11 +21,18 @@ public static class IamServiceCollectionExtensions
         services.AddScoped<IUserRepository, EfUserRepository>();
 
         services.AddScoped<AuthTokenGenerator>();
+        services.AddScoped<AuthValidator>();
 
+        AddQueries(services);
+        AddCommands(services);
+
+        return services;
+    }
+
+    private static void AddQueries(IServiceCollection services)
+    {
         services.AddScoped<SigninQryHandler>();
         services.AddScoped<FindUserByIdQryHandler>();
-
-        services.AddScoped<AuthValidator>();
 
         var queryHandlerInformation =
             services
@@ -34,7 +42,18 @@ public static class IamServiceCollectionExtensions
 
         queryHandlerInformation.Add<SigninQry, SigninQryHandler, SigninSuccess>();
         queryHandlerInformation.Add<FindUserByIdQry, FindUserByIdQryHandler, User>();
+    }
 
-        return services;
+    private static void AddCommands(IServiceCollection services)
+    {
+        services.AddScoped<SignupCmdHandler>();
+
+        var commandHandlerInformation =
+            services
+                .FirstOrDefault(service => service.ServiceType == typeof(CommandHandlerInformation))
+                ?.ImplementationInstance as CommandHandlerInformation
+            ?? throw new InvalidOperationException("CommandHandlerInformation service not found");
+
+        commandHandlerInformation.Add<SignupCmd, SignupCmdHandler>();
     }
 }

@@ -1,8 +1,6 @@
-using NativeException = System.Exception;
+namespace FlowTrack.Shared.Domain;
 
-namespace FlowTrack.Shared.Domain.Exception;
-
-public abstract class DomainException(string message, string code) : NativeException(message)
+public abstract class DomainException(string message, string code) : Exception(message)
 {
     public string Code { get; } = code;
 }

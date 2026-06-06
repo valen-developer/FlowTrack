@@ -1,6 +1,5 @@
 using FlowTrack.Iam.Domain;
 using FlowTrack.Shared.Domain;
-using FlowTrack.Shared.Domain.Exception;
 
 namespace FlowTrack.Iam.Application;
 

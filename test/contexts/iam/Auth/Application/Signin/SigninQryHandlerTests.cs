@@ -2,7 +2,6 @@ using System.Collections.Immutable;
 using FlowTrack.Iam.Application;
 using FlowTrack.Iam.Domain;
 using FlowTrack.Shared.Domain;
-using FlowTrack.Shared.Domain.Exception;
 
 namespace FlowTrack.Iam.Test;
 

@@ -1,5 +1,3 @@
-using FlowTrack.Shared.Domain.Exception;
-
 namespace FlowTrack.Shared.Domain;
 
 public class UnAuthenticatedException(

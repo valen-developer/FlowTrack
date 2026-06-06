@@ -1,4 +1,4 @@
-namespace FlowTrack.Shared.Domain.Exception;
+namespace FlowTrack.Shared.Domain;
 
 public class EnvVariableMissed(string key)
     : InternalException(
