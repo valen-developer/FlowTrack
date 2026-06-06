@@ -17,11 +17,7 @@ public static class IamServiceCollectionExtensions
             options.UseNpgsql(iamDbContext.Database.GetConnectionString())
         );
 
-        services.AddScoped<UserDao>();
         services.AddScoped<IUserRepository, EfUserRepository>();
-
-        services.AddScoped<AuthTokenGenerator>();
-        services.AddScoped<AuthValidator>();
 
         AddQueries(services);
         AddCommands(services);
@@ -31,9 +27,6 @@ public static class IamServiceCollectionExtensions
 
     private static void AddQueries(IServiceCollection services)
     {
-        services.AddScoped<SigninQryHandler>();
-        services.AddScoped<FindUserByIdQryHandler>();
-
         var queryHandlerInformation =
             services
                 .FirstOrDefault(service => service.ServiceType == typeof(QueryHandlerInformation))
@@ -46,7 +39,7 @@ public static class IamServiceCollectionExtensions
 
     private static void AddCommands(IServiceCollection services)
     {
-        services.AddScoped<SignupCmdHandler>();
+        // services.AddScoped<SignupCmdHandler>();
 
         var commandHandlerInformation =
             services

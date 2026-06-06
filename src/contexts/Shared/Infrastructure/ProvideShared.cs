@@ -20,7 +20,6 @@ public static class SharedServiceCollectionExtensions
         services.AddScoped<IQueryBus, InMemoryQueryBus>();
         services.AddScoped<ICommandBus, InMemoryCommandBus>();
 
-        services.AddScoped<DomainEventSubscriberScanner, DomainEventSubscriberScanner>();
         services.AddScoped(sp =>
         {
             var scanner = sp.GetRequiredService<DomainEventSubscriberScanner>();

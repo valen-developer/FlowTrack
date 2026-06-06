@@ -25,6 +25,11 @@ builder.Services.AddScoped<AuthCookieSetter>();
 
 builder.Services.ProvideShared();
 builder.Services.ProvideIam();
+builder.Services.Discover([
+    .. AppDomain
+        .CurrentDomain.GetAssemblies()
+        .Where(a => a.FullName?.StartsWith("FlowTrack") == true),
+]);
 
 builder
     .Services.AddAuthentication(options =>

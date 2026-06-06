@@ -1,8 +1,10 @@
+using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace FlowTrack.Iam.Infrastructure;
 
+[Service(Lifetime.Scoped)]
 public class UserDao(IamDbContext iamDbContext)
 {
     public async Task Insert(UserEntity userEntity)

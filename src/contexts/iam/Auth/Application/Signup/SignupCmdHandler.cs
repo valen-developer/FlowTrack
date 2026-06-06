@@ -4,6 +4,7 @@ using FlowTrack.Shared.Domain.Bus.Command;
 
 namespace FlowTrack.Iam.Application;
 
+[Service]
 public sealed class SignupCmdHandler(IUserRepository repository, IDomainEventBus eventBus)
     : ICommandHandler<SignupCmd>
 {

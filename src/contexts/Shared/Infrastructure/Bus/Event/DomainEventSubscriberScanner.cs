@@ -9,6 +9,7 @@ public sealed record DomainEventSubscriberInfo(
     Type EventType
 );
 
+[Service]
 public class DomainEventSubscriberScanner
 {
     public IReadOnlyList<DomainEventSubscriberInfo> Scan(params Assembly[] assemblies)

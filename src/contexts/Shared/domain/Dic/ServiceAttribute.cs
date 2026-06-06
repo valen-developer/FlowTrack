@@ -1,0 +1,16 @@
+using Microsoft.Extensions.DependencyInjection;
+
+namespace FlowTrack.Shared.Domain;
+
+public enum Lifetime
+{
+    Transient,
+    Scoped,
+    Singleton,
+}
+
+[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+public class ServiceAttribute(Lifetime lifetime = Lifetime.Scoped) : Attribute
+{
+    public Lifetime Lifetime { get; } = lifetime;
+}
