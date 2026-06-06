@@ -49,7 +49,7 @@ public class SignupCmdHandlerTests
         _eventBus
             .Setup(x => x.Publish(It.IsAny<List<DomainEvent>>()))
             .Callback<IEnumerable<DomainEvent>>(events => capturedEvents = events)
-            .Verifiable();
+            .Returns(Task.CompletedTask);
 
         User user = UserMother.Inactive();
         SignupCmd cmd = new(Id: user.Id.ToString(), Email: user.Email, Password: user.Password);
