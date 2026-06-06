@@ -17,8 +17,6 @@ public static class IamServiceCollectionExtensions
             options.UseNpgsql(iamDbContext.Database.GetConnectionString())
         );
 
-        services.AddScoped<IUserRepository, EfUserRepository>();
-
         AddQueries(services);
         AddCommands(services);
 

@@ -1,7 +1,9 @@
+using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Bus.Query;
 
 namespace FlowTrack.Shared.Infrastructure;
 
+[Provider(typeof(IQueryBus))]
 public class InMemoryQueryBus(
     IServiceProvider serviceProvider,
     QueryHandlerInformation queryHandlerInformation

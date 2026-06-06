@@ -1,7 +1,9 @@
 using FlowTrack.Iam.Domain;
+using FlowTrack.Shared.Domain;
 
 namespace FlowTrack.Iam.Infrastructure;
 
+[Provider(typeof(IUserRepository), Lifetime.Scoped)]
 public class EfUserRepository(UserDao userDao) : IUserRepository
 {
     private readonly UserDao userDao = userDao;

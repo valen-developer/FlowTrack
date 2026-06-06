@@ -6,6 +6,7 @@ using System.Text;
 using FlowTrack.Shared.Domain;
 using Microsoft.IdentityModel.Tokens;
 
+[Provider(typeof(IJWTService))]
 public class JWTService(IDateTimeProvider datetimeProvider) : IJWTService
 {
     public JWTPayload? Decode(string token)

@@ -3,6 +3,7 @@ using FlowTrack.Shared.Domain.Bus.Command;
 
 namespace FlowTrack.Shared.Infrastructure;
 
+[Provider(typeof(ICommandBus))]
 public sealed class InMemoryCommandBus(
     IServiceProvider serviceProvider,
     CommandHandlerInformation commandHandlerInformation

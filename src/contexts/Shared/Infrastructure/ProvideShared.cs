@@ -11,14 +11,8 @@ public static class SharedServiceCollectionExtensions
         var queryHandlerInformation = new QueryHandlerInformation();
         var commandHandlerInformation = new CommandHandlerInformation();
 
-        services.AddSingleton<IBcrypt, Bcrypt>();
-        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-        services.AddSingleton<IJWTService, JWTService>();
-        services.AddSingleton<IEnvStore, EnvStore>();
         services.AddSingleton(queryHandlerInformation);
         services.AddSingleton(commandHandlerInformation);
-        services.AddScoped<IQueryBus, InMemoryQueryBus>();
-        services.AddScoped<ICommandBus, InMemoryCommandBus>();
 
         services.AddScoped(sp =>
         {
@@ -35,7 +29,6 @@ public static class SharedServiceCollectionExtensions
 
             return dispatcher;
         });
-        services.AddScoped<IDomainEventBus, InMemoryDomainEventBus>();
 
         return services;
     }
