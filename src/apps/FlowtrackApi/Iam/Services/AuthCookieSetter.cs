@@ -1,8 +1,10 @@
 using FlowTrack.Iam.Domain;
 using FlowTrack.Shared;
+using FlowTrack.Shared.Domain;
 
 namespace FlowTrack.Iam.Services;
 
+[Service]
 public sealed class AuthCookieSetter(
     IHttpContextAccessor contextAccessor,
     IDateTimeProvider dateTimeProvider
