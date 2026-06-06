@@ -1,7 +1,6 @@
 using dotenv.net;
 using FlowTrack.Iam;
 using FlowTrack.Iam.Infrastructure;
-using FlowTrack.Iam.Services;
 using FlowTrack.Shared;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Infrastructure;

@@ -6,18 +6,26 @@ public sealed class CommandHandlerInformation
 {
     private readonly Dictionary<Type, Type> _handlers = new();
 
-    public void Add<C, H>()
-        where C : ICommand
-        where H : ICommandHandler<C>
+    public void Add(Type commandType, Type handlerType)
     {
-        var commandType = typeof(C);
+        if (!typeof(ICommand).IsAssignableFrom(commandType))
+            throw new ArgumentException(
+                $"Type '{commandType.FullName}' does not implement ICommand.",
+                nameof(commandType)
+            );
+
+        if (!typeof(ICommandHandler<>).MakeGenericType(commandType).IsAssignableFrom(handlerType))
+            throw new ArgumentException(
+                $"Handler type '{handlerType.FullName}' does not implement ICommandHandler<{commandType.Name}>.",
+                nameof(handlerType)
+            );
 
         if (_handlers.ContainsKey(commandType))
             throw new InvalidOperationException(
                 $"Command '{commandType.Name}' is already registered."
             );
 
-        _handlers[commandType] = typeof(H);
+        _handlers[commandType] = handlerType;
     }
 
     public Type Get<C>()

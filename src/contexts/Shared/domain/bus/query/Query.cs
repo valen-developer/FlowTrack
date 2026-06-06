@@ -1,4 +1,4 @@
-namespace FlowTrack.Shared.Domain.Bus.Query;
+namespace FlowTrack.Shared.Domain;
 
 public interface IQuery { }
 

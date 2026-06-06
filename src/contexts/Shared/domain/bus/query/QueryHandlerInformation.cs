@@ -1,19 +1,39 @@
-namespace FlowTrack.Shared.Domain.Bus.Query;
+namespace FlowTrack.Shared.Domain;
 
 public sealed class QueryHandlerInformation
 {
     private readonly Dictionary<Type, Type> _handlers = new();
 
-    public void Add<Q, H, R>()
-        where Q : IQuery<R>
-        where H : IQueryHandler<Q, R>
+    public void Add(Type queryType, Type handlerType)
     {
-        var queryType = typeof(Q);
+        if (!typeof(IQuery).IsAssignableFrom(queryType))
+            throw new ArgumentException(
+                $"Type '{queryType.FullName}' does not implement IQuery.",
+                nameof(queryType)
+            );
+
+        var queryHandlerInterface =
+            handlerType
+                .GetInterfaces()
+                .FirstOrDefault(i =>
+                    i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQueryHandler<,>)
+                )
+            ?? throw new ArgumentException(
+                $"Type '{handlerType.FullName}' does not implement IQueryHandler<,>.",
+                nameof(handlerType)
+            );
+        var handledQueryType = queryHandlerInterface.GetGenericArguments()[0];
+
+        if (handledQueryType != queryType)
+            throw new ArgumentException(
+                $"Handler '{handlerType.FullName}' handles query '{handledQueryType.FullName}', not '{queryType.FullName}'.",
+                nameof(handlerType)
+            );
 
         if (_handlers.ContainsKey(queryType))
             throw new InvalidOperationException($"Query '{queryType.Name}' is already registered.");
 
-        _handlers[queryType] = typeof(H);
+        _handlers[queryType] = handlerType;
     }
 
     public Type Get<Q, R>()

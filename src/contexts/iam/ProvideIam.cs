@@ -1,8 +1,4 @@
-using FlowTrack.Iam.Application;
-using FlowTrack.Iam.Domain;
 using FlowTrack.Iam.Infrastructure;
-using FlowTrack.Shared.Domain;
-using FlowTrack.Shared.Domain.Bus.Query;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,32 +14,6 @@ public static class IamServiceCollectionExtensions
             options.UseNpgsql(iamDbContext.Database.GetConnectionString())
         );
 
-        AddQueries(services);
-        AddCommands(services);
-
         return services;
-    }
-
-    private static void AddQueries(IServiceCollection services)
-    {
-        var queryHandlerInformation =
-            services
-                .FirstOrDefault(service => service.ServiceType == typeof(QueryHandlerInformation))
-                ?.ImplementationInstance as QueryHandlerInformation
-            ?? throw new InvalidOperationException("QueryHandlerInformation service not found");
-
-        queryHandlerInformation.Add<SigninQry, SigninQryHandler, SigninSuccess>();
-        queryHandlerInformation.Add<FindUserByIdQry, FindUserByIdQryHandler, User>();
-    }
-
-    private static void AddCommands(IServiceCollection services)
-    {
-        var commandHandlerInformation =
-            services
-                .FirstOrDefault(service => service.ServiceType == typeof(CommandHandlerInformation))
-                ?.ImplementationInstance as CommandHandlerInformation
-            ?? throw new InvalidOperationException("CommandHandlerInformation service not found");
-
-        commandHandlerInformation.Add<SignupCmd, SignupCmdHandler>();
     }
 }

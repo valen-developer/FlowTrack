@@ -1,5 +1,5 @@
 using FlowTrack.Iam.Domain;
-using FlowTrack.Shared.Domain.Bus.Query;
+using FlowTrack.Shared.Domain;
 
 namespace FlowTrack.Iam.Application;
 

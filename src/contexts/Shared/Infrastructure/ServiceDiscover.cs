@@ -1,9 +1,10 @@
 using System.Reflection;
+using FlowTrack.Shared.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowTrack.Shared.Domain;
 
-public static class SharedServiceCollectionExtensions
+public static class ServicesDiscoverCollectionExtensions
 {
     public static IServiceCollection DiscoverServices(
         this IServiceCollection services,
@@ -14,6 +15,8 @@ public static class SharedServiceCollectionExtensions
 
         DiscoverServices(services, types);
         DiscoverProviders(services, types);
+        services.DiscoverCommands(assemblies);
+        services.DiscoverQueries(assemblies);
 
         return services;
     }
@@ -49,7 +52,9 @@ public static class SharedServiceCollectionExtensions
             .Where(a => !a.IsDynamic)
             .ToArray();
 
-        return services.DiscoverServices(assemblies);
+        services.DiscoverServices(assemblies);
+
+        return services;
     }
 
     private static void DiscoverProviders(IServiceCollection services, IEnumerable<Type> types)
