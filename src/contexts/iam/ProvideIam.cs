@@ -1,11 +1,12 @@
 using FlowTrack.Iam.Application;
 using FlowTrack.Iam.Domain;
+using FlowTrack.Iam.Infrastructure;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Bus.Query;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowTrack.Iam.Infrastructure;
+namespace FlowTrack.Iam;
 
 public static class IamServiceCollectionExtensions
 {
@@ -37,8 +38,6 @@ public static class IamServiceCollectionExtensions
 
     private static void AddCommands(IServiceCollection services)
     {
-        // services.AddScoped<SignupCmdHandler>();
-
         var commandHandlerInformation =
             services
                 .FirstOrDefault(service => service.ServiceType == typeof(CommandHandlerInformation))
