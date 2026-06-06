@@ -6,6 +6,7 @@ using FlowTrack.Shared.Infrastructure;
 
 namespace FlowTrack.Iam.Test.Infrastructure;
 
+[Service]
 [DomainEventSubscriber(typeof(UserCreated))]
 internal sealed class OnUserCreatedDomainEventSubscriber
 {

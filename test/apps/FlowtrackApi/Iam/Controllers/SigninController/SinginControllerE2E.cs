@@ -8,8 +8,9 @@ using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowtrackApi.Iam;
+namespace FlowtrackApi.Test;
 
+[Collection(nameof(FlowtrackApiCollection))]
 public class SinginControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(fixture)
 {
     [Fact]

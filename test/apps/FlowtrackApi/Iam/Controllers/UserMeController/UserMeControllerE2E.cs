@@ -6,8 +6,9 @@ using FlowTrack.Iam.Schemas;
 using FlowTrack.Iam.Test;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowtrackApi.Iam;
+namespace FlowtrackApi.Test;
 
+[Collection(nameof(FlowtrackApiCollection))]
 public class UserMeControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(fixture)
 {
     [Fact]

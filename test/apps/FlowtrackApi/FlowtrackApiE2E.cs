@@ -1,9 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
+namespace FlowtrackApi.Test;
 
-namespace FlowtrackApi;
-
+[Collection(nameof(FlowtrackApiCollection))]
 public abstract class FlowtrackApiE2E(FlowtrackApiFixture fixture)
-    : IClassFixture<FlowtrackApiFixture>
 {
     private readonly FlowtrackApiFixture _fixture = fixture;
     protected HttpClient HttpClient => _fixture.HttpClient;

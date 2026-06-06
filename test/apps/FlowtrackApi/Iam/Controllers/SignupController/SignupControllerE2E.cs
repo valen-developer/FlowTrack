@@ -3,8 +3,9 @@ using System.Net.Http.Json;
 using FlowTrack.Iam.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowtrackApi.Iam;
+namespace FlowtrackApi.Test;
 
+[Collection(nameof(FlowtrackApiCollection))]
 public class SignupControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(fixture)
 {
     [Fact]

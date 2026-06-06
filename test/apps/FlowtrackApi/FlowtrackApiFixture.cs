@@ -9,7 +9,7 @@ using Moq;
 using Npgsql;
 using Testcontainers.PostgreSql;
 
-namespace FlowtrackApi;
+namespace FlowtrackApi.Test;
 
 public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 {
@@ -56,7 +56,7 @@ public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetim
     private async Task RunPostgreSqlContainer()
     {
         _postgresContainer = new PostgreSqlBuilder("postgres:18-alpine")
-            .WithDatabase("flowtrack-api")
+            .WithDatabase($"flowtrack-api-{Guid.NewGuid():N}")
             .WithUsername(Environment.GetEnvironmentVariable("POSTGRES_USER") ?? "postgres")
             .WithPassword(Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? "password")
             .Build();
