@@ -13,7 +13,7 @@ namespace FlowTrack.Iam.Test;
 
 public class IamIntegrationFixture : IntegrationTestCase, IAsyncLifetime
 {
-    private static readonly PostgreSqlContainer _postgresContainer = new PostgreSqlBuilder(
+    private readonly PostgreSqlContainer _postgresContainer = new PostgreSqlBuilder(
         "postgres:18-alpine"
     )
         .WithDatabase("flowtrack-iam")
