@@ -101,6 +101,22 @@ public class SigninQryHandlerTests
     }
 
     [Fact]
+    public async Task Should_Throw_Exception_When_User_Is_Inactive()
+    {
+        var query = new SigninQry("testuser", "password123");
+        var inactiveUser = UserMother.Inactive();
+
+        var to = new SigninQryHandlerTestObject()
+            .DefaultMocks()
+            .WithUserByEmail(query.Email, inactiveUser);
+
+        var handler = to.handler;
+
+        var exception = await Assert.ThrowsAsync<SigninFailed>(() => handler.Handle(query));
+        to.AssertIsSigninFailed(exception);
+    }
+
+    [Fact]
     public async Task Should_Throw_Exception_When_Password_Does_Not_Match()
     {
         var query = new SigninQry("testuser", "wrongpassword");

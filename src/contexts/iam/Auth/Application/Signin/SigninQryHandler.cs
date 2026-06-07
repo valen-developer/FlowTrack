@@ -14,6 +14,9 @@ public sealed class SigninQryHandler(
     {
         var user = await repository.FindByEmail(qry.Email) ?? throw new SigninFailed();
 
+        if (!user.IsActive)
+            throw new SigninFailed();
+
         var isValidPassword = bcrypt.Compare(qry.Password, user.Password);
         if (!isValidPassword)
             throw new SigninFailed();
