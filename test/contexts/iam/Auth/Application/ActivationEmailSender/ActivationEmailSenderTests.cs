@@ -19,6 +19,7 @@ public class ActivationEmailSenderTests
         services.AddSingleton(_jwtServiceMock.Object);
         services.AddSingleton(_envStoreMock.Object);
         services.AddSingleton(_mailerMock.Object);
+        services.AddScoped<ActivationEmailGenerator>();
 
         services.AddScoped<ActivationEmailSender>();
 
@@ -49,6 +50,10 @@ public class ActivationEmailSenderTests
         _envStoreMock
             .Setup(e => e.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
             .Returns(expectedTokenSecret);
+
+        _envStoreMock
+            .Setup(e => e.Get(IamEnvironmentKeysEnum.IAM_URL_OF_ACTIVATION.ToString()))
+            .Returns("https://example.com/activate");
 
         await _activationEmailSender.Send(ActivationEmailSenderParams);
 

@@ -2,7 +2,13 @@ using FlowTrack.Shared.Domain;
 
 namespace FlowTrack.Iam.Application;
 
-public sealed class ActivationEmailSender(IJWTService jwtService, IEnvStore env, IMailer mailer)
+[Provider(typeof(IActivationEmailSender))]
+public sealed class ActivationEmailSender(
+    IJWTService jwtService,
+    IEnvStore env,
+    IMailer mailer,
+    ActivationEmailGenerator mailGenerator
+) : IActivationEmailSender
 {
     public async Task Send(ActivationEmailSenderParams @params)
     {
@@ -21,10 +27,8 @@ public sealed class ActivationEmailSender(IJWTService jwtService, IEnvStore env,
 
         var token = jwtService.Generate(payload: tokenPayload, options: tokenOptions);
 
-        var mail = new Mail(
-            to: @params.Email,
-            subject: "Activate your account",
-            body: $"<a href=\"{urlOfActivation}?token={token}\">Activate Account</a>"
+        var mail = await mailGenerator.Generate(
+            new(new Email(@params.Email), token, urlOfActivation)
         );
 
         await mailer.Send(mail);
