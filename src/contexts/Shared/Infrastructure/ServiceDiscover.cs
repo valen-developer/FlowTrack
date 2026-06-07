@@ -17,6 +17,7 @@ public static class ServicesDiscoverCollectionExtensions
         DiscoverProviders(services, types);
         services.DiscoverCommands(assemblies);
         services.DiscoverQueries(assemblies);
+        services.DiscoverDomainEventSubscribers(assemblies);
 
         return services;
     }

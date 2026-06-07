@@ -10,6 +10,7 @@ public class SignupCmdHandlerTests
 {
     private readonly SignupCmdHandler _handler;
     private readonly Mock<IUserRepository> _userRepositoryMock = new();
+    private readonly Mock<IBcrypt> _bcrypt = new();
     private readonly Mock<IDomainEventBus> _eventBus = new();
 
     public SignupCmdHandlerTests()
@@ -18,6 +19,7 @@ public class SignupCmdHandlerTests
 
         services.AddSingleton(_userRepositoryMock.Object);
         services.AddSingleton(_eventBus.Object);
+        services.AddSingleton(_bcrypt.Object);
         services.AddScoped<SignupCmdHandler>();
 
         _handler = services.BuildServiceProvider().GetRequiredService<SignupCmdHandler>();
@@ -27,7 +29,10 @@ public class SignupCmdHandlerTests
     public async Task Should_Save_An_Inactive_User()
     {
         User user = UserMother.Inactive();
+        string expectedHashedPassword = "hashed-password";
         User? expectedUser = null;
+
+        _bcrypt.Setup(x => x.Hash(It.IsAny<string>())).Returns(expectedHashedPassword);
 
         _userRepositoryMock
             .Setup(x => x.Create(It.IsAny<User>()))
@@ -37,7 +42,9 @@ public class SignupCmdHandlerTests
         await _handler.Handle(cmd);
 
         _userRepositoryMock.Verify(x => x.Create(It.IsAny<User>()), Times.Once);
-        Assert.Equivalent(expectedUser, user);
+        Assert.Equal(user.Id, expectedUser!.Id);
+        Assert.Equal(user.Email, expectedUser.Email);
+        Assert.Equal(expectedHashedPassword, expectedUser.Password);
         Assert.False(expectedUser!.IsActive);
     }
 

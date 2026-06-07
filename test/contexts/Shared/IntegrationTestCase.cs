@@ -7,7 +7,7 @@ namespace FlowTrack.Shared.Test;
 
 public abstract class IntegrationTestCase
 {
-    protected readonly ServiceCollection serviceCollection = new();
+    public readonly ServiceCollection serviceCollection = new();
     private ServiceProvider? serviceProvider;
     private IServiceScope? serviceScope;
 

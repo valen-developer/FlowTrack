@@ -1,18 +1,15 @@
 using System.Reflection;
 using FlowTrack.Shared.Domain;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowTrack.Shared.Infrastructure;
 
-public sealed record DomainEventSubscriberInfo(
-    Type SubscriberType,
-    MethodInfo HandlerMethod,
-    Type EventType
-);
-
-[Service]
-public class DomainEventSubscriberScanner
+public static class DomainEventSubscriberDiscoverServiceCollectionExtensions
 {
-    public IReadOnlyList<DomainEventSubscriberInfo> Scan(params Assembly[] assemblies)
+    public static IServiceCollection DiscoverDomainEventSubscribers(
+        this IServiceCollection services,
+        params Assembly[] assemblies
+    )
     {
         var subscriptions = new List<DomainEventSubscriberInfo>();
 
@@ -60,6 +57,9 @@ public class DomainEventSubscriberScanner
             }
         }
 
-        return subscriptions;
+        var subscriberInformation = new DomainEventSubscriberInformation([.. subscriptions]);
+        services.AddSingleton(subscriberInformation);
+
+        return services;
     }
 }

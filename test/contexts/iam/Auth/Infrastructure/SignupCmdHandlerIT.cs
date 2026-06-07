@@ -3,6 +3,7 @@ using FlowTrack.Iam.Domain;
 using FlowTrack.Iam.Infrastructure;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowTrack.Iam.Test.Infrastructure;
 
@@ -27,8 +28,16 @@ public class SignupCmdHandlerIT : IamIntegrationTestCase
     public SignupCmdHandlerIT(IamIntegrationFixture fixture)
         : base(fixture)
     {
+        DomainEventSubscriberInformation subscriberInfo = new([
+            new DomainEventSubscriberInfo(
+                typeof(OnUserCreatedDomainEventSubscriber),
+                typeof(OnUserCreatedDomainEventSubscriber).GetMethod("OnUserCreated")!,
+                typeof(UserCreated)
+            ),
+        ]);
+
+        fixture.serviceCollection.AddSingleton(subscriberInfo);
         fixture.AddScoped<SignupCmdHandler, SignupCmdHandler>();
-        fixture.AddScoped<DomainEventSubscriberScanner, DomainEventSubscriberScanner>();
         fixture.AddScoped<DomainEventDispatcher, DomainEventDispatcher>();
         fixture.AddScoped<IDomainEventBus, InMemoryDomainEventBus>();
         fixture.AddScoped<OnUserCreatedDomainEventSubscriber, OnUserCreatedDomainEventSubscriber>();
@@ -47,15 +56,13 @@ public class SignupCmdHandlerIT : IamIntegrationTestCase
 
         var savedUser = await userDao.FindById(user.Id);
 
-        Assert.Equivalent(user, savedUser);
+        Assert.Equal(user.Id, savedUser!.Id);
+        Assert.Equal(user.Email, savedUser.Email);
     }
 
     [Fact]
     public async Task Should_Emit_User_Created_Event()
     {
-        var dispatcher = _fixture.GetService<DomainEventDispatcher>();
-        dispatcher.RegisterSubscribers(typeof(OnUserCreatedDomainEventSubscriber).Assembly);
-
         var subscriber = _fixture.GetService<OnUserCreatedDomainEventSubscriber>();
         var handler = _fixture.GetService<SignupCmdHandler>();
 

@@ -21,7 +21,6 @@ builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
-builder.Services.ProvideShared();
 builder.Services.ProvideIam();
 builder.Services.DiscoverServices(["FlowTrack*.dll"]);
 

@@ -5,8 +5,11 @@ using FlowTrack.Shared.Domain.Bus.Command;
 namespace FlowTrack.Iam.Application;
 
 [Service]
-public sealed class SignupCmdHandler(IUserRepository repository, IDomainEventBus eventBus)
-    : ICommandHandler<SignupCmd>
+public sealed class SignupCmdHandler(
+    IUserRepository repository,
+    IDomainEventBus eventBus,
+    IBcrypt bcrypt
+) : ICommandHandler<SignupCmd>
 {
     public async Task Handle(SignupCmd command)
     {
@@ -19,7 +22,9 @@ public sealed class SignupCmdHandler(IUserRepository repository, IDomainEventBus
         Password password = Password.EnsurePassword(command.Password);
         Email email = new(command.Email);
 
-        var user = User.Create(command.Id, email.Value, password.Value, false);
+        string hashedPassword = bcrypt.Hash(password.Value);
+
+        var user = User.Create(command.Id, email.Value, hashedPassword, false);
         await repository.Create(user);
 
         await eventBus.Publish(user.PullDomainEvents());
