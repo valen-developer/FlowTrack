@@ -5,6 +5,7 @@
   </Folder>
   <Folder Name="/src/contexts/">
     <Project Path="src/contexts/Shared/FlowTrack.Shared.csproj" />
+    <Project Path="src/contexts/WorkManagement/FlowTrack.WorkManagement.csproj" />
   </Folder>
   <Folder Name="/src/contexts/Iam/">
     <Project Path="src/contexts/Iam/FlowTrack.Iam.csproj" />
@@ -16,5 +17,6 @@
   <Folder Name="/test/contexts/">
     <Project Path="test/contexts/Iam/FlowTrack.Iam.Test.csproj" />
     <Project Path="test/contexts/Shared/FlowTrack.Shared.Test.csproj" />
+    <Project Path="test/contexts/WorkManagement/FlowTrack.WorkManagement.Test.csproj" />
   </Folder>
 </Solution>
