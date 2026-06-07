@@ -59,4 +59,28 @@ public class ActivationEmailSenderTests
             Times.Once
         );
     }
+
+    [Fact]
+    public async Task Should_Throw_If_Token_Secret_Is_Missing()
+    {
+        var user = UserMother.Random();
+
+        var ActivationEmailSenderParams = new ActivationEmailSenderParams(
+            UserId: user.Id,
+            Email: user.Email
+        );
+
+        _envStoreMock
+            .Setup(e => e.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
+            .Returns((string?)null);
+
+        var exception = await Assert.ThrowsAsync<EnvVariableMissed>(() =>
+            _activationEmailSender.Send(ActivationEmailSenderParams)
+        );
+
+        Assert.Equal(
+            $"Environment variable {IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET} is required",
+            exception.Message
+        );
+    }
 }
