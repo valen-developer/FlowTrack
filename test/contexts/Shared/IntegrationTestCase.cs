@@ -23,7 +23,7 @@ public abstract class IntegrationTestCase
         DotEnvOptions options = new(envFilePaths: [envPath]);
         DotEnv.Load(options);
 
-        datetimeProviderMock.SetupGet(m => m.Now).Returns(new DateTime(2024, 1, 1));
+        datetimeProviderMock.SetupGet(m => m.Now).Returns(DateTime.UtcNow);
         serviceCollection.AddSingleton<IDateTimeProvider>(datetimeProviderMock.Object);
     }
 
