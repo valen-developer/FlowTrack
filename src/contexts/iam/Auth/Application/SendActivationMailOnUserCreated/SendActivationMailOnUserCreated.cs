@@ -6,6 +6,12 @@ public sealed class SendActivationMailOnUserCreated(IActivationEmailSender email
 {
     public async Task On(UserCreated @event)
     {
+        var isActive = @event.IsActive;
+        if (isActive)
+        {
+            return;
+        }
+
         await emailSender.Send(new ActivationEmailSenderParams(@event.UserId, @event.Email));
     }
 }
