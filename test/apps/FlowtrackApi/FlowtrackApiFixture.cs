@@ -1,5 +1,4 @@
 using System.Net.Sockets;
-using dotenv.net;
 using FlowTrack.Iam;
 using FlowTrack.Shared;
 using Microsoft.AspNetCore.Hosting;
@@ -19,9 +18,9 @@ public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetim
 
     public async Task InitializeAsync()
     {
-        ChargeEnv();
         await RunPostgreSqlContainer();
         await SetConnectionStrings();
+        ChargeEnv();
 
         var httpClientOptions = new WebApplicationFactoryClientOptions
         {
@@ -52,6 +51,25 @@ public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetim
     }
 
     Task IAsyncLifetime.DisposeAsync() => DisposeAsync().AsTask();
+
+    private static void ChargeEnv()
+    {
+        var env = new Dictionary<string, string>()
+        {
+            [IamEnvironmentKeysEnum.IAM_URL_OF_ACTIVATION.ToString()] = "http://localhost/activate",
+            [IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()] =
+                "access_token_secret_super_ultra_mega_strong",
+            [IamEnvironmentKeysEnum.ACCESS_TOKEN_SECRET.ToString()] =
+                "access_token_secret_super_ultra_mega_strong",
+            [IamEnvironmentKeysEnum.REFRESH_TOKEN_SECRET.ToString()] =
+                "access_token_secret_super_ultra_mega_strong",
+        };
+
+        foreach (var item in env)
+        {
+            Environment.SetEnvironmentVariable(item.Key, item.Value);
+        }
+    }
 
     private async Task RunPostgreSqlContainer()
     {
@@ -105,52 +123,5 @@ public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetim
         throw new InvalidOperationException(
             $"PostgreSQL container was not ready after {maxAttempts * delayMs} ms"
         );
-    }
-
-    private static void ChargeEnv()
-    {
-        string? envPath = FindEnvFilePath();
-
-        if (envPath is null)
-            return;
-
-        DotEnvOptions options = new(envFilePaths: [envPath]);
-        DotEnv.Load(options);
-    }
-
-    private static string? FindEnvFilePath()
-    {
-        foreach (string startPath in GetCandidateStartPaths())
-        {
-            string? envPath = FindEnvFrom(startPath);
-
-            if (envPath is not null)
-                return envPath;
-        }
-
-        return null;
-    }
-
-    private static IEnumerable<string> GetCandidateStartPaths()
-    {
-        yield return Directory.GetCurrentDirectory();
-        yield return AppContext.BaseDirectory;
-    }
-
-    private static string? FindEnvFrom(string startPath)
-    {
-        DirectoryInfo? currentDirectory = new(startPath);
-
-        while (currentDirectory is not null)
-        {
-            string envPath = Path.Combine(currentDirectory.FullName, ".env");
-
-            if (File.Exists(envPath))
-                return envPath;
-
-            currentDirectory = currentDirectory.Parent;
-        }
-
-        return null;
     }
 }
