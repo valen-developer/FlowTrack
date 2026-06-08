@@ -22,7 +22,19 @@ public class IamIntegrationFixture : IntegrationTestCase, IAsyncLifetime
         .Build();
 
     public IamIntegrationFixture()
-        : base()
+        : base(
+            env: new Dictionary<string, string>()
+            {
+                [IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()] =
+                    "activate_token_secret_super_ultra_mega_strong",
+                [IamEnvironmentKeysEnum.IAM_URL_OF_ACTIVATION.ToString()] =
+                    "http://localhost:5000/activate",
+                [IamEnvironmentKeysEnum.ACCESS_TOKEN_SECRET.ToString()] =
+                    "access_token_secret_super_ultra_mega_strong",
+                [IamEnvironmentKeysEnum.REFRESH_TOKEN_SECRET.ToString()] =
+                    "refresh_token_secret_super_ultra_mega_strong",
+            }
+        )
     {
         AddScoped<IJWTService, JWTService>();
         AddScoped<IEnvStore, EnvStore>();

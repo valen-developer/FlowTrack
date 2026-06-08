@@ -10,9 +10,6 @@ using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
-DotEnvOptions options = new(envFilePaths: ["../../../.env"]);
-DotEnv.Load(options);
-
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
@@ -42,6 +39,8 @@ builder
     );
 
 var app = builder.Build();
+
+app.Services.GetRequiredService<IDotEnvCharger>().Load(["../../../.env"]);
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseExceptionHandler(handler =>
