@@ -11,15 +11,19 @@ public class SignupCmdHandlerTests
     private readonly SignupCmdHandler _handler;
     private readonly Mock<IUserRepository> _userRepositoryMock = new();
     private readonly Mock<IBcrypt> _bcrypt = new();
-    private readonly Mock<IDomainEventBus> _eventBus = new();
+    private readonly Mock<IDomainEventBus> _domainEventBus = new();
 
     public SignupCmdHandlerTests()
     {
         var services = new ServiceCollection();
 
+        services.AddSingleton(_domainEventBus.Object);
+        services.AddSingleton(Mock.Of<IExternalEventBus>());
+
         services.AddSingleton(_userRepositoryMock.Object);
-        services.AddSingleton(_eventBus.Object);
         services.AddSingleton(_bcrypt.Object);
+
+        services.AddScoped<EventBus>();
         services.AddScoped<SignupCmdHandler>();
 
         _handler = services.BuildServiceProvider().GetRequiredService<SignupCmdHandler>();
@@ -53,8 +57,8 @@ public class SignupCmdHandlerTests
     {
         IEnumerable<DomainEvent>? capturedEvents = null;
 
-        _eventBus
-            .Setup(x => x.Publish(It.IsAny<List<DomainEvent>>()))
+        _domainEventBus
+            .Setup(x => x.Publish(It.IsAny<IEnumerable<DomainEvent>>()))
             .Callback<IEnumerable<DomainEvent>>(events => capturedEvents = events)
             .Returns(Task.CompletedTask);
 
@@ -69,7 +73,7 @@ public class SignupCmdHandlerTests
 
         await _handler.Handle(cmd);
 
-        _eventBus.Verify(x => x.Publish(It.IsAny<List<DomainEvent>>()), Times.Once);
+        _domainEventBus.Verify(x => x.Publish(It.IsAny<IEnumerable<DomainEvent>>()), Times.Once);
 
         Assert.NotNull(capturedEvents);
         Assert.Single(capturedEvents);

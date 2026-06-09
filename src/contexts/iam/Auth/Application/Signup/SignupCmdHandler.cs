@@ -5,11 +5,8 @@ using FlowTrack.Shared.Domain.Bus.Command;
 namespace FlowTrack.Iam.Application;
 
 [Service]
-public sealed class SignupCmdHandler(
-    IUserRepository repository,
-    IDomainEventBus eventBus,
-    IBcrypt bcrypt
-) : ICommandHandler<SignupCmd>
+public sealed class SignupCmdHandler(IUserRepository repository, EventBus eventBus, IBcrypt bcrypt)
+    : ICommandHandler<SignupCmd>
 {
     public async Task Handle(SignupCmd command)
     {

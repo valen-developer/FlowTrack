@@ -7,7 +7,7 @@ namespace FlowTrack.Iam.Test.Infrastructure;
 
 public class SendActivationEmailOnUserCreatedIT : IamIntegrationTestCase
 {
-    private IDomainEventBus _domainEventBus;
+    private EventBus _domainEventBus;
     private Mock<IMailer> _mailerMock = new();
 
     public SendActivationEmailOnUserCreatedIT(IamIntegrationFixture fixture)
@@ -16,7 +16,7 @@ public class SendActivationEmailOnUserCreatedIT : IamIntegrationTestCase
         fixture.serviceCollection.DiscoverServices(["FlowTrack*.dll"]);
         fixture.serviceCollection.AddSingleton(_mailerMock.Object);
 
-        _domainEventBus = fixture.GetService<IDomainEventBus>();
+        _domainEventBus = fixture.GetService<EventBus>();
     }
 
     [Fact]

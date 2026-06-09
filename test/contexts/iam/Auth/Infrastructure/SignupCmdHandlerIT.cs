@@ -37,9 +37,11 @@ public class SignupCmdHandlerIT : IamIntegrationTestCase
         ]);
 
         fixture.serviceCollection.AddSingleton(subscriberInfo);
+        fixture.AddScoped<EventBus, EventBus>();
         fixture.AddScoped<SignupCmdHandler, SignupCmdHandler>();
         fixture.AddScoped<DomainEventDispatcher, DomainEventDispatcher>();
         fixture.AddScoped<IDomainEventBus, InMemoryDomainEventBus>();
+        fixture.AddScoped<IExternalEventBus, InMemoryExternalEventBus>();
         fixture.AddScoped<OnUserCreatedDomainEventSubscriber, OnUserCreatedDomainEventSubscriber>();
     }
 

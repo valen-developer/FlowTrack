@@ -1,4 +1,3 @@
-using dotenv.net;
 using FlowTrack.Iam;
 using FlowTrack.Iam.Infrastructure;
 using FlowTrack.Shared;
@@ -7,7 +6,6 @@ using FlowTrack.Shared.Infrastructure;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 new DotEnvCharger().Load(["../../../.env"]);
