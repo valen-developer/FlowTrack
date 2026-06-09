@@ -16,20 +16,8 @@ public class SinginControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(
     [Fact]
     public async Task Should_Set_Auth_Cookies()
     {
-        var bcrypt =
-            Services.GetService<IBcrypt>()
-            ?? throw new InvalidOperationException("BCrypt service not found");
-
-        var userDao =
-            Services.GetService<UserDao>()
-            ?? throw new InvalidOperationException("UserDao service not found");
-
         var user = UserMother.Active();
-        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(user.Password);
-        var userEntity = UserEntity.FromDomain(user);
-        userEntity.Password = hashedPassword;
-
-        await userDao.Insert(userEntity);
+        await AddUserToDatabase(user);
 
         var authTokenGenerator =
             Services.GetService<AuthTokenGenerator>()
@@ -64,5 +52,28 @@ public class SinginControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(
         Assert.Equal(signinFailed.Message, responseBody.ErrorMessage);
         Assert.Equal(signinFailed.Code, responseBody.ErrorCode);
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    private async Task AddUserToDatabase(User user)
+    {
+        var dbContext =
+            Services.GetService<IamDbContext>()
+            ?? throw new InvalidOperationException("IamDbContext service not found");
+
+        var bcrypt =
+            Services.GetService<IBcrypt>()
+            ?? throw new InvalidOperationException("BCrypt service not found");
+
+        var userDao =
+            Services.GetService<UserDao>()
+            ?? throw new InvalidOperationException("UserDao service not found");
+
+        var hashedPassword = bcrypt.Hash(user.Password);
+        var userEntity = UserEntity.FromDomain(user);
+        userEntity.Password = hashedPassword;
+
+        await userDao.Insert(userEntity);
+
+        dbContext.SaveChanges();
     }
 }

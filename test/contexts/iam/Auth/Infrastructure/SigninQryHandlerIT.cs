@@ -25,11 +25,7 @@ public class SigninQryHandlerIT : IamIntegrationTestCase
     public async Task Should_Signin_User()
     {
         var user = UserMother.Active();
-
-        var userDao = _fixture.GetService<UserDao>();
-        var userEntity = UserEntity.FromDomain(user);
-        userEntity.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-        await userDao.Insert(userEntity);
+        await AddUserToDatabase(user);
 
         var jwtService = _fixture.GetService<IJWTService>();
         var envStore = _fixture.GetService<IEnvStore>();
@@ -61,5 +57,16 @@ public class SigninQryHandlerIT : IamIntegrationTestCase
         var result = await handler.Handle(qry);
 
         Assert.Equivalent(expectedResult, result);
+    }
+
+    private async Task AddUserToDatabase(User user)
+    {
+        var dbcontext = _fixture.GetService<IamDbContext>();
+        var userDao = _fixture.GetService<UserDao>();
+        var userEntity = UserEntity.FromDomain(user);
+        userEntity.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+        await userDao.Insert(userEntity);
+
+        dbcontext.SaveChanges();
     }
 }

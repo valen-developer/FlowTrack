@@ -6,15 +6,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FlowTrack.Iam.Controllers;
 
-public class SignupController(ICommandBus commandBus) : AuthController
+public class SignupController([FromKeyedServices("IAM")] Context context, ICommandBus commandBus)
+    : AuthController
 {
     [AllowAnonymous]
     [HttpPost("signup")]
     public async Task<IActionResult> Execute([FromBody] SignupRequest request)
     {
-        SignupCmd cmd = new(request.Id, request.Email, request.Password);
-        await commandBus.Dispatch(cmd);
+        return await context.Transaction.RunInTransaction(async () =>
+        {
+            SignupCmd cmd = new(request.Id, request.Email, request.Password);
+            await commandBus.Dispatch(cmd);
 
-        return StatusCode(201);
+            return StatusCode(201);
+        });
     }
 }

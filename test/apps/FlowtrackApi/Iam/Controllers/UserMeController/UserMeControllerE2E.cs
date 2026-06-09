@@ -1,9 +1,11 @@
 using System.Net;
 using System.Net.Http.Json;
 using FlowTrack.Iam.Application;
+using FlowTrack.Iam.Domain;
 using FlowTrack.Iam.Infrastructure;
 using FlowTrack.Iam.Schemas;
 using FlowTrack.Iam.Test;
+using FlowTrack.Shared.Domain;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowtrackApi.Test;
@@ -15,14 +17,7 @@ public class UserMeControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(
     public async Task Should_Return_User_Info()
     {
         var user = UserMother.Random();
-        var userEntity = UserEntity.FromDomain(user);
-        userEntity.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-
-        var userDao =
-            Services.GetService<UserDao>()
-            ?? throw new InvalidOperationException("UserDao service not found");
-
-        await userDao.Insert(userEntity);
+        await AddUserToDatabase(user);
 
         var authTokenGenerator =
             Services.GetService<AuthTokenGenerator>()
@@ -42,5 +37,28 @@ public class UserMeControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(
         Assert.NotNull(userInfo);
         Assert.Equal(user.Id.ToString(), userInfo.Id);
         Assert.Equal(user.Email, userInfo.Email);
+    }
+
+    private async Task AddUserToDatabase(User user)
+    {
+        var dbContext =
+            Services.GetService<IamDbContext>()
+            ?? throw new InvalidOperationException("IamDbContext service not found");
+
+        var bcrypt =
+            Services.GetService<IBcrypt>()
+            ?? throw new InvalidOperationException("BCrypt service not found");
+
+        var userDao =
+            Services.GetService<UserDao>()
+            ?? throw new InvalidOperationException("UserDao service not found");
+
+        var hashedPassword = bcrypt.Hash(user.Password);
+        var userEntity = UserEntity.FromDomain(user);
+        userEntity.Password = hashedPassword;
+
+        await userDao.Insert(userEntity);
+
+        dbContext.SaveChanges();
     }
 }

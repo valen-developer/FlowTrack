@@ -7,8 +7,10 @@ using FlowTrack.Shared.Infrastructure;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+new DotEnvCharger().Load(["../../../.env"]);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -20,6 +22,15 @@ builder.Services.AddOpenApi();
 
 builder.Services.ProvideIam();
 builder.Services.DiscoverServices(["FlowTrack*.dll"]);
+builder.Services.AddKeyedScoped<Context>(
+    "IAM",
+    (sp, _) =>
+    {
+        var dbContext = sp.GetRequiredService<IamDbContext>();
+        var transaction = new EfCoreTransaction(dbContext);
+        return new Context(transaction);
+    }
+);
 
 builder
     .Services.AddAuthentication(options =>
@@ -40,7 +51,6 @@ builder
 
 var app = builder.Build();
 
-app.Services.GetRequiredService<IDotEnvCharger>().Load(["../../../.env"]);
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseExceptionHandler(handler =>
