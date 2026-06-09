@@ -15,6 +15,23 @@ services:
     volumes:
       - flowtrack:/var/lib/postgresql
 
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: flowtrack-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: flowtrack
+      RABBITMQ_DEFAULT_PASS: flowtrack
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    networks:
+      flowtrack:
+        aliases:
+          - flowtrack-rabbitmq
+    volumes:
+      - ./rabbitmq_plugins:/etc/rabbitmq/enabled_plugins
+
   adminer:
     image: adminer
     container_name: adminer

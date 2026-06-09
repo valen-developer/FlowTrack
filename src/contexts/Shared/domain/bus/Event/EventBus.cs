@@ -1,6 +1,6 @@
 namespace FlowTrack.Shared.Domain;
 
-[Service]
+[Service(Lifetime.Singleton)]
 public sealed class EventBus(IDomainEventBus domainEventBus, IExternalEventBus externalEventBus)
 {
     public async Task Publish<T>(T @event)

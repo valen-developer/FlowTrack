@@ -4,6 +4,7 @@ using FlowTrack.Iam.Domain;
 using FlowTrack.Iam.Schemas;
 using FlowTrack.Shared;
 using FlowTrack.Shared.Domain;
+using FlowtrackApi;
 using FlowtrackApi.Iam.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,4 +1,5 @@
 using FlowTrack.Iam;
+using FlowTrack.Iam.Domain;
 using FlowTrack.Iam.Infrastructure;
 using FlowTrack.Shared;
 using FlowTrack.Shared.Domain;

@@ -7,6 +7,6 @@ public record UserCreated(Guid UserId, string Email, bool IsActive)
 {
     public override bool IsExternal()
     {
-        return false;
+        return true;
     }
 }
