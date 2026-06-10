@@ -30,8 +30,7 @@ public class RabbitMqExternalEventBus(RabbitMqConnection rabbitConnection, IEnvS
     private string MapToJsonApiSchema(DomainEvent @event)
     {
         var id = Guid.NewGuid().ToString();
-        var generalType = env.Get("DOMAIN_EVENT_GENERAL_TYPE") ?? "domain_event";
-        var type = $"{generalType}.{@event.GetCode()}";
+        var type = @event.GetCode();
 
         var json = new
         {
