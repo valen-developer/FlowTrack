@@ -3,7 +3,7 @@ using FlowTrack.Shared.Domain;
 
 namespace FlowTrack.Shared.Infrastructure;
 
-[Service(Lifetime.Singleton)]
+[Service]
 public class DomainEventDispatcher(
     DomainEventSubscriberInformation subscriberInformation,
     IServiceProvider serviceProvider

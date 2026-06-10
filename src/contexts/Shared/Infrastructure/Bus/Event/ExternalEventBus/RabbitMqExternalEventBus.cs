@@ -3,7 +3,7 @@ using RabbitMQ.Client;
 
 namespace FlowTrack.Shared.Infrastructure;
 
-[Provider(typeof(IExternalEventBus), Lifetime.Singleton)]
+[Provider(typeof(IExternalEventBus))]
 public class RabbitMqExternalEventBus(RabbitMqConnection rabbitConnection, IEnvStore env)
     : IExternalEventBus
 {
@@ -11,7 +11,7 @@ public class RabbitMqExternalEventBus(RabbitMqConnection rabbitConnection, IEnvS
         where T : DomainEvent
     {
         var channel = await rabbitConnection.CreateChannelAsync();
-        var exchangeName = "domain_events";
+        var exchangeName = env.Get("EXTERNAL_EVENT_EXCHANGE_NAME") ?? "domain_events";
 
         await channel.ExchangeDeclareAsync(exchangeName, ExchangeType.Topic, durable: true);
 
@@ -39,8 +39,9 @@ public class RabbitMqExternalEventBus(RabbitMqConnection rabbitConnection, IEnvS
             {
                 id,
                 type,
+                code = @event.Code,
                 ocurred_at = @event.OccurredOn.ToUniversalTime(),
-                attributes = @event,
+                attributes = (object)@event,
                 meta = new { },
             },
         };

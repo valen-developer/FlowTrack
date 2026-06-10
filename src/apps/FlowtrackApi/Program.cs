@@ -48,6 +48,8 @@ builder
             .Build()
     );
 
+builder.Services.AddHostedService<ExternalEventSubscribeBackground>();
+
 var app = builder.Build();
 
 app.UseAuthentication();

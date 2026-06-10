@@ -2,7 +2,7 @@ using FlowTrack.Shared.Domain;
 
 namespace FlowTrack.Shared.Infrastructure;
 
-[Provider(typeof(IDomainEventBus), Lifetime.Singleton)]
+[Provider(typeof(IDomainEventBus))]
 public class InMemoryDomainEventBus(DomainEventDispatcher dispatcher) : IDomainEventBus
 {
     public async Task Publish<T>(T @event)
