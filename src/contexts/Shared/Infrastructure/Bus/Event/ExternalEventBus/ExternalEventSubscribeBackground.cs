@@ -53,7 +53,7 @@ public sealed class ExternalEventSubscribeBackground(
                         await channel.BasicAckAsync(args.DeliveryTag, false);
                         return;
                     }
-                    await dispatcher.DispatchAsync(domainEvent);
+                    await dispatcher.DispatchExternal(subscriberInfo, domainEvent);
 
                     await channel.BasicAckAsync(args.DeliveryTag, false);
                 }

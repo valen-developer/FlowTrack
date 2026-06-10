@@ -6,22 +6,10 @@ namespace FlowTrack.Shared.Infrastructure;
 [Service]
 public class DomainEventDispatcher(
     DomainEventSubscriberInformation subscriberInformation,
-    ExternalEventSubscriberInformation externalSubscriberInformation,
     IServiceProvider serviceProvider
 )
 {
     public async Task DispatchAsync(DomainEvent domainEvent)
-    {
-        if (domainEvent.IsExternal())
-        {
-            await DispatchExternalEvent(domainEvent);
-            return;
-        }
-
-        await DispatchDomainEvent(domainEvent);
-    }
-
-    private async Task DispatchDomainEvent(DomainEvent domainEvent)
     {
         var eventType = domainEvent.GetType();
         var handlers = subscriberInformation.GetSubscribersForEvent(eventType);
@@ -42,24 +30,18 @@ public class DomainEventDispatcher(
         }
     }
 
-    private async Task DispatchExternalEvent(DomainEvent domainEvent)
+    public async Task DispatchExternal(ExternalEventSubscriberInfo info, DomainEvent domainEvent)
     {
-        var eventType = domainEvent.GetType();
-        var handlers = externalSubscriberInformation.GetSubscribersForEvent(eventType);
+        var instance =
+            serviceProvider.GetService(info.SubscriberType)
+            ?? throw new InvalidOperationException(
+                $"Unable to resolve an instance of {info.SubscriberType.FullName} for handling external event."
+            );
+        var result = info.HandlerMethod.Invoke(instance, [domainEvent]);
 
-        foreach (var handler in handlers)
+        if (result is Task taskResult)
         {
-            var instance =
-                serviceProvider.GetService(handler.SubscriberType)
-                ?? throw new InvalidOperationException(
-                    $"Unable to resolve an instance of {handler.SubscriberType.FullName} for handling external event {eventType.FullName}."
-                );
-            var result = handler.HandlerMethod.Invoke(instance, [domainEvent]);
-
-            if (result is Task taskResult)
-            {
-                await taskResult;
-            }
+            await taskResult;
         }
     }
 }
