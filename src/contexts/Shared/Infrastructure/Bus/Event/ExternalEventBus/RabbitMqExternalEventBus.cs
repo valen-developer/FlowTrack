@@ -15,7 +15,7 @@ public class RabbitMqExternalEventBus(RabbitMqConnection rabbitConnection, IEnvS
 
         await channel.ExchangeDeclareAsync(exchangeName, ExchangeType.Topic, durable: true);
 
-        var routingKey = @event.Code;
+        var routingKey = @event.GetCode();
 
         var body = MapToJsonApiSchema(@event);
         var bodyBytes = System.Text.Encoding.UTF8.GetBytes(body);
@@ -31,7 +31,7 @@ public class RabbitMqExternalEventBus(RabbitMqConnection rabbitConnection, IEnvS
     {
         var id = Guid.NewGuid().ToString();
         var generalType = env.Get("DOMAIN_EVENT_GENERAL_TYPE") ?? "domain_event";
-        var type = $"{generalType}.{@event.Code}";
+        var type = $"{generalType}.{@event.GetCode()}";
 
         var json = new
         {
@@ -39,7 +39,7 @@ public class RabbitMqExternalEventBus(RabbitMqConnection rabbitConnection, IEnvS
             {
                 id,
                 type,
-                code = @event.Code,
+                code = @event.GetCode(),
                 ocurred_at = @event.OccurredOn.ToUniversalTime(),
                 attributes = (object)@event,
                 meta = new { },

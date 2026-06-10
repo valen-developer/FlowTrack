@@ -1,9 +1,10 @@
 namespace FlowTrack.Shared.Domain;
 
-public abstract record DomainEvent(string code)
+public abstract record DomainEvent
 {
     public DateTime OccurredOn { get; protected set; } = DateTime.UtcNow;
-    public string Code { get; } = code;
 
     public abstract bool IsExternal();
+
+    public abstract string GetCode();
 }

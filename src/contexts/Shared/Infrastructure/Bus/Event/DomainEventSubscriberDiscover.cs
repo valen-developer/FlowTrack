@@ -12,6 +12,7 @@ public static class DomainEventSubscriberDiscoverServiceCollectionExtensions
     )
     {
         var subscriptions = new List<DomainEventSubscriberInfo>();
+        var externalSubscriptions = new List<ExternalEventSubscriberInfo>();
 
         foreach (var assembly in assemblies)
         {
@@ -47,18 +48,41 @@ public static class DomainEventSubscriberDiscoverServiceCollectionExtensions
                         && (m.ReturnType == typeof(void) || m.ReturnType == typeof(Task))
                     );
 
-                foreach (var handlerMethod in handlerMethods)
+                var firstHandlerMethod = handlerMethods.FirstOrDefault();
+                if (firstHandlerMethod == null)
                 {
-                    var eventType = handlerMethod.GetParameters()[0].ParameterType;
-                    subscriptions.Add(
-                        new DomainEventSubscriberInfo(subscriberType, handlerMethod, eventType)
+                    throw new InvalidOperationException(
+                        $"Type {subscriberType.FullName} is marked as a domain event subscriber but does not have any valid handler methods."
                     );
                 }
+
+                var eventType = firstHandlerMethod.GetParameters()[0].ParameterType;
+                var isExternal =
+                    eventType.GetProperty("External")?.GetValue(null) as bool? ?? false;
+
+                if (isExternal)
+                {
+                    externalSubscriptions.Add(
+                        new ExternalEventSubscriberInfo(subscriberType, firstHandlerMethod)
+                    );
+
+                    continue;
+                }
+
+                subscriptions.Add(
+                    new DomainEventSubscriberInfo(subscriberType, firstHandlerMethod, eventType)
+                );
             }
         }
 
-        var subscriberInformation = new DomainEventSubscriberInformation([.. subscriptions]);
-        services.AddSingleton(subscriberInformation);
+        var domainEventSubscriberInformation = new DomainEventSubscriberInformation([
+            .. subscriptions,
+        ]);
+        var externalEventSubscriberInformation = new ExternalEventSubscriberInformation([
+            .. externalSubscriptions,
+        ]);
+        services.AddSingleton(domainEventSubscriberInformation);
+        services.AddSingleton(externalEventSubscriberInformation);
 
         return services;
     }

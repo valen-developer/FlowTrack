@@ -8,22 +8,35 @@ public sealed class ExternalEventSubscribeBackground(
     IEnvStore env,
     IJsonToDomainEventMapper jsonToDomainEventMapper,
     RabbitMqSubscriber suscriber,
+    ExternalEventSubscriberInformation subscriberInformation,
     IServiceScopeFactory serviceScopeFactory
 ) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var routingKeys = (env.Get("EXTERNAL_EVENT_ROUTING_KEYS") ?? "").Split(",") ?? [];
+        var scope = serviceScopeFactory.CreateScope();
+        var dispatcher = scope.ServiceProvider.GetRequiredService<DomainEventDispatcher>();
+        var subscribeTasks = subscriberInformation.Subscribers.Select(subscriberInfo =>
+            HandleSusbcription(subscriberInfo, dispatcher)
+        );
+        await Task.WhenAll(subscribeTasks);
+    }
+
+    private async Task HandleSusbcription(
+        ExternalEventSubscriberInfo subscriberInfo,
+        DomainEventDispatcher dispatcher
+    )
+    {
+        var exchangeName = env.Get("EXTERNAL_EVENT_EXCHANGE_NAME") ?? "";
+        var queueName = subscriberInfo.QueueName;
+        var routingKey = subscriberInfo.EventCode;
 
         var subcriberParams = new RabbitMqSubscribeParams()
         {
-            ExchangeName = env.Get("EXTERNAL_EVENT_EXCHANGE_NAME") ?? "",
-            QueueName = env.Get("EXTERNAL_EVENT_QUEUE_NAME") ?? "",
-            RoutingKeys = routingKeys,
+            ExchangeName = exchangeName,
+            QueueName = queueName,
+            RoutingKeys = [routingKey],
         };
-
-        var scope = serviceScopeFactory.CreateScope();
-        var dispatcher = scope.ServiceProvider.GetRequiredService<DomainEventDispatcher>();
 
         await suscriber.SubscribeAsync(
             subcriberParams,

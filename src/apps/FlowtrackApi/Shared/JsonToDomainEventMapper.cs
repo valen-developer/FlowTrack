@@ -10,13 +10,15 @@ public sealed class JsonToDomainEventMapper : IJsonToDomainEventMapper
     public DomainEvent? Map(string json)
     {
         var jsonApi = JsonSerializer.Deserialize<object>(json) as JsonElement?;
-        var attributes = jsonApi?.GetProperty("data").GetProperty("attributes");
-        var eventCode = attributes?.GetProperty("code").GetString();
+        var data = jsonApi?.GetProperty("data");
+        var attributes = data?.GetProperty("attributes");
+        var eventCode = data?.GetProperty("code").GetString();
 
-        return eventCode switch
+        if (eventCode == UserCreated.Code)
         {
-            "iam.user.created" => attributes!.Value.Deserialize<UserCreated>(),
-            _ => null,
-        };
+            return attributes!.Value.Deserialize<UserCreated>();
+        }
+
+        return null;
     }
 }
