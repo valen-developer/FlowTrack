@@ -16,6 +16,8 @@ public sealed class SendActivationMailOnUserCreated(IActivationEmailSender email
             return;
         }
 
-        await emailSender.Send(new ActivationEmailSenderParams(@event.UserId, @event.Email));
+        await emailSender.Send(
+            new ActivationEmailSenderParams(new Guid(@event.UserId), @event.Email)
+        );
     }
 }

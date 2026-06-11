@@ -25,7 +25,7 @@ public sealed class AuthTokenGenerator(IEnvStore envStore, IJWTService jwtServic
     private JWTPayload GeneratePayload(User user)
     {
         return new JWTPayload(
-            new Dictionary<string, string> { { "id", user.Id.ToString() } }.ToImmutableDictionary()
+            new Dictionary<string, string> { { "id", user.Id.Value } }.ToImmutableDictionary()
         );
     }
 

@@ -2,19 +2,20 @@ using FlowTrack.Shared.Domain;
 
 namespace FlowTrack.Iam.Domain;
 
-public class User(Guid id, string email, string password, bool isActive = false) : AggregatedRoot
+public class User(UserId id, UserEmail email, UserPassword password, bool isActive = false)
+    : AggregatedRoot
 {
-    public Guid Id { get; } = id;
-    public string Email { get; } = email;
-    public string Password { get; } = password;
+    public UserId Id { get; } = id;
+    public UserEmail Email { get; } = email;
+    public UserPassword Password { get; } = password;
     public bool IsActive { get; } = isActive;
 
-    public static User Create(string id, string email, string password, bool isActive)
+    public static User Create(UserId id, UserEmail email, UserPassword password, bool isActive)
     {
-        var user = new User(Guid.Parse(id), email, password, isActive);
+        var user = new User(id, email, password, isActive);
         UserCreated userCreatedEvent = new(
-            UserId: user.Id,
-            Email: user.Email,
+            UserId: user.Id.Value,
+            Email: user.Email.Value,
             IsActive: user.IsActive
         );
 

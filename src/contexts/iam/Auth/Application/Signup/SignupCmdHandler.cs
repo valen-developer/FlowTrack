@@ -17,11 +17,16 @@ public sealed class SignupCmdHandler(IUserRepository repository, EventBus eventB
         }
 
         Password password = Password.EnsurePassword(command.Password);
-        Email email = new(command.Email);
+        UserEmail email = new(command.Email);
 
         string hashedPassword = bcrypt.Hash(password.Value);
 
-        var user = User.Create(command.Id, email.Value, hashedPassword, false);
+        var user = User.Create(
+            id: new UserId(command.Id),
+            password: new UserPassword(hashedPassword),
+            email: email,
+            isActive: false
+        );
         await repository.Create(user);
 
         await eventBus.Publish(user.PullDomainEvents());

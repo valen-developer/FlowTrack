@@ -17,7 +17,7 @@ public sealed class SigninQryHandler(
         if (!user.IsActive)
             throw new SigninFailed();
 
-        var isValidPassword = bcrypt.Compare(qry.Password, user.Password);
+        var isValidPassword = bcrypt.Compare(qry.Password, user.Password.Value);
         if (!isValidPassword)
             throw new SigninFailed();
 

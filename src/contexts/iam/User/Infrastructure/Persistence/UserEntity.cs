@@ -13,15 +13,20 @@ public class UserEntity
     {
         return new UserEntity()
         {
-            Id = user.Id,
-            Email = user.Email,
-            Password = user.Password,
+            Id = new Guid(user.Id.Value),
+            Email = user.Email.Value,
+            Password = user.Password.Value,
             IsActive = user.IsActive,
         };
     }
 
     public User ToDomain()
     {
-        return new User(Id, Email, Password, IsActive);
+        return new User(
+            new UserId(Id.ToString()),
+            new UserEmail(Email),
+            new UserPassword(Password),
+            IsActive
+        );
     }
 }
