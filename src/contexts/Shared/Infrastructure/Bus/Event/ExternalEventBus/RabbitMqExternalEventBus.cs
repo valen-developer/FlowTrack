@@ -20,9 +20,19 @@ public class RabbitMqExternalEventBus(RabbitMqConnection rabbitConnection, IEnvS
         var body = MapToJsonApiSchema(@event);
         var bodyBytes = System.Text.Encoding.UTF8.GetBytes(body);
 
+        var props = new RabbitMQ.Client.BasicProperties
+        {
+            Headers = new Dictionary<string, object?>
+            {
+                ["x-retry-count"] = 0
+            }
+        };
+
         await channel.BasicPublishAsync(
             exchange: exchangeName,
             routingKey: routingKey,
+            mandatory: true,
+            basicProperties: props,
             body: bodyBytes
         );
     }
