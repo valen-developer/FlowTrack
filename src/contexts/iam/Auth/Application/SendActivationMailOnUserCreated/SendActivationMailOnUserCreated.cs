@@ -4,18 +4,12 @@ using FlowTrack.Shared.Domain;
 namespace FlowTrack.Iam.Application;
 
 [Service]
-[DomainEventSubscriber(typeof(UserCreated))]
+[DomainEventSubscriber(typeof(UserSignupped))]
 public sealed class SendActivationMailOnUserCreated(IActivationEmailSender emailSender)
 {
     [DomainEventListener]
-    public async Task On(UserCreated @event)
+    public async Task On(UserSignupped @event)
     {
-        var isActive = @event.IsActive;
-        if (isActive)
-        {
-            return;
-        }
-
         await emailSender.Send(
             new ActivationEmailSenderParams(new Guid(@event.UserId), @event.Email)
         );

@@ -10,14 +10,10 @@ public class User(UserId id, UserEmail email, UserPassword password, bool isActi
     public UserPassword Password { get; } = password;
     public bool IsActive { get; } = isActive;
 
-    public static User Create(UserId id, UserEmail email, UserPassword password, bool isActive)
+    public static User Signup(UserId id, UserEmail email, UserPassword password)
     {
-        var user = new User(id, email, password, isActive);
-        UserCreated userCreatedEvent = new(
-            UserId: user.Id.Value,
-            Email: user.Email.Value,
-            IsActive: user.IsActive
-        );
+        var user = new User(id, email, password, false);
+        UserSignupped userCreatedEvent = new(UserId: user.Id.Value, Email: user.Email.Value);
 
         user.Record(userCreatedEvent);
 

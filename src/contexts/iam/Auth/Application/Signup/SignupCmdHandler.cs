@@ -21,11 +21,10 @@ public sealed class SignupCmdHandler(IUserRepository repository, EventBus eventB
 
         string hashedPassword = bcrypt.Hash(password.Value);
 
-        var user = User.Create(
+        var user = User.Signup(
             id: new UserId(command.Id),
             password: new UserPassword(hashedPassword),
-            email: email,
-            isActive: false
+            email: email
         );
         await repository.Create(user);
 
