@@ -22,10 +22,7 @@ public class RabbitMqExternalEventBus(RabbitMqConnection rabbitConnection, IEnvS
 
         var props = new RabbitMQ.Client.BasicProperties
         {
-            Headers = new Dictionary<string, object?>
-            {
-                ["x-retry-count"] = 0
-            }
+            Headers = new Dictionary<string, object?> { ["x-retry-count"] = 0 },
         };
 
         await channel.BasicPublishAsync(
