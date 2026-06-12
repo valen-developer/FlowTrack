@@ -1,8 +1,10 @@
 using System.Net.Sockets;
 using FlowTrack.Iam;
+using FlowTrack.Iam.Infrastructure;
 using FlowTrack.Shared;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Npgsql;
@@ -123,5 +125,13 @@ public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetim
         throw new InvalidOperationException(
             $"PostgreSQL container was not ready after {maxAttempts * delayMs} ms"
         );
+    }
+
+    public async Task<List<T>> ExecuteQueryAsync<T>(string sqlQuery)
+        where T : class
+    {
+        var dbContext = Services.GetRequiredService<IamDbContext>();
+
+        return await dbContext.Set<T>().FromSqlRaw(sqlQuery).AsNoTracking().ToListAsync();
     }
 }

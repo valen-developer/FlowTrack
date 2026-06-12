@@ -111,6 +111,6 @@ public class IamIntegrationFixture : IntegrationTestCase, IAsyncLifetime
         using var scope = provider.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<IamDbContext>();
 
-        return await dbContext.Set<T>().FromSqlRaw(sqlQuery).ToListAsync();
+        return await dbContext.Set<T>().FromSqlRaw(sqlQuery).AsNoTracking().ToListAsync();
     }
 }
