@@ -2,6 +2,7 @@ using FlowTrack.Iam.Application;
 using FlowTrack.Iam.Domain;
 using FlowTrack.Shared;
 using FlowTrack.Shared.Domain;
+using FlowTrack.Shared.Test;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
@@ -24,6 +25,9 @@ public class ActivateUserByTokenCmdTests
         service.AddSingleton(_queryBusMock.Object);
         service.AddSingleton(_eventBusMock.Object);
         service.AddSingleton(_userRepositoryMock.Object);
+
+        var context = new Context(new DummyTransaction());
+        service.AddKeyedScoped("IAM", (_, _) => context);
 
         service.AddSingleton(Mock.Of<IExternalEventBus>());
         service.AddSingleton<EventBus>();

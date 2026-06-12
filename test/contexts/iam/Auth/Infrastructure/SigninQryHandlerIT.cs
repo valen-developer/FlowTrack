@@ -56,15 +56,4 @@ public class SigninQryHandlerIT : IamIntegrationTestCase
 
         Assert.Equivalent(expectedResult, result);
     }
-
-    private async Task AddUserToDatabase(User user)
-    {
-        var dbcontext = _fixture.GetService<IamDbContext>();
-        var userDao = _fixture.GetService<UserDao>();
-        var userEntity = UserEntity.FromDomain(user);
-        userEntity.Password = BCrypt.Net.BCrypt.HashPassword(user.Password.Value);
-        await userDao.Insert(userEntity);
-
-        dbcontext.SaveChanges();
-    }
 }

@@ -41,6 +41,16 @@ public class IamIntegrationFixture : IntegrationTestCase, IAsyncLifetime
         AddScoped<IBcrypt, Bcrypt>();
         AddScoped<IUserRepository, EfUserRepository>();
         AddScoped<UserDao, UserDao>();
+
+        serviceCollection.AddKeyedScoped(
+            "IAM",
+            (sp, _) =>
+            {
+                var dbContext = sp.GetRequiredService<IamDbContext>();
+                var transaction = new EfCoreTransaction(dbContext);
+                return new Context(transaction);
+            }
+        );
     }
 
     public async Task InitializeAsync()
@@ -92,5 +102,15 @@ public class IamIntegrationFixture : IntegrationTestCase, IAsyncLifetime
     public async Task DisposeAsync()
     {
         await _postgresContainer.DisposeAsync();
+    }
+
+    public async Task<List<T>> ExecuteQueryAsync<T>(string sqlQuery)
+        where T : class
+    {
+        using var provider = serviceCollection.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<IamDbContext>();
+
+        return await dbContext.Set<T>().FromSqlRaw(sqlQuery).ToListAsync();
     }
 }

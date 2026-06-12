@@ -2,10 +2,13 @@ using FlowTrack.Iam.Domain;
 using FlowTrack.Shared;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Bus.Command;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowTrack.Iam.Application;
 
+[Service]
 public sealed class ActivateUserByTokenCmdHandler(
+    [FromKeyedServices("IAM")] Context context,
     IEnvStore envStore,
     IJWTService jwtService,
     IQueryBus queryBus,
@@ -15,25 +18,29 @@ public sealed class ActivateUserByTokenCmdHandler(
 {
     public async Task Handle(ActivateUserByTokenCmd command)
     {
-        var secretKey = IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString();
-
-        var secret = envStore.Get(secretKey) ?? throw new EnvVariableMissed(secretKey);
-        var isValid = jwtService.Verify(command.Token, secret);
-
-        if (!isValid)
+        await context.Transaction.RunInTransaction(async () =>
         {
-            throw new UnAuthenticatedException();
-        }
+            var secretKey = IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString();
 
-        var decoded = jwtService.Decode(command.Token);
-        var userId = decoded?.Claims["id"];
+            var secret = envStore.Get(secretKey) ?? throw new EnvVariableMissed(secretKey);
+            var isValid = jwtService.Verify(command.Token, secret);
 
-        var user = await queryBus.Ask<FindUserByIdQry, User>(new FindUserByIdQry(userId!));
+            if (!isValid)
+            {
+                throw new UnAuthenticatedException();
+            }
 
-        user.Activate();
+            var decoded = jwtService.Decode(command.Token);
+            var userId = decoded?.Claims["id"];
 
-        await userRepository.Update(user);
+            var user = await queryBus.Ask<FindUserByIdQry, User>(new FindUserByIdQry(userId!));
 
-        await eventBus.Publish(user.PullDomainEvents());
+            user.Activate();
+
+            await userRepository.Update(user);
+
+            await eventBus.Publish(user.PullDomainEvents());
+            return true;
+        });
     }
 }

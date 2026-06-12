@@ -1,3 +1,4 @@
+using FlowTrack.Iam.Domain;
 using FlowTrack.Shared.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +24,7 @@ public class UserDao(IamDbContext iamDbContext)
 
     public async Task Update(UserEntity userEntity)
     {
-        iamDbContext.Users.Update(userEntity);
+        var tracked = await iamDbContext.Users.FindAsync(userEntity.Id) ?? throw new UserNotFound();
+        iamDbContext.Entry(tracked).CurrentValues.SetValues(userEntity);
     }
 }
