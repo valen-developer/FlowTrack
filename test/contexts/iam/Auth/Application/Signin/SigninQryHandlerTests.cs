@@ -220,7 +220,5 @@ public class SigninQryHandlerTests
         );
 
     private JWTPayload ExpectedPayload(User user) =>
-        new(
-            new Dictionary<string, string> { { "id", user.Id.ToString() } }.ToImmutableDictionary()
-        );
+        new(new Dictionary<string, string> { { "id", user.Id.Value } }.ToImmutableDictionary());
 }

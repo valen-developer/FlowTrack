@@ -20,12 +20,12 @@ public class SendActivationEmailOnUserCreatedIT : IamIntegrationTestCase
     }
 
     [Fact]
-    public async Task Should_Send_Activation_Email_When_User_Is_Created()
+    public async Task Should_Send_Activation_Email_When_User_Is_Signupped()
     {
         var user = UserMother.Random();
-        var userCreatedEvent = new UserCreated(user.Id, user.Email, false);
+        var userSignupedEvent = new UserSignupped(user.Id.Value, user.Email.Value);
 
-        await _domainEventBus.Publish(userCreatedEvent);
+        await _domainEventBus.Publish(userSignupedEvent);
 
         _mailerMock.Verify(m => m.Send(It.IsAny<Mail>()), Times.Once);
     }

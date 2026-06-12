@@ -25,9 +25,9 @@ public class FindUserByIdQryTest
     public async Task Should_Return_User()
     {
         var user = UserMother.Random();
-        userRepositoryMock.Setup(r => r.FindById(user.Id)).ReturnsAsync(user);
+        userRepositoryMock.Setup(r => r.FindById(user.Id.Value)).ReturnsAsync(user);
 
-        var qry = new FindUserByIdQry(user.Id);
+        var qry = new FindUserByIdQry(user.Id.Value);
         var result = await handler.Handle(qry);
 
         Assert.Equivalent(user, result);
@@ -36,7 +36,7 @@ public class FindUserByIdQryTest
     [Fact]
     public async Task Should_Throw_UserNotFoundException()
     {
-        var userId = Guid.NewGuid();
+        var userId = Guid.NewGuid().ToString();
         userRepositoryMock.Setup(r => r.FindById(userId)).ReturnsAsync((User)null);
 
         var qry = new FindUserByIdQry(userId);

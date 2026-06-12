@@ -36,7 +36,7 @@ public class UserMeControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(
         var userInfo = await response.Content.ReadFromJsonAsync<UserMeResponse>();
         Assert.NotNull(userInfo);
         Assert.Equal(user.Id.ToString(), userInfo.Id);
-        Assert.Equal(user.Email, userInfo.Email);
+        Assert.Equal(user.Email.Value, userInfo.Email);
     }
 
     private async Task AddUserToDatabase(User user)
@@ -53,7 +53,7 @@ public class UserMeControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(
             Services.GetService<UserDao>()
             ?? throw new InvalidOperationException("UserDao service not found");
 
-        var hashedPassword = bcrypt.Hash(user.Password);
+        var hashedPassword = bcrypt.Hash(user.Password.Value);
         var userEntity = UserEntity.FromDomain(user);
         userEntity.Password = hashedPassword;
 

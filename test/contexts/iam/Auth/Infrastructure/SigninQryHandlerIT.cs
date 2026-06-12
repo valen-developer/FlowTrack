@@ -40,9 +40,7 @@ public class SigninQryHandlerIT : IamIntegrationTestCase
             ?? throw new Exception("REFRESH_TOKEN_SECRET is not set");
         var refreshTokenExpirationMinutes = 60 * 24 * 30;
 
-        var payload = new JWTPayload(
-            new Dictionary<string, string> { ["id"] = user.Id.ToString() }
-        );
+        var payload = new JWTPayload(new Dictionary<string, string> { ["id"] = user.Id.Value });
 
         var accessTokenOptions = new JWTOptions(accessTokenSecret, accessTokenExpirationMinutes);
         var refreshTokenOptions = new JWTOptions(refreshTokenSecret, refreshTokenExpirationMinutes);
@@ -52,7 +50,7 @@ public class SigninQryHandlerIT : IamIntegrationTestCase
         var expectedResult = new SigninSuccess(expectedAccessToken, expectedRefreshToken);
 
         var handler = _fixture.GetService<SigninQryHandler>();
-        var qry = new SigninQry(user.Email, user.Password);
+        var qry = new SigninQry(user.Email.Value, user.Password.Value);
 
         var result = await handler.Handle(qry);
 
@@ -64,7 +62,7 @@ public class SigninQryHandlerIT : IamIntegrationTestCase
         var dbcontext = _fixture.GetService<IamDbContext>();
         var userDao = _fixture.GetService<UserDao>();
         var userEntity = UserEntity.FromDomain(user);
-        userEntity.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+        userEntity.Password = BCrypt.Net.BCrypt.HashPassword(user.Password.Value);
         await userDao.Insert(userEntity);
 
         dbcontext.SaveChanges();

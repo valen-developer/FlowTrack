@@ -10,26 +10,31 @@ public class UserMother : ObjectMother
 
     public static User Random()
     {
-        return new User(
-            Guid.NewGuid(),
-            faker.Email(),
-            faker.FromRegex(PasswordPattern),
-            faker.boolean()
-        );
+        return new User(Id(), Email(), Password(), faker.boolean());
     }
 
     public static User Active()
     {
-        return new User(Guid.NewGuid(), faker.Email(), faker.FromRegex(PasswordPattern), true);
+        return new User(Id(), Email(), Password(), true);
     }
 
     public static User Inactive()
     {
-        return new User(
-            Guid.NewGuid(),
-            faker.Email(),
-            faker.FromRegex(InvalidPassword.Regex),
-            false
-        );
+        return new User(Id(), Email(), Password(), false);
+    }
+
+    private static UserId Id()
+    {
+        return new UserId(Guid.NewGuid().ToString());
+    }
+
+    private static UserEmail Email()
+    {
+        return new UserEmail(faker.Email());
+    }
+
+    private static UserPassword Password()
+    {
+        return new UserPassword(faker.FromRegex(PasswordPattern));
     }
 }

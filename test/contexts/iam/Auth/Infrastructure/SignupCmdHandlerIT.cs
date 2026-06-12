@@ -8,14 +8,14 @@ using Microsoft.Extensions.DependencyInjection;
 namespace FlowTrack.Iam.Test.Infrastructure;
 
 [Service]
-[DomainEventSubscriber(typeof(UserCreated))]
-internal sealed class OnUserCreatedDomainEventSubscriber
+[DomainEventSubscriber(typeof(UserSignupped))]
+internal sealed class OnUserSignuppedDomainEventSubscriber
 {
-    public UserCreated? CapturedEvent { get; private set; }
+    public UserSignupped? CapturedEvent { get; private set; }
     public int CalledTimes { get; private set; }
 
     [DomainEventListener]
-    public Task OnUserCreated(UserCreated @event)
+    public Task On(UserSignupped @event)
     {
         CapturedEvent = @event;
         CalledTimes++;
@@ -30,9 +30,9 @@ public class SignupCmdHandlerIT : IamIntegrationTestCase
     {
         DomainEventSubscriberInformation subscriberInfo = new([
             new DomainEventSubscriberInfo(
-                typeof(OnUserCreatedDomainEventSubscriber),
-                typeof(OnUserCreatedDomainEventSubscriber).GetMethod("OnUserCreated")!,
-                typeof(UserCreated)
+                typeof(OnUserSignuppedDomainEventSubscriber),
+                typeof(OnUserSignuppedDomainEventSubscriber).GetMethod("On")!,
+                typeof(UserSignupped)
             ),
         ]);
 
@@ -42,7 +42,10 @@ public class SignupCmdHandlerIT : IamIntegrationTestCase
         fixture.AddScoped<DomainEventDispatcher, DomainEventDispatcher>();
         fixture.AddScoped<IDomainEventBus, InMemoryDomainEventBus>();
         fixture.AddScoped<IExternalEventBus, InMemoryExternalEventBus>();
-        fixture.AddScoped<OnUserCreatedDomainEventSubscriber, OnUserCreatedDomainEventSubscriber>();
+        fixture.AddScoped<
+            OnUserSignuppedDomainEventSubscriber,
+            OnUserSignuppedDomainEventSubscriber
+        >();
     }
 
     [Fact]
@@ -52,33 +55,32 @@ public class SignupCmdHandlerIT : IamIntegrationTestCase
         var handler = _fixture.GetService<SignupCmdHandler>();
 
         var user = UserMother.Inactive();
-        var cmd = new SignupCmd(user.Id.ToString(), user.Email, user.Password);
+        var cmd = new SignupCmd(user.Id.Value, user.Email.Value, user.Password.Value);
 
         await handler.Handle(cmd);
 
-        var savedUser = await userDao.FindById(user.Id);
+        var savedUser = await userDao.FindById(user.Id.Value);
 
-        Assert.Equal(user.Id, savedUser!.Id);
-        Assert.Equal(user.Email, savedUser.Email);
+        Assert.Equal(user.Id.Value, savedUser!.Id.ToString());
+        Assert.Equal(user.Email.Value, savedUser.Email);
     }
 
     [Fact]
     public async Task Should_Emit_User_Created_Event()
     {
-        var subscriber = _fixture.GetService<OnUserCreatedDomainEventSubscriber>();
+        var subscriber = _fixture.GetService<OnUserSignuppedDomainEventSubscriber>();
         var handler = _fixture.GetService<SignupCmdHandler>();
 
         var user = UserMother.Inactive();
-        var cmd = new SignupCmd(user.Id.ToString(), user.Email, user.Password);
+        var cmd = new SignupCmd(user.Id.Value, user.Email.Value, user.Password.Value);
 
         await handler.Handle(cmd);
 
-        UserCreated expectedEvent = new(user.Id, user.Email, false);
-        UserCreated actualEvent = subscriber.CapturedEvent!;
+        UserSignupped expectedEvent = new(user.Id.Value, user.Email.Value);
+        UserSignupped actualEvent = subscriber.CapturedEvent!;
 
         Assert.NotNull(subscriber.CapturedEvent);
         Assert.Equal(expectedEvent.UserId, actualEvent.UserId);
         Assert.Equal(expectedEvent.Email, actualEvent.Email);
-        Assert.Equal(expectedEvent.IsActive, actualEvent.IsActive);
     }
 }

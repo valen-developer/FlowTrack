@@ -27,7 +27,7 @@ public class SignupControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
-        var user = await userDao.FindById(Guid.Parse(request.Id));
+        var user = await userDao.FindById(request.Id);
         Assert.NotNull(user);
         Assert.Equal(request.Email, user.Email);
     }

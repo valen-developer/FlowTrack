@@ -25,8 +25,11 @@ public class SinginControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(
 
         var signinSuccess = authTokenGenerator.Generate(user);
 
-        var request = new { Email = user.Email, Password = user.Password };
+        var request = new { Email = user.Email.Value, Password = user.Password.Value };
         var response = await HttpClient.PostAsJsonAsync("/auth/signin", request);
+
+        // read body withno type
+        var responseBody = response.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var cookies = response.Headers.GetValues("Set-Cookie");
@@ -68,7 +71,7 @@ public class SinginControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(
             Services.GetService<UserDao>()
             ?? throw new InvalidOperationException("UserDao service not found");
 
-        var hashedPassword = bcrypt.Hash(user.Password);
+        var hashedPassword = bcrypt.Hash(user.Password.Value);
         var userEntity = UserEntity.FromDomain(user);
         userEntity.Password = hashedPassword;
 

@@ -20,7 +20,7 @@ public class EfUserRepository(UserDao userDao) : IUserRepository
         return user;
     }
 
-    public async Task<User?> FindById(Guid id)
+    public async Task<User?> FindById(string id)
     {
         var userEntity = await userDao.FindById(id);
         if (userEntity is null)

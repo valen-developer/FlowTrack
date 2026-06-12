@@ -38,13 +38,11 @@ public class ActivationEmailSenderTests
             expirationMinutes: 60 * 24 * 7
         );
 
-        var jwtPayload = new JWTPayload(
-            new Dictionary<string, string> { { "id", user.Id.ToString() } }
-        );
+        var jwtPayload = new JWTPayload(new Dictionary<string, string> { { "id", user.Id.Value } });
 
         var ActivationEmailSenderParams = new ActivationEmailSenderParams(
-            UserId: user.Id,
-            Email: user.Email
+            UserId: user.Id.Value,
+            Email: user.Email.Value
         );
 
         _envStoreMock
@@ -60,7 +58,7 @@ public class ActivationEmailSenderTests
         _jwtServiceMock.Verify(
             j =>
                 j.Generate(
-                    It.Is<JWTPayload>(p => p.Claims["id"] == user.Id.ToString()),
+                    It.Is<JWTPayload>(p => p.Claims["id"] == user.Id.Value),
                     It.Is<JWTOptions>(o => o.Secret == expectedTokenSecret)
                 ),
             Times.Once
@@ -73,8 +71,8 @@ public class ActivationEmailSenderTests
         var user = UserMother.Random();
 
         var ActivationEmailSenderParams = new ActivationEmailSenderParams(
-            UserId: user.Id,
-            Email: user.Email
+            UserId: user.Id.Value,
+            Email: user.Email.Value
         );
 
         _envStoreMock
@@ -111,8 +109,8 @@ public class ActivationEmailSenderTests
             .Returns(expetectedToken);
 
         var ActivationEmailSenderParams = new ActivationEmailSenderParams(
-            UserId: user.Id,
-            Email: user.Email
+            UserId: user.Id.Value,
+            Email: user.Email.Value
         );
 
         await _activationEmailSender.Send(ActivationEmailSenderParams);
@@ -121,7 +119,7 @@ public class ActivationEmailSenderTests
             m =>
                 m.Send(
                     It.Is<Mail>(m =>
-                        m.To == user.Email
+                        m.To == user.Email.Value
                         && m.Subject == "Activate your account"
                         && m.Body.Contains($"{expectedUrlOfActivation}?token={expetectedToken}")
                     )
@@ -144,8 +142,8 @@ public class ActivationEmailSenderTests
             .Returns((string?)null);
 
         var ActivationEmailSenderParams = new ActivationEmailSenderParams(
-            UserId: user.Id,
-            Email: user.Email
+            UserId: user.Id.Value,
+            Email: user.Email.Value
         );
 
         var exception = await Assert.ThrowsAsync<EnvVariableMissed>(() =>

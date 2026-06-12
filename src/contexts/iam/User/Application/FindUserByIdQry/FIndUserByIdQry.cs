@@ -3,4 +3,4 @@ using FlowTrack.Shared.Domain;
 
 namespace FlowTrack.Iam.Application;
 
-public record FindUserByIdQry(Guid Id) : IQuery<User>;
+public record FindUserByIdQry(string Id) : IQuery<User>;
