@@ -35,7 +35,7 @@ public class UserMeControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(
 
         var userInfo = await response.Content.ReadFromJsonAsync<UserMeResponse>();
         Assert.NotNull(userInfo);
-        Assert.Equal(user.Id.ToString(), userInfo.Id);
+        Assert.Equal(user.Id.Value, userInfo.Id);
         Assert.Equal(user.Email.Value, userInfo.Email);
     }
 
