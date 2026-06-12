@@ -1,4 +1,6 @@
 using FlowTrack.Iam.Application;
+using FlowTrack.Iam.Domain;
+using FlowTrack.Shared;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,12 +13,14 @@ public class ActivateUserByTokenCmdTests
     private readonly ActivateUserByTokenCmdHandler _handler;
     private readonly Mock<IJWTService> _jwtServiceMock = new();
     private readonly Mock<IEnvStore> _envStoreMock = new();
+    private readonly Mock<IQueryBus> _queryBusMock = new();
 
     public ActivateUserByTokenCmdTests()
     {
         var service = new ServiceCollection();
         service.AddSingleton(_jwtServiceMock.Object);
         service.AddSingleton(_envStoreMock.Object);
+        service.AddSingleton(_queryBusMock.Object);
 
         service.AddScoped<ActivateUserByTokenCmdHandler>();
 
@@ -40,5 +44,24 @@ public class ActivateUserByTokenCmdTests
         await _handler.Handle(cmd);
 
         _jwtServiceMock.Verify(s => s.Verify(token, secret), Times.Once);
+    }
+
+    [Fact]
+    public async Task Should_Find_The_User()
+    {
+        var userId = Guid.NewGuid().ToString();
+
+        _jwtServiceMock.Setup(s => s.Verify(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+        _jwtServiceMock
+            .Setup(s => s.Decode(It.IsAny<string>()))
+            .Returns(new JWTPayload(new Dictionary<string, string> { { "id", userId } }));
+
+        var cmd = new ActivateUserByTokenCmd("valid_token");
+        await _handler.Handle(cmd);
+
+        _queryBusMock.Verify(
+            q => q.Ask<FindUserByIdQry, User>(It.Is<FindUserByIdQry>(qry => qry.Id == userId)),
+            Times.Once
+        );
     }
 }
