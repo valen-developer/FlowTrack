@@ -20,4 +20,9 @@ public class UserDao(IamDbContext iamDbContext)
     {
         return await iamDbContext.Users.FindAsync(new Guid(id));
     }
+
+    public async Task Update(UserEntity userEntity)
+    {
+        iamDbContext.Users.Update(userEntity);
+    }
 }
