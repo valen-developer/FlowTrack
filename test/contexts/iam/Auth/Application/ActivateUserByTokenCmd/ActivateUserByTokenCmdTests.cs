@@ -64,4 +64,27 @@ public class ActivateUserByTokenCmdTests
             Times.Once
         );
     }
+
+    [Fact]
+    public async Task Should_Activate_User()
+    {
+        var user = UserMother.Inactive();
+
+        _jwtServiceMock.Setup(s => s.Verify(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+        _jwtServiceMock
+            .Setup(s => s.Decode(It.IsAny<string>()))
+            .Returns(new JWTPayload(new Dictionary<string, string> { { "id", user.Id.Value } }));
+
+        _queryBusMock
+            .Setup(q => q.Ask<FindUserByIdQry, User>(It.IsAny<FindUserByIdQry>()))
+            .ReturnsAsync(user);
+
+        var cmd = new ActivateUserByTokenCmd("valid_token");
+        await _handler.Handle(cmd);
+
+        Assert.True(user.IsActive);
+        Assert.IsType<UserActivated>(
+            user.PullDomainEvents().FirstOrDefault(e => e is UserActivated)
+        );
+    }
 }

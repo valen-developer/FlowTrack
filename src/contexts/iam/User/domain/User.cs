@@ -8,7 +8,7 @@ public class User(UserId id, UserEmail email, UserPassword password, bool isActi
     public UserId Id { get; } = id;
     public UserEmail Email { get; } = email;
     public UserPassword Password { get; } = password;
-    public bool IsActive { get; } = isActive;
+    public bool IsActive { get; private set; } = isActive;
 
     public static User Signup(UserId id, UserEmail email, UserPassword password)
     {
@@ -18,5 +18,17 @@ public class User(UserId id, UserEmail email, UserPassword password, bool isActi
         user.Record(userCreatedEvent);
 
         return user;
+    }
+
+    public void Activate()
+    {
+        if (IsActive)
+            return;
+
+        IsActive = true;
+
+        var activatedEvent = new UserActivated(Id: Id.Value);
+
+        Record(activatedEvent);
     }
 }

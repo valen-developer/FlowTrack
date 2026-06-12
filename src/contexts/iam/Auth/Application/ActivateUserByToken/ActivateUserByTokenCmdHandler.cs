@@ -11,7 +11,7 @@ public sealed class ActivateUserByTokenCmdHandler(
     IQueryBus queryBus
 ) : ICommandHandler<ActivateUserByTokenCmd>
 {
-    public Task Handle(ActivateUserByTokenCmd command)
+    public async Task Handle(ActivateUserByTokenCmd command)
     {
         var secret = envStore.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString());
         var isValid = jwtService.Verify(command.Token, secret);
@@ -19,8 +19,8 @@ public sealed class ActivateUserByTokenCmdHandler(
         var decoded = jwtService.Decode(command.Token);
         var userId = decoded?.Claims["id"];
 
-        queryBus.Ask<FindUserByIdQry, User>(new FindUserByIdQry(userId));
+        var user = await queryBus.Ask<FindUserByIdQry, User>(new FindUserByIdQry(userId));
 
-        return Task.CompletedTask;
+        user?.Activate();
     }
 }
