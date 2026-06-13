@@ -23,7 +23,11 @@ public class SendActivationEmailOnUserSignuppedTests
     public async Task Should_Call_ActivationEmailSender()
     {
         var user = UserMother.Random();
-        var userCreatedEvent = new UserCreated(UserId: user.Id.Value, Email: user.Email.Value, IsActive: user.IsActive);
+        var userCreatedEvent = new UserCreated(
+            UserId: user.Id.Value,
+            Email: user.Email.Value,
+            IsActive: user.IsActive
+        );
 
         var expectedParams = new ActivationEmailSenderParams(
             UserId: userCreatedEvent.UserId,
