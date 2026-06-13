@@ -1,5 +1,3 @@
-using FlowTrack.Shared.Domain;
-
 namespace FlowTrack.Shared.Infrastructure.Bus.Event;
 
 [Provider(typeof(IDomainEventBus))]

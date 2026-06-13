@@ -1,5 +1,3 @@
-using FlowTrack.Shared.Domain;
-
 namespace FlowTrack.Iam.Users.Domain;
 
 internal class User(UserId id, UserEmail email, UserPassword password, bool isActive = false)

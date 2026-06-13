@@ -1,5 +1,3 @@
-using FlowTrack.Shared.Domain;
-
 namespace FlowTrack.Iam.Users.Domain;
 
 internal sealed class UserNotFound : NotFoundException

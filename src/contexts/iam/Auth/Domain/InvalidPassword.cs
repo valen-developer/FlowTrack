@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using FlowTrack.Shared.Domain;
 
 namespace FlowTrack.Iam.Auth.Domain;
 

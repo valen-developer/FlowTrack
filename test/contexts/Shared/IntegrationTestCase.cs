@@ -1,4 +1,3 @@
-using dotenv.net;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 

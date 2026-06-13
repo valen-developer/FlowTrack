@@ -1,5 +1,3 @@
-using FlowTrack.Iam;
-using FlowTrack.Shared.Domain;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;

@@ -1,11 +1,11 @@
-using FlowTrack.Shared.Domain;
-using FlowTrack.Shared.Domain.Bus.Command;
-
 namespace FlowTrack.Iam.Auth.Application;
 
 [Service]
-internal sealed class SignupCmdHandler(IUserRepository repository, EventBus eventBus, IBcrypt bcrypt)
-    : ICommandHandler<SignupCmd>
+internal sealed class SignupCmdHandler(
+    IUserRepository repository,
+    EventBus eventBus,
+    IBcrypt bcrypt
+) : ICommandHandler<SignupCmd>
 {
     public async Task Handle(SignupCmd command)
     {

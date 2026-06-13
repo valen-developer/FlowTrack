@@ -1,5 +1,4 @@
 using System.Reflection;
-using FlowTrack.Shared.Domain;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowTrack.Shared.Infrastructure.Bus.Event;

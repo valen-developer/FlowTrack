@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using FlowTrack.Shared.Domain;
 
 namespace FlowTrack.Iam.Auth.Application;
 

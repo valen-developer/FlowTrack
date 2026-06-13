@@ -1,4 +1,3 @@
-using FlowTrack.Shared.Domain;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 

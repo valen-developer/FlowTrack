@@ -1,5 +1,3 @@
-using FlowTrack.Shared.Domain;
-
 namespace FlowTrack.Iam.Users.Domain;
 
 internal record UserCreated(string UserId, string Email, bool IsActive) : DomainEvent, IDomainEvent

@@ -1,4 +1,3 @@
-using FlowtrackApi.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlowtrackApi.Iam.Controllers.Users;

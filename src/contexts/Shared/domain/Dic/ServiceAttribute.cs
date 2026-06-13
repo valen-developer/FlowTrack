@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-
 namespace FlowTrack.Shared.Domain.Dic;
 
 public enum Lifetime

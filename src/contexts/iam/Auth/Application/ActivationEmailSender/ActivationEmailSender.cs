@@ -1,5 +1,3 @@
-using FlowTrack.Shared.Domain;
-
 namespace FlowTrack.Iam.Auth.Application;
 
 [Provider(typeof(IActivationEmailSender))]

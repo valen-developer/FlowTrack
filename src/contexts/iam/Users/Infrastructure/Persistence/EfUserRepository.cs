@@ -1,5 +1,3 @@
-using FlowTrack.Shared.Domain;
-
 namespace FlowTrack.Iam.Users.Infrastructure.Persistence;
 
 [Provider(typeof(IUserRepository), Lifetime.Scoped)]

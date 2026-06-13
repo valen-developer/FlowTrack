@@ -1,4 +1,3 @@
-using FlowTrack.Shared.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace FlowTrack.Iam.Users.Infrastructure.Persistence;

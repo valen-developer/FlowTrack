@@ -1,4 +1,3 @@
-using dotenv.net;
 using FlowTrack.Shared.Domain;
 
 namespace FlowTrack.Shared.Infrastructure.DotEnv;
