@@ -1,3 +1,5 @@
+using FlowTrack.Shared.Domain.Iam.Users;
+
 namespace FlowTrack.Iam.Auth.Application;
 
 [Service]

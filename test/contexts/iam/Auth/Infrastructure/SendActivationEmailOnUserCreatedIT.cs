@@ -1,3 +1,4 @@
+using FlowTrack.Shared.Domain.Iam.Users;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 

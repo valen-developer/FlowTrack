@@ -1,6 +1,6 @@
-namespace FlowTrack.Iam.Users.Domain;
+namespace FlowTrack.Shared.Domain.Iam.Users;
 
-internal record UserCreated(string UserId, string Email, bool IsActive) : DomainEvent, IDomainEvent
+public record UserCreated(string UserId, string Email, bool IsActive) : DomainEvent, IDomainEvent
 {
     public static bool External => true;
 

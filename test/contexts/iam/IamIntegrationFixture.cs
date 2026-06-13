@@ -1,6 +1,6 @@
 using System.Net.Sockets;
 using System.Text.Json;
-using FlowTrack.Shared.Domain.Bus.Event;
+using FlowTrack.Shared.Domain.Iam.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
