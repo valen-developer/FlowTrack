@@ -14,4 +14,12 @@ public class Faker
         var xeger = new Xeger(pattern.ToString());
         return xeger.Generate();
     }
+
+    public string Words(int count)
+    {
+        return string.Join(
+            " ",
+            Enumerable.Range(0, count).Select(_ => FromRegex(new Regex("[a-zA-Z]{3,10}")))
+        );
+    }
 }

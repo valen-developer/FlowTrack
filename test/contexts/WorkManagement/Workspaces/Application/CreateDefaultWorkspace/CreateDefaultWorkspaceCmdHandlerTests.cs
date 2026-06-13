@@ -29,11 +29,7 @@ public class CreateDefaultWorkspaceCmdHandlerTests
         var userId = Guid.NewGuid().ToString();
         var command = new CreateDefaultWorkspaceCmd(userId);
 
-        var expectedWorkspace = new Workspace(
-            Id: new WorkspaceId(Guid.NewGuid().ToString()),
-            Name: new WorkspaceName(DEFAULT_WORKSPACE_NAME),
-            OwnerId: new WorkspaceOwnerId(userId)
-        );
+        var expectedWorkspace = WorkspaceMother.WithNameAndOwner(DEFAULT_WORKSPACE_NAME, userId);
 
         await _handler.Handle(command);
 

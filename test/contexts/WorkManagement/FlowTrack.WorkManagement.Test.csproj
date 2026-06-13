@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="../../../src/contexts/Shared/FlowTrack.Shared.csproj" />
     <ProjectReference Include="../../../src/contexts/WorkManagement/FlowTrack.WorkManagement.csproj" />
+    <ProjectReference Include="../Shared/FlowTrack.Shared.Test.csproj" />
   </ItemGroup>
 
   <ItemGroup>
