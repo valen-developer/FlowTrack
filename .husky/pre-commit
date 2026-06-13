@@ -1,0 +1,9 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+csharpier_files=$(git diff --cached --name-only --diff-filter=ACM -- '*.cs' '*.csproj')
+
+if [ -n "$csharpier_files" ]; then
+  echo "$csharpier_files" | tr '\n' '\0' | xargs -0 ~/.dotnet/tools/csharpier format
+  git add --intent-to-add $csharpier_files
+fi

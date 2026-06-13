@@ -15,15 +15,14 @@ namespace FlowTrack.Iam.Shared.Infrastructure.Persistence.Migrations
                 table: "users",
                 type: "boolean",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: false
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "IsActive",
-                table: "users");
+            migrationBuilder.DropColumn(name: "IsActive", table: "users");
         }
     }
 }
