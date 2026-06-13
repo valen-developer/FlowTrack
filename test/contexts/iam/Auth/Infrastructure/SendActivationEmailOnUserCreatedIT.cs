@@ -21,7 +21,7 @@ public class SendActivationEmailOnUserCreatedIT : IamIntegrationTestCase
     public async Task Should_Send_Activation_Email_When_User_Is_Signupped()
     {
         var user = UserMother.Random();
-        var userSignupedEvent = new UserSignupped(user.Id.Value, user.Email.Value);
+        var userSignupedEvent = new UserCreated(UserId: user.Id.Value, Email: user.Email.Value, IsActive: user.IsActive);
 
         await _domainEventBus.Publish(userSignupedEvent);
 

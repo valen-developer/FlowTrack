@@ -3,14 +3,14 @@ using Microsoft.Extensions.DependencyInjection;
 namespace FlowTrack.Iam.Test.Auth.Infrastructure;
 
 [Service]
-[DomainEventSubscriber(typeof(UserSignupped))]
-internal sealed class OnUserSignuppedDomainEventSubscriber
+[DomainEventSubscriber(typeof(UserCreated))]
+internal sealed class OnUserCreatedDomainEventSubscriber
 {
-    public UserSignupped? CapturedEvent { get; private set; }
+    public UserCreated? CapturedEvent { get; private set; }
     public int CalledTimes { get; private set; }
 
     [DomainEventListener]
-    public Task On(UserSignupped @event)
+    public Task On(UserCreated @event)
     {
         CapturedEvent = @event;
         CalledTimes++;
@@ -25,9 +25,9 @@ public class SignupCmdHandlerIT : IamIntegrationTestCase
     {
         DomainEventSubscriberInformation subscriberInfo = new([
             new DomainEventSubscriberInfo(
-                typeof(OnUserSignuppedDomainEventSubscriber),
-                typeof(OnUserSignuppedDomainEventSubscriber).GetMethod("On")!,
-                typeof(UserSignupped)
+                typeof(OnUserCreatedDomainEventSubscriber),
+                typeof(OnUserCreatedDomainEventSubscriber).GetMethod("On")!,
+                typeof(UserCreated)
             ),
         ]);
 
@@ -38,8 +38,8 @@ public class SignupCmdHandlerIT : IamIntegrationTestCase
         fixture.AddScoped<IDomainEventBus, InMemoryDomainEventBus>();
         fixture.AddScoped<IExternalEventBus, InMemoryExternalEventBus>();
         fixture.AddScoped<
-            OnUserSignuppedDomainEventSubscriber,
-            OnUserSignuppedDomainEventSubscriber
+            OnUserCreatedDomainEventSubscriber,
+            OnUserCreatedDomainEventSubscriber
         >();
     }
 
@@ -63,7 +63,7 @@ public class SignupCmdHandlerIT : IamIntegrationTestCase
     [Fact]
     public async Task Should_Emit_User_Created_Event()
     {
-        var subscriber = _fixture.GetService<OnUserSignuppedDomainEventSubscriber>();
+        var subscriber = _fixture.GetService<OnUserCreatedDomainEventSubscriber>();
         var handler = _fixture.GetService<SignupCmdHandler>();
 
         var user = UserMother.Inactive();
@@ -71,8 +71,8 @@ public class SignupCmdHandlerIT : IamIntegrationTestCase
 
         await handler.Handle(cmd);
 
-        UserSignupped expectedEvent = new(user.Id.Value, user.Email.Value);
-        UserSignupped actualEvent = subscriber.CapturedEvent!;
+        UserCreated expectedEvent = new(UserId: user.Id.Value, Email: user.Email.Value, IsActive: user.IsActive);
+        UserCreated actualEvent = subscriber.CapturedEvent!;
 
         Assert.NotNull(subscriber.CapturedEvent);
         Assert.Equal(expectedEvent.UserId, actualEvent.UserId);

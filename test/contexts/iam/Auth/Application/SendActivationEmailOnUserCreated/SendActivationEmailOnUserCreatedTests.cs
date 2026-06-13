@@ -5,25 +5,25 @@ namespace FlowTrack.Iam.Test.Auth.Application;
 
 public class SendActivationEmailOnUserSignuppedTests
 {
-    private readonly SendActivationMailOnUserSignupped _sendActivationEmailOnUserCreated;
+    private readonly SendActivationMailOnUserCreated _sendActivationEmailOnUserCreated;
     private readonly Mock<IActivationEmailSender> _activationEmailSenderMock = new();
 
     public SendActivationEmailOnUserSignuppedTests()
     {
         var services = new ServiceCollection();
         services.AddSingleton(_activationEmailSenderMock.Object);
-        services.AddScoped<SendActivationMailOnUserSignupped>();
+        services.AddScoped<SendActivationMailOnUserCreated>();
 
         _sendActivationEmailOnUserCreated = services
             .BuildServiceProvider()
-            .GetRequiredService<SendActivationMailOnUserSignupped>();
+            .GetRequiredService<SendActivationMailOnUserCreated>();
     }
 
     [Fact]
     public async Task Should_Call_ActivationEmailSender()
     {
         var user = UserMother.Random();
-        var userCreatedEvent = new UserSignupped(UserId: user.Id.Value, Email: user.Email.Value);
+        var userCreatedEvent = new UserCreated(UserId: user.Id.Value, Email: user.Email.Value, IsActive: user.IsActive);
 
         var expectedParams = new ActivationEmailSenderParams(
             UserId: userCreatedEvent.UserId,

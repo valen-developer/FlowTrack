@@ -50,7 +50,7 @@ public class SignupCmdHandlerTests
     }
 
     [Fact]
-    public async Task Should_Emit_User_Signupped_Event()
+    public async Task Should_Emit_User_Created_Event()
     {
         IEnumerable<DomainEvent>? capturedEvents = null;
 
@@ -66,7 +66,7 @@ public class SignupCmdHandlerTests
             Password: user.Password.Value
         );
 
-        UserSignupped expectedEvent = new(UserId: user.Id.Value, Email: user.Email.Value);
+        UserCreated expectedEvent = new(UserId: user.Id.Value, Email: user.Email.Value, IsActive: user.IsActive);
 
         await _handler.Handle(cmd);
 
@@ -75,11 +75,11 @@ public class SignupCmdHandlerTests
         Assert.NotNull(capturedEvents);
         Assert.Single(capturedEvents);
 
-        UserSignupped userSignuppedEvent = (UserSignupped)capturedEvents!.First();
-        Assert.NotNull(userSignuppedEvent);
-        Assert.IsType<UserSignupped>(userSignuppedEvent);
-        Assert.Equal(expectedEvent.UserId, userSignuppedEvent.UserId);
-        Assert.Equal(expectedEvent.Email, userSignuppedEvent.Email);
+        UserCreated userCreatedEvent = (UserCreated)capturedEvents!.First();
+        Assert.NotNull(userCreatedEvent);
+        Assert.IsType<UserCreated>(userCreatedEvent);
+        Assert.Equal(expectedEvent.UserId, userCreatedEvent.UserId);
+        Assert.Equal(expectedEvent.Email, userCreatedEvent.Email);
     }
 
     [Theory]
