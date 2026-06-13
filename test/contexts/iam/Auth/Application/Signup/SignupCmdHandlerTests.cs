@@ -8,14 +8,14 @@ public class SignupCmdHandlerTests
     private readonly SignupCmdHandler _handler;
     private readonly Mock<IUserRepository> _userRepositoryMock = new();
     private readonly Mock<IBcrypt> _bcrypt = new();
-    private readonly Mock<IDomainEventBus> _domainEventBus = new();
+    private readonly Mock<IExternalEventBus> _externalEventBus = new();
 
     public SignupCmdHandlerTests()
     {
         var services = new ServiceCollection();
 
-        services.AddSingleton(_domainEventBus.Object);
-        services.AddSingleton(Mock.Of<IExternalEventBus>());
+        services.AddSingleton(_externalEventBus.Object);
+        services.AddSingleton(Mock.Of<IDomainEventBus>());
 
         services.AddSingleton(_userRepositoryMock.Object);
         services.AddSingleton(_bcrypt.Object);
@@ -52,11 +52,11 @@ public class SignupCmdHandlerTests
     [Fact]
     public async Task Should_Emit_User_Created_Event()
     {
-        IEnumerable<DomainEvent>? capturedEvents = null;
+        DomainEvent? capturedEvent = null;
 
-        _domainEventBus
-            .Setup(x => x.Publish(It.IsAny<IEnumerable<DomainEvent>>()))
-            .Callback<IEnumerable<DomainEvent>>(events => capturedEvents = events)
+        _externalEventBus
+            .Setup(x => x.Publish(It.IsAny<DomainEvent>()))
+            .Callback<DomainEvent>(@event => capturedEvent = @event)
             .Returns(Task.CompletedTask);
 
         User user = UserMother.Inactive();
@@ -74,12 +74,7 @@ public class SignupCmdHandlerTests
 
         await _handler.Handle(cmd);
 
-        _domainEventBus.Verify(x => x.Publish(It.IsAny<IEnumerable<DomainEvent>>()), Times.Once);
-
-        Assert.NotNull(capturedEvents);
-        Assert.Single(capturedEvents);
-
-        UserCreated userCreatedEvent = (UserCreated)capturedEvents!.First();
+        UserCreated userCreatedEvent = (UserCreated)capturedEvent!;
         Assert.NotNull(userCreatedEvent);
         Assert.IsType<UserCreated>(userCreatedEvent);
         Assert.Equal(expectedEvent.UserId, userCreatedEvent.UserId);

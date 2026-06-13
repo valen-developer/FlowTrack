@@ -6,8 +6,8 @@ namespace FlowTrack.Shared.Test;
 public abstract class IntegrationTestCase
 {
     public readonly ServiceCollection serviceCollection = new();
-    private ServiceProvider? serviceProvider;
-    private IServiceScope? serviceScope;
+    protected ServiceProvider? serviceProvider;
+    protected IServiceScope? serviceScope;
 
     private readonly Mock<IDateTimeProvider> datetimeProviderMock = new();
 
@@ -49,6 +49,28 @@ public abstract class IntegrationTestCase
         where TImplementation : class, TService
     {
         serviceCollection.AddTransient<TService, TImplementation>();
+    }
+
+    public async Task WaitForMockAsync<T>(
+        Mock<T> mock,
+        System.Linq.Expressions.Expression<Action<T>> expression,
+        int timeoutMs = 5000,
+        int pollIntervalMs = 100
+    )
+        where T : class
+    {
+        var start = DateTime.UtcNow;
+        while ((DateTime.UtcNow - start).TotalMilliseconds < timeoutMs)
+        {
+            try
+            {
+                mock.Verify(expression, Moq.Times.Once);
+                return;
+            }
+            catch (MockException) { }
+            await Task.Delay(pollIntervalMs);
+        }
+        mock.Verify(expression, Moq.Times.Once);
     }
 
     private void EnsureProviderBuilt()

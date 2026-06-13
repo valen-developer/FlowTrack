@@ -27,8 +27,9 @@ public class SendActivationEmailOnUserCreatedIT : IamIntegrationTestCase
             IsActive: user.IsActive
         );
 
+        await _fixture.EnsureServicesAsync();
         await _domainEventBus.Publish(userSignupedEvent);
 
-        _mailerMock.Verify(m => m.Send(It.IsAny<Mail>()), Times.Once);
+        await _fixture.WaitForMockAsync(_mailerMock, m => m.Send(It.IsAny<Mail>()));
     }
 }

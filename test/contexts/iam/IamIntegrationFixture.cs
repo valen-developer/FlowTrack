@@ -1,8 +1,13 @@
 using System.Net.Sockets;
+using System.Text.Json;
+using FlowTrack.Shared.Domain.Bus.Event;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 using Testcontainers.PostgreSql;
+using Testcontainers.RabbitMq;
 
 namespace FlowTrack.Iam.Test;
 
@@ -14,6 +19,13 @@ public class IamIntegrationFixture : IntegrationTestCase, IAsyncLifetime
         .WithDatabase("flowtrack-iam")
         .WithUsername("postgres")
         .WithPassword("password")
+        .Build();
+
+    private readonly RabbitMqContainer _rabbitMqContainer = new RabbitMqBuilder(
+        "rabbitmq:3.11-management-alpine"
+    )
+        .WithUsername("guest")
+        .WithPassword("guest")
         .Build();
 
     public IamIntegrationFixture()
@@ -60,6 +72,24 @@ public class IamIntegrationFixture : IntegrationTestCase, IAsyncLifetime
             options.UseNpgsql(connectionString)
         );
 
+        await _rabbitMqContainer.StartAsync();
+        Environment.SetEnvironmentVariable("RABBITMQ_HOST", _rabbitMqContainer.Hostname);
+        Environment.SetEnvironmentVariable(
+            "RABBITMQ_PORT",
+            _rabbitMqContainer.GetMappedPublicPort(5672).ToString()
+        );
+        Environment.SetEnvironmentVariable("RABBITMQ_USERNAME", "guest");
+        Environment.SetEnvironmentVariable("RABBITMQ_PASSWORD", "guest");
+        Environment.SetEnvironmentVariable("EXTERNAL_EVENT_EXCHANGE_NAME", "domain_events");
+
+        serviceCollection.AddLogging(builder =>
+            builder.AddConsole().SetMinimumLevel(LogLevel.Warning)
+        );
+        serviceCollection.AddSingleton<IJsonToDomainEventMapper>(
+            _ => new TestJsonToDomainEventMapper()
+        );
+        serviceCollection.AddHostedService<ExternalEventSubscribeBackground>();
+
         using var provider = serviceCollection.BuildServiceProvider();
         using var scope = provider.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<IamDbContext>();
@@ -96,7 +126,57 @@ public class IamIntegrationFixture : IntegrationTestCase, IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        if (_hostedServicesStarted)
+        {
+            var hostedServices = serviceProvider!.GetServices<IHostedService>().Reverse();
+            foreach (var hs in hostedServices)
+                await hs.StopAsync(CancellationToken.None);
+        }
+
+        if (serviceProvider is not null)
+        {
+            serviceScope?.Dispose();
+            await serviceProvider.DisposeAsync();
+        }
+
         await _postgresContainer.DisposeAsync();
+    }
+
+    public async Task EnsureServicesAsync()
+    {
+        if (serviceProvider is null)
+        {
+            serviceProvider = serviceCollection.BuildServiceProvider();
+            serviceScope = serviceProvider.CreateScope();
+        }
+
+        if (!_hostedServicesStarted)
+        {
+            _hostedServicesStarted = true;
+            var hostedServices = serviceProvider.GetServices<IHostedService>();
+            foreach (var hs in hostedServices)
+                await hs.StartAsync(CancellationToken.None);
+            await Task.Delay(100);
+        }
+    }
+
+    private bool _hostedServicesStarted;
+
+    private sealed class TestJsonToDomainEventMapper : IJsonToDomainEventMapper
+    {
+        public DomainEvent? Map(string json)
+        {
+            using var doc = JsonDocument.Parse(json);
+            var code = doc.RootElement.GetProperty("data").GetProperty("code").GetString();
+
+            if (code == UserCreated.Code)
+            {
+                var attributes = doc.RootElement.GetProperty("data").GetProperty("attributes");
+                return JsonSerializer.Deserialize<UserCreated>(attributes.GetRawText());
+            }
+
+            return null;
+        }
     }
 
     public async Task<List<T>> ExecuteQueryAsync<T>(string sqlQuery)

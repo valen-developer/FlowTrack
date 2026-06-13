@@ -6,12 +6,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Npgsql;
 using Testcontainers.PostgreSql;
+using Testcontainers.RabbitMq;
 
 namespace FlowtrackApi.Test;
 
 public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private PostgreSqlContainer? _postgresContainer;
+    private RabbitMqContainer? _rabbitMqContainer;
     public HttpClient HttpClient { get; private set; } = null!;
     private readonly Mock<IDateTimeProvider> _dateTimeProviderMock = new();
 
@@ -19,6 +21,7 @@ public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetim
     {
         await RunPostgreSqlContainer();
         await SetConnectionStrings();
+        await RunRabbitMqContainer();
         ChargeEnv();
 
         var httpClientOptions = new WebApplicationFactoryClientOptions
@@ -45,6 +48,9 @@ public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetim
     {
         if (_postgresContainer is not null)
             await _postgresContainer.DisposeAsync();
+
+        if (_rabbitMqContainer is not null)
+            await _rabbitMqContainer.DisposeAsync();
 
         await base.DisposeAsync();
     }
@@ -94,6 +100,25 @@ public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetim
         );
 
         return Task.CompletedTask;
+    }
+
+    private async Task RunRabbitMqContainer()
+    {
+        _rabbitMqContainer = new RabbitMqBuilder("rabbitmq:3.11-management-alpine")
+            .WithUsername("guest")
+            .WithPassword("guest")
+            .Build();
+
+        await _rabbitMqContainer.StartAsync();
+
+        Environment.SetEnvironmentVariable("RABBITMQ_HOST", _rabbitMqContainer.Hostname);
+        Environment.SetEnvironmentVariable(
+            "RABBITMQ_PORT",
+            _rabbitMqContainer.GetMappedPublicPort(5672).ToString()
+        );
+        Environment.SetEnvironmentVariable("RABBITMQ_USERNAME", "guest");
+        Environment.SetEnvironmentVariable("RABBITMQ_PASSWORD", "guest");
+        Environment.SetEnvironmentVariable("EXTERNAL_EVENT_EXCHANGE_NAME", "domain_events");
     }
 
     private static async Task WaitUntilPostgresIsReady(string connectionString)
