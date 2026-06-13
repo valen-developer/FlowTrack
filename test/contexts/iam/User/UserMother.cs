@@ -6,17 +6,17 @@ public class UserMother : ObjectMother
 {
     private static readonly Regex PasswordPattern = InvalidPassword.Regex;
 
-    public static User Random()
+    internal static User Random()
     {
         return new User(Id(), Email(), Password(), faker.boolean());
     }
 
-    public static User Active()
+    internal static User Active()
     {
         return new User(Id(), Email(), Password(), true);
     }
 
-    public static User Inactive()
+    internal static User Inactive()
     {
         return new User(Id(), Email(), Password(), false);
     }

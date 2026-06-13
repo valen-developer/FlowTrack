@@ -1,6 +1,6 @@
 namespace FlowTrack.Iam.Users.Infrastructure.Persistence;
 
-public class UserEntity
+internal class UserEntity
 {
     public required Guid Id { get; set; }
     public required string Email { get; set; }

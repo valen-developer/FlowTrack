@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowTrack.Iam;
 
-public static class IamServiceCollectionExtensions
+internal static class IamServiceCollectionExtensions
 {
     public static IServiceCollection ProvideIam(this IServiceCollection services)
     {

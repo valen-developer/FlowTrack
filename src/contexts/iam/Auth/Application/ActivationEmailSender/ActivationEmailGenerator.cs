@@ -3,7 +3,7 @@ using FlowTrack.Shared.Domain;
 namespace FlowTrack.Iam.Auth.Application;
 
 [Service]
-public sealed class ActivationEmailGenerator
+internal sealed class ActivationEmailGenerator
 {
     private const string Subject = "Activate your account";
 

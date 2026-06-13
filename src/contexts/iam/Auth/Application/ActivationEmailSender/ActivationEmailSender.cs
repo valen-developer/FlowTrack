@@ -3,7 +3,7 @@ using FlowTrack.Shared.Domain;
 namespace FlowTrack.Iam.Auth.Application;
 
 [Provider(typeof(IActivationEmailSender))]
-public sealed class ActivationEmailSender(
+internal sealed class ActivationEmailSender(
     IJWTService jwtService,
     IEnvStore env,
     IMailer mailer,

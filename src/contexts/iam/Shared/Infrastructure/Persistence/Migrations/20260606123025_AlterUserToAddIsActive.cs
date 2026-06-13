@@ -5,7 +5,7 @@
 namespace FlowTrack.Iam.Shared.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class AlterUserToAddIsActive : Migration
+    internal partial class AlterUserToAddIsActive : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

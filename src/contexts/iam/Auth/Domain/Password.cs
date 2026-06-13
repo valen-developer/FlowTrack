@@ -1,6 +1,6 @@
 namespace FlowTrack.Iam.Auth.Domain;
 
-public class Password(string value)
+internal class Password(string value)
 {
     public string Value { get; } = value;
 

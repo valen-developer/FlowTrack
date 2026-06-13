@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FlowTrack.Iam.Shared.Infrastructure;
 
-public class IamDbContext(DbContextOptions<IamDbContext> options) : DbContext(options)
+internal class IamDbContext(DbContextOptions<IamDbContext> options) : DbContext(options)
 {
     public DbSet<UserEntity> Users => Set<UserEntity>();
 

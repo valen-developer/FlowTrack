@@ -2,7 +2,7 @@ using FlowTrack.Shared.Domain;
 
 namespace FlowTrack.Iam.Users.Domain;
 
-public class User(UserId id, UserEmail email, UserPassword password, bool isActive = false)
+internal class User(UserId id, UserEmail email, UserPassword password, bool isActive = false)
     : AggregatedRoot
 {
     public UserId Id { get; } = id;

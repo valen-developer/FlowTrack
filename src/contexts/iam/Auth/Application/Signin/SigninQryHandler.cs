@@ -3,7 +3,7 @@ using FlowTrack.Shared.Domain;
 namespace FlowTrack.Iam.Auth.Application;
 
 [Service(Lifetime.Scoped)]
-public sealed class SigninQryHandler(
+internal sealed class SigninQryHandler(
     IUserRepository repository,
     AuthTokenGenerator authTokenGenerator,
     IBcrypt bcrypt

@@ -3,7 +3,7 @@ using FlowTrack.Shared.Domain;
 
 namespace FlowTrack.Iam.Auth.Domain;
 
-public class InvalidPassword()
+internal class InvalidPassword()
     : InvalidException(
         "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter and one digit.",
         "exception.iam.auth.password.invalid"

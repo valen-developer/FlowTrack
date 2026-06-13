@@ -3,7 +3,7 @@ using FlowTrack.Shared.Domain;
 namespace FlowTrack.Iam.Auth.Application;
 
 [Service(Lifetime.Scoped)]
-public sealed class AuthValidator(IJWTService jwtService, IEnvStore env)
+internal sealed class AuthValidator(IJWTService jwtService, IEnvStore env)
 {
     public AuthValidation ValidateAccessToken(string token)
     {

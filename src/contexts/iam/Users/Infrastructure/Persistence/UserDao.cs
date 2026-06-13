@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace FlowTrack.Iam.Users.Infrastructure.Persistence;
 
 [Service(Lifetime.Scoped)]
-public class UserDao(IamDbContext iamDbContext)
+internal class UserDao(IamDbContext iamDbContext)
 {
     public async Task Insert(UserEntity userEntity)
     {

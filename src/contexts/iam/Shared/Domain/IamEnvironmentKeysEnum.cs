@@ -1,6 +1,6 @@
 namespace FlowTrack.Iam.Shared.Domain;
 
-public enum IamEnvironmentKeysEnum
+internal enum IamEnvironmentKeysEnum
 {
     ACCESS_TOKEN_SECRET,
     ACCESS_TOKEN_EXPIRE_MINUTES,

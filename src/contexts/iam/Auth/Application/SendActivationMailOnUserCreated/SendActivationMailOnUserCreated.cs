@@ -4,7 +4,7 @@ namespace FlowTrack.Iam.Auth.Application;
 
 [Service]
 [DomainEventSubscriber(typeof(UserCreated))]
-public sealed class SendActivationMailOnUserCreated(IActivationEmailSender emailSender)
+internal sealed class SendActivationMailOnUserCreated(IActivationEmailSender emailSender)
 {
     [DomainEventListener]
     public async Task On(UserCreated @event)

@@ -9,7 +9,7 @@ public abstract class FlowtrackApiE2E(FlowtrackApiFixture fixture)
     protected HttpClient HttpClient => _fixture.HttpClient;
     protected IServiceProvider Services => _fixture.Services;
 
-    protected async Task AddUserToDatabase(User user)
+    internal async Task AddUserToDatabase(User user)
     {
         var dbContext =
             Services.GetService<IamDbContext>()

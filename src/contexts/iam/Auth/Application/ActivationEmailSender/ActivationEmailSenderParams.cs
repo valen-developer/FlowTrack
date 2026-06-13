@@ -1,3 +1,3 @@
 namespace FlowTrack.Iam.Auth.Application;
 
-public sealed record ActivationEmailSenderParams(string UserId, string Email);
+internal sealed record ActivationEmailSenderParams(string UserId, string Email);

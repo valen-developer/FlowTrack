@@ -31,4 +31,10 @@
     <ProjectReference Include="../../../src/contexts/iam/FlowTrack.Iam.csproj" />
     <ProjectReference Include="../Shared/FlowTrack.Shared.Test.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>FlowtrackApiTest</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FlowTrack.Iam.Shared.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateUsersTable : Migration
+    internal partial class CreateUsersTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

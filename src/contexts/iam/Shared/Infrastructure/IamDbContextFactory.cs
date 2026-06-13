@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace FlowTrack.Iam.Shared.Infrastructure;
 
-public class IamDbContextFactory : IDesignTimeDbContextFactory<IamDbContext>
+internal class IamDbContextFactory : IDesignTimeDbContextFactory<IamDbContext>
 {
     public IamDbContext CreateDbContext(string[] args)
     {

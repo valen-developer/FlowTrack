@@ -1,6 +1,6 @@
 namespace FlowTrack.Iam.Users.Domain;
 
-public interface IUserRepository
+internal interface IUserRepository
 {
     Task<User?> FindByEmail(string email);
     Task<User?> FindById(string id);

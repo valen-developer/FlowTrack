@@ -2,7 +2,7 @@ using FlowTrack.Shared.Domain;
 
 namespace FlowTrack.Iam.Users.Domain;
 
-public sealed record UserActivated(string Id) : DomainEvent, IDomainEvent
+internal sealed record UserActivated(string Id) : DomainEvent, IDomainEvent
 {
     public string Id { get; init; } = Id;
 

@@ -1,6 +1,6 @@
 namespace FlowTrack.Iam.Users.Domain;
 
-public class UserId
+internal class UserId
 {
     public string Value { get; }
 

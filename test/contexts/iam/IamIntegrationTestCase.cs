@@ -11,7 +11,7 @@ public abstract class IamIntegrationTestCase(IamIntegrationFixture fixture)
         return new EfCoreTransaction(dbcontext);
     }
 
-    protected async Task AddUserToDatabase(User user)
+    internal async Task AddUserToDatabase(User user)
     {
         var dbcontext = _fixture.GetService<IamDbContext>();
         var userDao = _fixture.GetService<UserDao>();

@@ -6,7 +6,7 @@ public sealed class AuthCookieSetter(
     IDateTimeProvider dateTimeProvider
 )
 {
-    public void SetAuthCookies(SigninSuccess signinSuccess)
+    internal void SetAuthCookies(SigninSuccess signinSuccess)
     {
         var context =
             contextAccessor.HttpContext

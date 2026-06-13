@@ -4,7 +4,7 @@ using FlowTrack.Shared.Domain;
 namespace FlowTrack.Iam.Auth.Application;
 
 [Service(Lifetime.Scoped)]
-public sealed class AuthTokenGenerator(IEnvStore envStore, IJWTService jwtService)
+internal sealed class AuthTokenGenerator(IEnvStore envStore, IJWTService jwtService)
 {
     private const int DefaultAccessTokenExpireInMinutes = 60;
     private const int DefaultRefreshTokenExpireInMinutes = 60 * 24 * 30;

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FlowTrack.Iam.Users.Infrastructure.Persistence;
 
-public class UserEntityConf : IEntityTypeConfiguration<UserEntity>
+internal class UserEntityConf : IEntityTypeConfiguration<UserEntity>
 {
     public void Configure(EntityTypeBuilder<UserEntity> builder)
     {

@@ -2,7 +2,7 @@ using FlowTrack.Shared.Domain;
 
 namespace FlowTrack.Iam.Users.Domain;
 
-public record UserCreated(string UserId, string Email, bool IsActive) : DomainEvent, IDomainEvent
+internal record UserCreated(string UserId, string Email, bool IsActive) : DomainEvent, IDomainEvent
 {
     public static bool External => false;
 

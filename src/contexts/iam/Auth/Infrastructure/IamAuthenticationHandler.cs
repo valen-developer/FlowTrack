@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 
 namespace FlowTrack.Iam.Auth.Infrastructure;
 
-public sealed class IamAuthenticationHandler(
+internal sealed class IamAuthenticationHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,
     ILoggerFactory logger,
     UrlEncoder encoder,

@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace FlowTrack.Iam.Auth.Application;
 
 [Service]
-public sealed class ActivateUserByTokenCmdHandler(
+internal sealed class ActivateUserByTokenCmdHandler(
     [FromKeyedServices("IAM")] Context context,
     IEnvStore envStore,
     IJWTService jwtService,
