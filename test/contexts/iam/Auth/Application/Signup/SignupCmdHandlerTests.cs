@@ -66,7 +66,11 @@ public class SignupCmdHandlerTests
             Password: user.Password.Value
         );
 
-        UserCreated expectedEvent = new(UserId: user.Id.Value, Email: user.Email.Value, IsActive: user.IsActive);
+        UserCreated expectedEvent = new(
+            UserId: user.Id.Value,
+            Email: user.Email.Value,
+            IsActive: user.IsActive
+        );
 
         await _handler.Handle(cmd);
 

@@ -37,10 +37,7 @@ public class SignupCmdHandlerIT : IamIntegrationTestCase
         fixture.AddScoped<DomainEventDispatcher, DomainEventDispatcher>();
         fixture.AddScoped<IDomainEventBus, InMemoryDomainEventBus>();
         fixture.AddScoped<IExternalEventBus, InMemoryExternalEventBus>();
-        fixture.AddScoped<
-            OnUserCreatedDomainEventSubscriber,
-            OnUserCreatedDomainEventSubscriber
-        >();
+        fixture.AddScoped<OnUserCreatedDomainEventSubscriber, OnUserCreatedDomainEventSubscriber>();
     }
 
     [Fact]
@@ -71,7 +68,11 @@ public class SignupCmdHandlerIT : IamIntegrationTestCase
 
         await handler.Handle(cmd);
 
-        UserCreated expectedEvent = new(UserId: user.Id.Value, Email: user.Email.Value, IsActive: user.IsActive);
+        UserCreated expectedEvent = new(
+            UserId: user.Id.Value,
+            Email: user.Email.Value,
+            IsActive: user.IsActive
+        );
         UserCreated actualEvent = subscriber.CapturedEvent!;
 
         Assert.NotNull(subscriber.CapturedEvent);
