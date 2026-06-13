@@ -1,9 +1,4 @@
 using System.Net.Sockets;
-using FlowTrack.Iam.Domain;
-using FlowTrack.Iam.Infrastructure;
-using FlowTrack.Shared.Domain;
-using FlowTrack.Shared.Infrastructure;
-using FlowTrack.Shared.Test;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;

@@ -1,8 +1,3 @@
-using FlowTrack.Iam.Application;
-using FlowTrack.Iam.Domain;
-using FlowTrack.Shared;
-using FlowTrack.Shared.Domain;
-using FlowTrack.Shared.Test;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 

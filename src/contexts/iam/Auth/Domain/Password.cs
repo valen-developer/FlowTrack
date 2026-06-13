@@ -1,4 +1,4 @@
-namespace FlowTrack.Iam.Domain;
+namespace FlowTrack.Iam.Auth.Domain;
 
 public class Password(string value)
 {

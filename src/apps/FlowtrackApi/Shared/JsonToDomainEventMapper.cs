@@ -1,8 +1,6 @@
 using System.Text.Json;
-using FlowTrack.Iam.Domain;
-using FlowTrack.Shared.Domain;
 
-namespace FlowtrackApi;
+namespace FlowtrackApi.Shared;
 
 [Provider(typeof(IJsonToDomainEventMapper), Lifetime.Singleton)]
 public sealed class JsonToDomainEventMapper : IJsonToDomainEventMapper

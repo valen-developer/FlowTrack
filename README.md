@@ -89,6 +89,25 @@ test/
   - Tests de integracion contra PostgreSQL real con contenedores.
   - Tests E2E contra la API real con `WebApplicationFactory`.
 
+## Convencion de namespaces
+
+El namespace de cada archivo coincide con su ruta de carpeta dentro del proyecto.
+
+**Reglas:**
+- `namespace == ruta de carpeta` — ej: `src/contexts/Iam/Auth/Domain/Password.cs` → `FlowTrack.Iam.Auth.Domain`
+- Nombres de carpeta en **PascalCase**.
+- Si una carpeta tiene el mismo nombre que una clase que contiene (ej: `User/User.cs`), la carpeta se **pluraliza** (`Users/User.cs`) para evitar ambigüedad entre el namespace y el tipo.
+- En la capa `Application/`, las carpetas de caso de uso (Signin, Signup, ActivationEmailSender, etc.) son organizativas y **no** forman parte del namespace — todos los archivos usan el namespace del directorio `Application` padre.
+
+Ejemplos:
+
+| Ruta | Namespace |
+|---|---|
+| `src/contexts/Iam/Users/Domain/User.cs` | `FlowTrack.Iam.Users.Domain` |
+| `src/contexts/Iam/Auth/Application/ActivationEmailSender/ActivationEmailSender.cs` | `FlowTrack.Iam.Auth.Application` |
+| `src/contexts/Shared/Domain/Bus/Event/DomainEvent.cs` | `FlowTrack.Shared.Domain.Bus.Event` |
+| `src/contexts/Shared/Infrastructure/HttpErrorResponses/HttpErrorResponse.cs` | `FlowTrack.Shared.Infrastructure.HttpErrorResponses` |
+
 ## Estructura de proyectos
 
 - `src/apps/FlowtrackApi/FlowtrackApi.csproj`

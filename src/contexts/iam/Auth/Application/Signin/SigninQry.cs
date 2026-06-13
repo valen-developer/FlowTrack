@@ -1,6 +1,5 @@
-using FlowTrack.Iam.Domain;
 using FlowTrack.Shared.Domain;
 
-namespace FlowTrack.Iam.Application;
+namespace FlowTrack.Iam.Auth.Application;
 
 public record SigninQry(string Email, string Password) : IQuery<SigninSuccess>;

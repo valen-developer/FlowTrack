@@ -1,6 +1,6 @@
 using FlowTrack.Shared.Domain;
 
-namespace FlowTrack.Shared.Infrastructure;
+namespace FlowTrack.Shared.Infrastructure.Bus.Event;
 
 [Provider(typeof(IDomainEventBus))]
 public class InMemoryDomainEventBus(DomainEventDispatcher dispatcher) : IDomainEventBus

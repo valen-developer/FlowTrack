@@ -1,10 +1,8 @@
-using FlowTrack.Iam.Application;
-using FlowTrack.Shared.Domain;
 using FlowtrackApi.Iam.Schemas;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FlowTrack.Iam.Controllers;
+namespace FlowtrackApi.Iam.Controllers.Auth;
 
 public class SignupController([FromKeyedServices("IAM")] Context context, ICommandBus commandBus)
     : AuthController

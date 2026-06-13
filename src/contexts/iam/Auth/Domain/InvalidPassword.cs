@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using FlowTrack.Shared.Domain;
 
-namespace FlowTrack.Iam.Domain;
+namespace FlowTrack.Iam.Auth.Domain;
 
 public class InvalidPassword()
     : InvalidException(

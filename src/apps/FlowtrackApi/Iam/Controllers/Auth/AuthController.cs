@@ -1,7 +1,6 @@
-using FlowtrackApi.Shared;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FlowTrack.Iam.Controllers;
+namespace FlowtrackApi.Iam.Controllers.Auth;
 
 [Route("auth")]
 public abstract class AuthController : IController { }

@@ -1,7 +1,7 @@
 using System.Reflection;
 using FlowTrack.Shared.Domain;
 
-namespace FlowTrack.Shared.Infrastructure;
+namespace FlowTrack.Shared.Infrastructure.Bus.Event;
 
 [Service]
 public class DomainEventDispatcher(

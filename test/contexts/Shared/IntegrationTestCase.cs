@@ -1,5 +1,4 @@
 using dotenv.net;
-using FlowTrack.Shared.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 

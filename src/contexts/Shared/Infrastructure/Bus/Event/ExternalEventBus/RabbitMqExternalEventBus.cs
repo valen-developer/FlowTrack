@@ -1,7 +1,7 @@
 using FlowTrack.Shared.Domain;
 using RabbitMQ.Client;
 
-namespace FlowTrack.Shared.Infrastructure;
+namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus;
 
 [Provider(typeof(IExternalEventBus))]
 public class RabbitMqExternalEventBus(RabbitMqConnection rabbitConnection, IEnvStore env)

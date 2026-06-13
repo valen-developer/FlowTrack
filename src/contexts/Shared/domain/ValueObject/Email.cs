@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
+using FlowTrack.Shared.Domain.Exception;
 
-namespace FlowTrack.Shared.Domain;
+namespace FlowTrack.Shared.Domain.ValueObject;
 
 public class Email
 {

@@ -1,7 +1,4 @@
 using System.Net.Sockets;
-using FlowTrack.Iam;
-using FlowTrack.Iam.Infrastructure;
-using FlowTrack.Shared;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;

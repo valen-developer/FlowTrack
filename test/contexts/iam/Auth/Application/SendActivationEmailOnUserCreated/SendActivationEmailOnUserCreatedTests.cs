@@ -1,5 +1,3 @@
-using FlowTrack.Iam.Application;
-using FlowTrack.Iam.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 

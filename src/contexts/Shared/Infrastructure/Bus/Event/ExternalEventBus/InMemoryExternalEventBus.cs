@@ -1,6 +1,6 @@
-using FlowTrack.Shared.Infrastructure;
+using FlowTrack.Shared.Domain.Bus.Event;
 
-namespace FlowTrack.Shared.Domain;
+namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus;
 
 public class InMemoryExternalEventBus(DomainEventDispatcher dispatcher) : IExternalEventBus
 {

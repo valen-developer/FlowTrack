@@ -1,6 +1,4 @@
-using FlowTrack.Shared.Domain.Bus.Command;
-
-namespace FlowTrack.Shared.Domain;
+namespace FlowTrack.Shared.Domain.Bus.Command;
 
 public interface ICommandBus
 {

@@ -1,9 +1,5 @@
 using System.Net;
 using System.Net.Http.Json;
-using FlowTrack.Iam.Application;
-using FlowTrack.Iam.Domain;
-using FlowTrack.Iam.Test;
-using FlowTrack.Shared.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowtrackApi.Test;

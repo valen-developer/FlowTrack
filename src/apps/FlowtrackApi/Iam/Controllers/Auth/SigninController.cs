@@ -1,12 +1,9 @@
-using FlowTrack.Iam.Application;
-using FlowTrack.Iam.Domain;
-using FlowTrack.Iam.Schemas;
-using FlowTrack.Iam.Services;
-using FlowTrack.Shared;
+using FlowtrackApi.Iam.Schemas;
+using FlowtrackApi.Iam.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FlowTrack.Iam.Controllers;
+namespace FlowtrackApi.Iam.Controllers.Auth;
 
 public class SigninController(IQueryBus queryBus, AuthCookieSetter cookieSetter) : AuthController
 {

@@ -1,10 +1,9 @@
-using FlowTrack.Iam.Domain;
 using FlowTrack.Shared;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Bus.Command;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowTrack.Iam.Application;
+namespace FlowTrack.Iam.Auth.Application;
 
 [Service]
 public sealed class ActivateUserByTokenCmdHandler(

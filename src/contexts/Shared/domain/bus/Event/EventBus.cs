@@ -1,4 +1,4 @@
-namespace FlowTrack.Shared.Domain;
+namespace FlowTrack.Shared.Domain.Bus.Event;
 
 [Service]
 public sealed class EventBus(IDomainEventBus domainEventBus, IExternalEventBus externalEventBus)

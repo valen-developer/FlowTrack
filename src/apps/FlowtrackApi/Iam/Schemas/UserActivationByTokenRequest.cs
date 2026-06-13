@@ -1,4 +1,4 @@
-namespace FlowTrack.Iam.Schemas;
+namespace FlowtrackApi.Iam.Schemas;
 
 public sealed record UserActivationByTokenRequest
 {

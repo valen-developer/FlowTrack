@@ -1,4 +1,4 @@
-namespace FlowTrack.Shared.Domain;
+namespace FlowTrack.Shared.Domain.Exception;
 
 public class UnAuthenticatedException(
     string message = "Unauthenticated",

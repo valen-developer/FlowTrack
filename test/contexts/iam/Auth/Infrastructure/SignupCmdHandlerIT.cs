@@ -1,8 +1,3 @@
-using FlowTrack.Iam.Application;
-using FlowTrack.Iam.Domain;
-using FlowTrack.Iam.Infrastructure;
-using FlowTrack.Shared.Domain;
-using FlowTrack.Shared.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowTrack.Iam.Test.Infrastructure;

@@ -1,4 +1,4 @@
-namespace FlowTrack.Shared.Domain;
+namespace FlowTrack.Shared.Domain.Dic;
 
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public class ProviderAttribute(Type serviceType, Lifetime lifetime = Lifetime.Scoped) : Attribute

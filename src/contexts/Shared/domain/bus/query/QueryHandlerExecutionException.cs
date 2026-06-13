@@ -1,4 +1,4 @@
-namespace FlowTrack.Shared;
+namespace FlowTrack.Shared.Domain.Bus.Query;
 
-public class QueryHandlerExecutionException(Exception cause)
+public class QueryHandlerExecutionException(System.Exception cause)
     : ActionHandlerExecutionException(cause) { }

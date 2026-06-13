@@ -1,4 +1,4 @@
-namespace FlowTrack.Shared.Infrastructure;
+namespace FlowTrack.Shared.Infrastructure.Bus.Event;
 
 public class DomainEventSubscriberInformation(DomainEventSubscriberInfo[] Subscribers)
 {

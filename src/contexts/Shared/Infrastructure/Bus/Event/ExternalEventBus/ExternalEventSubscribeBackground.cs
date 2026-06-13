@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace FlowTrack.Shared.Infrastructure;
+namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus;
 
 public sealed class ExternalEventSubscribeBackground(
     IEnvStore env,

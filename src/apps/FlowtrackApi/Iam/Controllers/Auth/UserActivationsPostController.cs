@@ -1,11 +1,8 @@
-using FlowTrack.Iam.Application;
-using FlowTrack.Iam.Schemas;
-using FlowTrack.Shared.Domain;
-using FlowtrackApi.Shared;
+using FlowtrackApi.Iam.Schemas;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FlowtrackApi.Iam.Controllers;
+namespace FlowtrackApi.Iam.Controllers.Auth;
 
 [Route("user-activations")]
 public sealed class UserActivationsPostController(ICommandBus commandBus) : IController

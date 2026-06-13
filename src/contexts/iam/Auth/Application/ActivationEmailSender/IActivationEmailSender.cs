@@ -1,4 +1,4 @@
-namespace FlowTrack.Iam.Application;
+namespace FlowTrack.Iam.Auth.Application;
 
 public interface IActivationEmailSender
 {

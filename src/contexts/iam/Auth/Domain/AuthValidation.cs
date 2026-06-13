@@ -1,4 +1,4 @@
-namespace FlowTrack.Iam.Domain;
+namespace FlowTrack.Iam.Auth.Domain;
 
 public sealed record AuthValidation(bool IsAuthenticated, string? UserId)
 {

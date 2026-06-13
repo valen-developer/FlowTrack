@@ -1,8 +1,7 @@
 using System.Reflection;
-using FlowTrack.Shared.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowTrack.Shared.Domain;
+namespace FlowTrack.Shared.Infrastructure;
 
 public static class ServicesDiscoverCollectionExtensions
 {

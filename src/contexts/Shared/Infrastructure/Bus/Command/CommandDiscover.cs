@@ -3,7 +3,7 @@ using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Bus.Command;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowTrack.Shared.Infrastructure;
+namespace FlowTrack.Shared.Infrastructure.Bus.Command;
 
 public static class DicoverCommandsServiceCollectionExtensions
 {

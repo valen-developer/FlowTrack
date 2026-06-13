@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace FlowTrack.Shared.Infrastructure;
+namespace FlowTrack.Shared.Infrastructure.Bus.Event;
 
 public sealed record DomainEventSubscriberInfo(
     Type SubscriberType,

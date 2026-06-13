@@ -1,4 +1,4 @@
-namespace FlowTrack.Iam;
+namespace FlowTrack.Iam.Shared.Domain;
 
 public enum IamEnvironmentKeysEnum
 {

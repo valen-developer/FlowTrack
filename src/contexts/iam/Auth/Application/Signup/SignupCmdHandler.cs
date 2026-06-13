@@ -1,8 +1,7 @@
-using FlowTrack.Iam.Domain;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Bus.Command;
 
-namespace FlowTrack.Iam.Application;
+namespace FlowTrack.Iam.Auth.Application;
 
 [Service]
 public sealed class SignupCmdHandler(IUserRepository repository, EventBus eventBus, IBcrypt bcrypt)

@@ -1,13 +1,13 @@
 using dotenv.net;
 using FlowTrack.Shared.Domain;
 
-namespace FlowTrack.Shared.Infrastructure;
+namespace FlowTrack.Shared.Infrastructure.DotEnv;
 
 [Provider(typeof(IDotEnvCharger))]
 public class DotEnvCharger : IDotEnvCharger
 {
     public void Load(string[] paths)
     {
-        DotEnv.Load(new(envFilePaths: paths));
+        dotenv.net.DotEnv.Load(new(envFilePaths: paths));
     }
 }

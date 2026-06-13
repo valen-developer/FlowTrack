@@ -1,4 +1,4 @@
-namespace FlowTrack.Shared.Domain;
+namespace FlowTrack.Shared.Domain.Bus.Command;
 
-public class CommandHandlerExecutionException(Exception cause)
+public class CommandHandlerExecutionException(System.Exception cause)
     : ActionHandlerExecutionException(cause) { }

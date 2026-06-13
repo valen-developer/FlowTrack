@@ -1,4 +1,4 @@
-namespace FlowTrack.Shared.Domain;
+namespace FlowTrack.Shared.Domain.Mailer;
 
 public class Mail(string to, string subject, string body)
 {

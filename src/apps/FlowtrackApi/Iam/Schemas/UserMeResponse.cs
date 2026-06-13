@@ -1,6 +1,4 @@
-using FlowTrack.Iam.Domain;
-
-namespace FlowTrack.Iam.Schemas;
+namespace FlowtrackApi.Iam.Schemas;
 
 public sealed record UserMeResponse(string Id, string Email)
 {

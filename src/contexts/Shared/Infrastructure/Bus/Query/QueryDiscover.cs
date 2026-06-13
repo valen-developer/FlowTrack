@@ -2,7 +2,7 @@ using System.Reflection;
 using FlowTrack.Shared.Domain;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowTrack.Shared.Infrastructure;
+namespace FlowTrack.Shared.Infrastructure.Bus.Query;
 
 public static class DicoverQueriesServiceCollectionExtensions
 {

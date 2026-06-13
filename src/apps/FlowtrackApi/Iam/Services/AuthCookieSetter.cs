@@ -1,8 +1,4 @@
-using FlowTrack.Iam.Domain;
-using FlowTrack.Shared;
-using FlowTrack.Shared.Domain;
-
-namespace FlowTrack.Iam.Services;
+namespace FlowtrackApi.Iam.Services;
 
 [Service]
 public sealed class AuthCookieSetter(

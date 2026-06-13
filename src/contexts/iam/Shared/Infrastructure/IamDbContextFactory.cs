@@ -2,7 +2,7 @@ using FlowTrack.Shared.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace FlowTrack.Iam.Infrastructure;
+namespace FlowTrack.Iam.Shared.Infrastructure;
 
 public class IamDbContextFactory : IDesignTimeDbContextFactory<IamDbContext>
 {

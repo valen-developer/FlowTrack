@@ -1,4 +1,4 @@
-namespace FlowTrack.Shared.Infrastructure;
+namespace FlowTrack.Shared.Infrastructure.RabbitMq;
 
 public sealed record RabbitMqSubscribeParams
 {

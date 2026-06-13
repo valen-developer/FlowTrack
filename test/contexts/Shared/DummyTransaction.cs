@@ -1,5 +1,3 @@
-using FlowTrack.Shared.Domain;
-
 namespace FlowTrack.Shared.Test;
 
 public sealed class DummyTransaction : Transaction

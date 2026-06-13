@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using FlowTrack.Iam.Application;
+using FlowTrack.Iam.Auth.Application;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Infrastructure;
 using Microsoft.AspNetCore.Authentication;
@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace FlowTrack.Iam.Infrastructure;
+namespace FlowTrack.Iam.Auth.Infrastructure;
 
 public sealed class IamAuthenticationHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,

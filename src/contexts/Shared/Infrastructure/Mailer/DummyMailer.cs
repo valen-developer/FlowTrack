@@ -1,6 +1,6 @@
 using FlowTrack.Shared.Domain;
 
-namespace FlowTrack.Shared.Infrastructure;
+namespace FlowTrack.Shared.Infrastructure.Mailer;
 
 [Provider(typeof(IMailer))]
 public sealed class DummyMailer : IMailer

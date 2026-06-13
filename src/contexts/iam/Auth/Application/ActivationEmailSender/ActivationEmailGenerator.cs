@@ -1,6 +1,6 @@
 using FlowTrack.Shared.Domain;
 
-namespace FlowTrack.Iam.Application;
+namespace FlowTrack.Iam.Auth.Application;
 
 [Service]
 public sealed class ActivationEmailGenerator

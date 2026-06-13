@@ -1,8 +1,7 @@
 using System.Collections.Immutable;
-using FlowTrack.Iam.Domain;
 using FlowTrack.Shared.Domain;
 
-namespace FlowTrack.Iam.Application;
+namespace FlowTrack.Iam.Auth.Application;
 
 [Service(Lifetime.Scoped)]
 public sealed class AuthTokenGenerator(IEnvStore envStore, IJWTService jwtService)

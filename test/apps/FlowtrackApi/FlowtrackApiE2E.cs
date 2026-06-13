@@ -1,6 +1,3 @@
-using FlowTrack.Iam.Domain;
-using FlowTrack.Iam.Infrastructure;
-using FlowTrack.Shared.Domain;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowtrackApi.Test;

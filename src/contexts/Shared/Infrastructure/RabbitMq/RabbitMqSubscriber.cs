@@ -2,7 +2,7 @@ using FlowTrack.Shared.Domain;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace FlowTrack.Shared.Infrastructure;
+namespace FlowTrack.Shared.Infrastructure.RabbitMq;
 
 [Service(Lifetime.Singleton)]
 public class RabbitMqSubscriber(RabbitMqConnection connection)

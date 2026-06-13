@@ -1,7 +1,7 @@
 using FlowTrack.Shared.Domain;
 using RabbitMQ.Client;
 
-namespace FlowTrack.Shared.Infrastructure;
+namespace FlowTrack.Shared.Infrastructure.RabbitMq;
 
 [Service(Lifetime.Singleton)]
 public sealed class RabbitMqConnection : IAsyncDisposable

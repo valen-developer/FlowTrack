@@ -1,4 +1,4 @@
-namespace FlowTrack.Shared;
+namespace FlowTrack.Shared.Domain;
 
 public interface IDateTimeProvider
 {
