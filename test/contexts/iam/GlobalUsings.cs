@@ -1,3 +1,7 @@
+global using FlowTrack.Iam.Test.Auth.Application;
+global using FlowTrack.Iam.Test.Auth.Infrastructure;
+global using FlowTrack.Iam.Test.Users;
+global using FlowTrack.Iam.Test.Users.Application;
 global using FlowTrack.Iam.Auth.Application;
 global using FlowTrack.Iam.Auth.Domain;
 global using FlowTrack.Iam.Auth.Infrastructure;

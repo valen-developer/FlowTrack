@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace FlowTrack.Iam.Test;
+namespace FlowTrack.Iam.Test.Auth.Application;
 
 public class ActivateUserByTokenCmdTests
 {

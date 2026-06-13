@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowtrackApi.Test;
+namespace FlowtrackApi.Test.Iam.Controllers.Auth;
 
 [Collection(nameof(FlowtrackApiCollection))]
 public class SinginControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(fixture)

@@ -1,10 +1,10 @@
-global using FlowTrack.Shared.Domain.Dic;
 global using FlowTrack.Shared.Domain.Bus.Command;
 global using FlowTrack.Shared.Domain.Bus.Event;
 global using FlowTrack.Shared.Domain.Bus.Query;
-global using FlowTrack.Shared.Domain.Transactions;
+global using FlowTrack.Shared.Domain.Dic;
 global using FlowTrack.Shared.Domain.Mailer;
-global using FlowTrack.Shared.Infrastructure.RabbitMq;
-global using FlowTrack.Shared.Infrastructure.Bus.Event;
+global using FlowTrack.Shared.Domain.Transactions;
 global using FlowTrack.Shared.Infrastructure.Bus.Command;
+global using FlowTrack.Shared.Infrastructure.Bus.Event;
 global using FlowTrack.Shared.Infrastructure.Bus.Query;
+global using FlowTrack.Shared.Infrastructure.RabbitMq;

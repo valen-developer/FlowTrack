@@ -1,4 +1,4 @@
-namespace FlowTrack.Iam.Test.Infrastructure;
+namespace FlowTrack.Iam.Test.Auth.Infrastructure;
 
 public class SigninQryHandlerIT : IamIntegrationTestCase
 {

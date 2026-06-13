@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace FlowTrack.Iam.Test.Infrastructure;
+namespace FlowTrack.Iam.Test.Auth.Infrastructure;
 
 public class SendActivationEmailOnUserCreatedIT : IamIntegrationTestCase
 {

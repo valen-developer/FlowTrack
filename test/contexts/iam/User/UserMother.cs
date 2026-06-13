@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace FlowTrack.Iam.Test;
+namespace FlowTrack.Iam.Test.Users;
 
 public class UserMother : ObjectMother
 {

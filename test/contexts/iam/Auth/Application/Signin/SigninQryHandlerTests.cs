@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace FlowTrack.Iam.Test;
+namespace FlowTrack.Iam.Test.Auth.Application;
 
 public class SigninQryHandlerTests
 {
