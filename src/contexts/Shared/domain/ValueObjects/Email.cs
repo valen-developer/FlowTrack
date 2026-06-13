@@ -1,20 +1,19 @@
 using System.Text.RegularExpressions;
 using FlowTrack.Shared.Domain.Exception;
 
-namespace FlowTrack.Shared.Domain.ValueObject;
+namespace FlowTrack.Shared.Domain.ValueObjects;
 
-public class Email
+public record Email : ValueObject<string>
 {
     public static readonly Regex EmailRegex = new(
         @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$",
         RegexOptions.Compiled
     );
-    public string Value { get; }
 
     public Email(string value)
+        : base(value)
     {
         EnsureEmail(value);
-        Value = value;
     }
 
     public static void EnsureEmail(string value)

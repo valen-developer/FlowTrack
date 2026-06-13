@@ -1,6 +1,3 @@
 namespace FlowTrack.Iam.Users.Domain;
 
-internal class UserPassword(string Value)
-{
-    public string Value { get; } = Value;
-}
+internal record UserPassword(string Value) : ValueObject<string>(Value) { }

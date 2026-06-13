@@ -13,5 +13,5 @@ global using FlowTrack.Shared.Domain.Contexts;
 global using FlowTrack.Shared.Domain.Dic;
 global using FlowTrack.Shared.Domain.Exception;
 global using FlowTrack.Shared.Domain.Mailer;
-global using FlowTrack.Shared.Domain.ValueObject;
+global using FlowTrack.Shared.Domain.ValueObjects;
 global using FlowTrack.Shared.Infrastructure.HttpErrorResponses;
