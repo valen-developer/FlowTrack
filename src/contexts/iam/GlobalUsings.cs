@@ -1,6 +1,5 @@
 global using FlowTrack.Iam.Auth.Application;
 global using FlowTrack.Iam.Auth.Domain;
-global using FlowTrack.Iam.Auth.Infrastructure;
 global using FlowTrack.Iam.Shared.Domain;
 global using FlowTrack.Iam.Shared.Infrastructure;
 global using FlowTrack.Iam.Users.Application;
@@ -14,7 +13,5 @@ global using FlowTrack.Shared.Domain.Contexts;
 global using FlowTrack.Shared.Domain.Dic;
 global using FlowTrack.Shared.Domain.Exception;
 global using FlowTrack.Shared.Domain.Mailer;
-global using FlowTrack.Shared.Domain.Transactions;
 global using FlowTrack.Shared.Domain.ValueObject;
-global using FlowTrack.Shared.Infrastructure;
 global using FlowTrack.Shared.Infrastructure.HttpErrorResponses;
