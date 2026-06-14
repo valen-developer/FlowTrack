@@ -8,3 +8,4 @@ global using FlowTrack.Shared.Infrastructure.Bus.Command;
 global using FlowTrack.Shared.Infrastructure.Bus.Event;
 global using FlowTrack.Shared.Infrastructure.Bus.Query;
 global using FlowTrack.Shared.Infrastructure.RabbitMq;
+global using static FlowTrack.Shared.Domain.Utils.AsyncWaiter;

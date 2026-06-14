@@ -1,4 +1,4 @@
-using System.Net.Sockets;
+using FlowTrack.WorkManagement.Shared.Domain;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -85,7 +85,25 @@ public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetim
             .Build();
 
         await _postgresContainer.StartAsync();
-        await WaitUntilPostgresIsReady(_postgresContainer.GetConnectionString());
+        await WaitForAsync(
+            async () =>
+            {
+                try
+                {
+                    await using var connection = new NpgsqlConnection(
+                        _postgresContainer.GetConnectionString()
+                    );
+                    await connection.OpenAsync();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            },
+            timeoutMs: 5000,
+            pollIntervalMs: 250
+        );
     }
 
     private Task SetConnectionStrings()
@@ -96,6 +114,10 @@ public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetim
         var connectionString = _postgresContainer.GetConnectionString();
         Environment.SetEnvironmentVariable(
             IamEnvironmentKeysEnum.IAM_DB_CONNECTION_STRING.ToString(),
+            connectionString
+        );
+        Environment.SetEnvironmentVariable(
+            WorkManagementEnvironmentKeysEnum.WORK_MANAGEMENT_DB_CONNECTION_STRING.ToString(),
             connectionString
         );
 
@@ -119,34 +141,6 @@ public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetim
         Environment.SetEnvironmentVariable("RABBITMQ_USERNAME", "guest");
         Environment.SetEnvironmentVariable("RABBITMQ_PASSWORD", "guest");
         Environment.SetEnvironmentVariable("EXTERNAL_EVENT_EXCHANGE_NAME", "domain_events");
-    }
-
-    private static async Task WaitUntilPostgresIsReady(string connectionString)
-    {
-        const int maxAttempts = 20;
-        const int delayMs = 250;
-
-        for (var attempt = 1; attempt <= maxAttempts; attempt++)
-        {
-            try
-            {
-                await using var connection = new NpgsqlConnection(connectionString);
-                await connection.OpenAsync();
-                return;
-            }
-            catch (NpgsqlException) when (attempt < maxAttempts)
-            {
-                await Task.Delay(delayMs);
-            }
-            catch (SocketException) when (attempt < maxAttempts)
-            {
-                await Task.Delay(delayMs);
-            }
-        }
-
-        throw new InvalidOperationException(
-            $"PostgreSQL container was not ready after {maxAttempts * delayMs} ms"
-        );
     }
 
     public async Task<List<T>> ExecuteQueryAsync<T>(string sqlQuery)

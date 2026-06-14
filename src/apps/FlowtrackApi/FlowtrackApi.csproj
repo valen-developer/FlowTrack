@@ -10,6 +10,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../contexts/Iam/FlowTrack.Iam.csproj" />
+    <ProjectReference Include="../../contexts/WorkManagement/FlowTrack.WorkManagement.csproj" />
   </ItemGroup>
   <Target
     Name="Husky"

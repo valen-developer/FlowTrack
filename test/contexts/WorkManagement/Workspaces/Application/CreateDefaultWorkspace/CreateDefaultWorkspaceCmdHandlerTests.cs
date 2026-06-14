@@ -1,5 +1,7 @@
 using FlowTrack.Shared.Domain.Bus.Event;
+using FlowTrack.Shared.Domain.Contexts;
 using FlowTrack.Shared.Domain.FilterCriterias;
+using FlowTrack.Shared.Test;
 using FlowTrack.WorkManagement.Workspaces.Application;
 using FlowTrack.WorkManagement.Workspaces.Domain;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +26,7 @@ public class CreateDefaultWorkspaceCmdHandlerTests
         services.AddSingleton(_domainEventBusMock.Object);
         services.AddSingleton(_externalEventBusMock.Object);
         services.AddSingleton<EventBus>();
+        services.AddKeyedScoped("WORK_MANAGEMENT", (_, _) => new Context(new DummyTransaction()));
 
         services.AddScoped<WorkspaceCreator>();
         services.AddScoped<CreateDefaultWorkspaceCmdHandler>();

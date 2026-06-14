@@ -10,7 +10,7 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus;
 
 public sealed class ExternalEventSubscribeBackground(
     IEnvStore env,
-    IJsonToDomainEventMapper jsonToDomainEventMapper,
+    IEnumerable<JsonToDomainEventMapper> jsonToDomainEventMappers,
     RabbitMqSubscriber suscriber,
     ExternalEventSubscriberInformation subscriberInformation,
     IServiceScopeFactory serviceScopeFactory,
@@ -68,7 +68,9 @@ public sealed class ExternalEventSubscribeBackground(
 
                 try
                 {
-                    var domainEvent = jsonToDomainEventMapper.Map(message);
+                    var domainEvent = jsonToDomainEventMappers
+                        .Select(m => m.Map(message))
+                        .FirstOrDefault(e => e != null);
                     if (domainEvent == null)
                     {
                         logger.LogWarning(

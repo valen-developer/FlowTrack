@@ -1,4 +1,8 @@
-using FlowTrack.Shared.Domain.Iam.Users;
+using FlowTrack.Shared.Domain.Contexts;
+using FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus;
+using FlowTrack.Shared.Infrastructure.Transactions;
+using FlowTrack.Shared.Test;
+using FlowTrack.WorkManagement.Shared.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -7,14 +11,16 @@ using Npgsql;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
 
-namespace FlowTrack.Iam.Test;
+namespace FlowTrack.WorkManagement.Test;
 
-public class IamIntegrationFixture : IntegrationTestCase, IAsyncLifetime
+public class WorkManagementIntegrationFixture : IntegrationTestCase, IAsyncLifetime
 {
+    private bool _hostedServicesStarted;
+
     private readonly PostgreSqlContainer _postgresContainer = new PostgreSqlBuilder(
         "postgres:18-alpine"
     )
-        .WithDatabase("flowtrack-iam")
+        .WithDatabase("flowtrack-workmanagement")
         .WithUsername("postgres")
         .WithPassword("password")
         .Build();
@@ -26,36 +32,36 @@ public class IamIntegrationFixture : IntegrationTestCase, IAsyncLifetime
         .WithPassword("guest")
         .Build();
 
-    public IamIntegrationFixture()
-        : base(
-            env: new Dictionary<string, string>()
-            {
-                [IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()] =
-                    "activate_token_secret_super_ultra_mega_strong",
-                [IamEnvironmentKeysEnum.IAM_URL_OF_ACTIVATION.ToString()] =
-                    "http://localhost:5000/activate",
-                [IamEnvironmentKeysEnum.ACCESS_TOKEN_SECRET.ToString()] =
-                    "access_token_secret_super_ultra_mega_strong",
-                [IamEnvironmentKeysEnum.REFRESH_TOKEN_SECRET.ToString()] =
-                    "refresh_token_secret_super_ultra_mega_strong",
-            }
-        )
+    public WorkManagementIntegrationFixture()
+        : base(env: new([]))
     {
-        AddScoped<IJWTService, JWTService>();
-        AddScoped<IEnvStore, EnvStore>();
-        AddScoped<IBcrypt, Bcrypt>();
-        AddScoped<IUserRepository, EfUserRepository>();
-        AddScoped<UserDao, UserDao>();
-
         serviceCollection.AddKeyedScoped(
-            "IAM",
+            "WORK_MANAGEMENT",
             (sp, _) =>
             {
-                var dbContext = sp.GetRequiredService<IamDbContext>();
+                var dbContext = sp.GetRequiredService<WorkManagementDbContext>();
                 var transaction = new EfCoreTransaction(dbContext);
                 return new Context(transaction);
             }
         );
+    }
+
+    public async Task DisposeAsync()
+    {
+        if (_hostedServicesStarted)
+        {
+            var hostedServices = serviceProvider!.GetServices<IHostedService>().Reverse();
+            foreach (var hs in hostedServices)
+                await hs.StopAsync(CancellationToken.None);
+        }
+
+        if (serviceProvider is not null)
+        {
+            serviceScope?.Dispose();
+            await serviceProvider.DisposeAsync();
+        }
+
+        await _postgresContainer.DisposeAsync();
     }
 
     public async Task InitializeAsync()
@@ -78,9 +84,11 @@ public class IamIntegrationFixture : IntegrationTestCase, IAsyncLifetime
             }
         }, timeoutMs: 5000, pollIntervalMs: 250);
 
-        serviceCollection.AddDbContext<IamDbContext>(options =>
+        serviceCollection.AddDbContext<WorkManagementDbContext>(options =>
             options.UseNpgsql(connectionString)
         );
+
+        serviceCollection.AddLogging(builder => builder.AddConsole());
 
         await _rabbitMqContainer.StartAsync();
         Environment.SetEnvironmentVariable("RABBITMQ_HOST", _rabbitMqContainer.Hostname);
@@ -92,36 +100,12 @@ public class IamIntegrationFixture : IntegrationTestCase, IAsyncLifetime
         Environment.SetEnvironmentVariable("RABBITMQ_PASSWORD", "guest");
         Environment.SetEnvironmentVariable("EXTERNAL_EVENT_EXCHANGE_NAME", "domain_events");
 
-        serviceCollection.AddLogging(builder =>
-            builder.AddConsole().SetMinimumLevel(LogLevel.Warning)
-        );
-        serviceCollection.AddSingleton<JsonToDomainEventMapper>(
-            _ => new TestJsonToDomainEventMapper()
-        );
         serviceCollection.AddHostedService<ExternalEventSubscribeBackground>();
 
         using var provider = serviceCollection.BuildServiceProvider();
         using var scope = provider.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<IamDbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<WorkManagementDbContext>();
         await dbContext.Database.EnsureCreatedAsync();
-    }
-
-    public async Task DisposeAsync()
-    {
-        if (_hostedServicesStarted)
-        {
-            var hostedServices = serviceProvider!.GetServices<IHostedService>().Reverse();
-            foreach (var hs in hostedServices)
-                await hs.StopAsync(CancellationToken.None);
-        }
-
-        if (serviceProvider is not null)
-        {
-            serviceScope?.Dispose();
-            await serviceProvider.DisposeAsync();
-        }
-
-        await _postgresContainer.DisposeAsync();
     }
 
     public async Task EnsureServicesAsync()
@@ -142,23 +126,12 @@ public class IamIntegrationFixture : IntegrationTestCase, IAsyncLifetime
         }
     }
 
-    private bool _hostedServicesStarted;
-
-    private sealed class TestJsonToDomainEventMapper : JsonToDomainEventMapper
-    {
-        public override DomainEvent? Map(string json)
-        {
-            var code = GetCode(json);
-            return code == UserCreated.Code ? Serialize<UserCreated>(json) : null;
-        }
-    }
-
     public async Task<List<T>> ExecuteQueryAsync<T>(string sqlQuery)
         where T : class
     {
         using var provider = serviceCollection.BuildServiceProvider();
         using var scope = provider.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<IamDbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<WorkManagementDbContext>();
 
         return await dbContext.Set<T>().FromSqlRaw(sqlQuery).AsNoTracking().ToListAsync();
     }

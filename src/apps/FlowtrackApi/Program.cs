@@ -14,6 +14,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.ProvideIam();
+builder.Services.ProvideWorkManagement();
 builder.Services.DiscoverServices(["FlowTrack*.dll"]);
 builder.Services.AddKeyedScoped<Context>(
     "IAM",

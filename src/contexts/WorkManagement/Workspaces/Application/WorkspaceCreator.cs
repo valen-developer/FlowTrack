@@ -1,9 +1,11 @@
 using FlowTrack.Shared.Domain.Bus.Event;
+using FlowTrack.Shared.Domain.Dic;
 using FlowTrack.Shared.Domain.FilterCriterias;
 using FlowTrack.WorkManagement.Workspaces.Domain;
 
 namespace FlowTrack.WorkManagement.Workspaces.Application;
 
+[Service]
 internal class WorkspaceCreator(IWorkspaceRepository repository, EventBus eventBus)
 {
     public async Task Create(Workspace workspace)

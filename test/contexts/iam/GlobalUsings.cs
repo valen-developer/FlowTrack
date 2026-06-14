@@ -19,3 +19,4 @@ global using FlowTrack.Shared.Infrastructure.Bus.Event;
 global using FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus;
 global using FlowTrack.Shared.Infrastructure.Transactions;
 global using FlowTrack.Shared.Test;
+global using static FlowTrack.Shared.Domain.Utils.AsyncWaiter;
