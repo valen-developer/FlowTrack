@@ -1,3 +1,4 @@
+using FlowTrack.WorkManagement.Shared.Infrastructure;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
@@ -21,6 +22,16 @@ builder.Services.AddKeyedScoped<Context>(
     (sp, _) =>
     {
         var dbContext = sp.GetRequiredService<IamDbContext>();
+        var transaction = new EfCoreTransaction(dbContext);
+        return new Context(transaction);
+    }
+);
+
+builder.Services.AddKeyedScoped<Context>(
+    "WORK_MANAGEMENT",
+    (sp, _) =>
+    {
+        var dbContext = sp.GetRequiredService<WorkManagementDbContext>();
         var transaction = new EfCoreTransaction(dbContext);
         return new Context(transaction);
     }
