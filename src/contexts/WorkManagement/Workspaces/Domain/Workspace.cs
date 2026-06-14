@@ -14,7 +14,7 @@ internal class Workspace(WorkspaceId Id, WorkspaceOwnerId OwnerId, WorkspaceName
     public static Workspace Create(WorkspaceId id, WorkspaceOwnerId ownerId, WorkspaceName name)
     {
         var workspace = new Workspace(id, ownerId, name);
-        var workspaceCreatedEvent = new WorkspaceCreated(id, ownerId, name);
+        var workspaceCreatedEvent = new WorkspaceCreated(id.Value, ownerId.Value, name.Value);
 
         workspace.Record(workspaceCreatedEvent);
 

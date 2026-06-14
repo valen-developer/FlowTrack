@@ -1,10 +1,11 @@
 using FlowTrack.Shared.Domain.Bus.Command;
+using FlowTrack.Shared.Domain.Bus.Event;
 using FlowTrack.Shared.Domain.FilterCriterias;
 using FlowTrack.WorkManagement.Workspaces.Domain;
 
 namespace FlowTrack.WorkManagement.Workspaces.Application;
 
-internal class CreateDefaultWorkspaceCmdHandler(IWorkspaceRepository repository)
+internal class CreateDefaultWorkspaceCmdHandler(IWorkspaceRepository repository, EventBus eventBus)
     : ICommandHandler<CreateDefaultWorkspaceCmd>
 {
     public async Task Handle(CreateDefaultWorkspaceCmd command)
@@ -27,5 +28,7 @@ internal class CreateDefaultWorkspaceCmdHandler(IWorkspaceRepository repository)
         );
 
         await repository.Save(workspace);
+
+        await eventBus.Publish(workspace.PullDomainEvents());
     }
 }

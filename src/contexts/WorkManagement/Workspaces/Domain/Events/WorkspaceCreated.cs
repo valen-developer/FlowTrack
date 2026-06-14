@@ -2,9 +2,7 @@ using FlowTrack.Shared.Domain.Bus.Event;
 
 namespace FlowTrack.WorkManagement.Workspaces.Domain;
 
-internal record WorkspaceCreated(WorkspaceId Id, WorkspaceOwnerId OwnerId, WorkspaceName Name)
-    : DomainEvent,
-        IDomainEvent
+internal record WorkspaceCreated(string Id, string OwnerId, string Name) : DomainEvent, IDomainEvent
 {
     public static bool External => false;
 
