@@ -25,10 +25,15 @@ public class CreateDefaultWorkspaceCmdHandlerTests
         services.AddSingleton(_externalEventBusMock.Object);
         services.AddSingleton<EventBus>();
 
-        services.AddSingleton<CreateDefaultWorkspaceCmdHandler>();
+        services.AddScoped<WorkspaceCreator>();
+        services.AddScoped<CreateDefaultWorkspaceCmdHandler>();
 
         var serviceProvider = services.BuildServiceProvider();
         _handler = serviceProvider.GetRequiredService<CreateDefaultWorkspaceCmdHandler>();
+
+        _workspaceRepositoryMock
+            .Setup(repo => repo.Matching(It.IsAny<FilterCriteria>()))
+            .ReturnsAsync([]);
     }
 
     [Fact]
