@@ -5,7 +5,7 @@ namespace FlowTrack.WorkManagement.Workspaces.Domain;
 internal class Workspace(WorkspaceId Id, WorkspaceOwnerId OwnerId, WorkspaceName Name)
     : AggregatedRoot
 {
-    private static readonly string DEFAULT_WORKSPACE_NAME = "Default";
+    public static readonly string DefaultName = "Default";
 
     public WorkspaceId Id { get; } = Id;
     public WorkspaceOwnerId OwnerId { get; } = OwnerId;
@@ -23,6 +23,6 @@ internal class Workspace(WorkspaceId Id, WorkspaceOwnerId OwnerId, WorkspaceName
 
     public static Workspace CreateDefault(WorkspaceId Id, WorkspaceOwnerId workspaceOwnerId)
     {
-        return Create(Id, workspaceOwnerId, new WorkspaceName(DEFAULT_WORKSPACE_NAME));
+        return Create(Id, workspaceOwnerId, new WorkspaceName(DefaultName));
     }
 }

@@ -1,3 +1,4 @@
+using FlowTrack.Shared.Domain.FilterCriterias;
 using FlowTrack.WorkManagement.Workspaces.Application;
 using FlowTrack.WorkManagement.Workspaces.Domain;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,5 +43,36 @@ public class CreateDefaultWorkspaceCmdHandlerTests
                 ),
             Times.Once
         );
+    }
+
+    [Fact]
+    public async Task Should_Not_Save_Workspace_If_Already_Exists()
+    {
+        var userId = Guid.NewGuid().ToString();
+        var command = new CreateDefaultWorkspaceCmd(userId);
+
+        var filters = new Filters([
+            new Filter(
+                new FilterField("ownerId"),
+                new FilterOperator(FilterOperators.Equals),
+                new FilterValue(userId)
+            ),
+            new Filter(
+                new FilterField("name"),
+                new FilterOperator(FilterOperators.Equals),
+                new FilterValue(DEFAULT_WORKSPACE_NAME)
+            ),
+        ]);
+
+        var criteria = new FilterCriteria(filters, Order.None);
+
+        var existingWorkspace = WorkspaceMother.WithNameAndOwner(DEFAULT_WORKSPACE_NAME, userId);
+        _workspaceRepositoryMock
+            .Setup(repo => repo.Matching(It.Is<FilterCriteria>(c => c.Equals(criteria))))
+            .ReturnsAsync([existingWorkspace]);
+
+        await _handler.Handle(command);
+
+        _workspaceRepositoryMock.Verify(repo => repo.Save(It.IsAny<Workspace>()), Times.Never);
     }
 }
