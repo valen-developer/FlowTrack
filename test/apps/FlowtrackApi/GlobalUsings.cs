@@ -6,6 +6,6 @@ global using FlowTrack.Iam.Test.Users;
 global using FlowTrack.Iam.Users.Domain;
 global using FlowTrack.Iam.Users.Infrastructure.Persistence;
 global using FlowTrack.Shared.Domain;
+global using static FlowTrack.Shared.Domain.Utils.AsyncWaiter;
 global using FlowTrack.Shared.Infrastructure.HttpErrorResponses;
 global using FlowtrackApi.Iam.Schemas;
-global using static FlowTrack.Shared.Domain.Utils.AsyncWaiter;

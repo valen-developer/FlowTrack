@@ -70,19 +70,23 @@ public class WorkManagementIntegrationFixture : IntegrationTestCase, IAsyncLifet
 
         var connectionString = _postgresContainer.GetConnectionString();
 
-        await WaitForAsync(async () =>
-        {
-            try
+        await WaitForAsync(
+            async () =>
             {
-                await using var connection = new NpgsqlConnection(connectionString);
-                await connection.OpenAsync();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }, timeoutMs: 5000, pollIntervalMs: 250);
+                try
+                {
+                    await using var connection = new NpgsqlConnection(connectionString);
+                    await connection.OpenAsync();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            },
+            timeoutMs: 5000,
+            pollIntervalMs: 250
+        );
 
         serviceCollection.AddDbContext<WorkManagementDbContext>(options =>
             options.UseNpgsql(connectionString)
