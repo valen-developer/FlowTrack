@@ -1,9 +1,11 @@
 using FlowTrack.Shared.Domain.FilterCriterias;
 
-namespace FlowTrack.WorkManagement.Workspaces.Domain;
-
-internal interface IWorkspaceRepository
+namespace FlowTrack.WorkManagement.Workspaces.Domain
 {
-    public Task<List<Workspace>> Matching(FilterCriteria criteria);
-    public abstract Task Save(Workspace workspace);
+    internal interface IWorkspaceRepository
+    {
+        public Task<List<Workspace>> Matching(FilterCriteria criteria);
+        public abstract Task<Workspace?> MatchingOne(FilterCriteria criteria);
+        public abstract Task Save(Workspace workspace);
+    }
 }
