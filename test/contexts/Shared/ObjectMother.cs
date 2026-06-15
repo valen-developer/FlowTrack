@@ -1,6 +1,7 @@
-namespace FlowTrack.Shared.Test;
-
-public abstract class ObjectMother
+namespace FlowTrack.Shared.Test
 {
-    protected static readonly Faker faker = new();
+    public abstract class ObjectMother
+    {
+        protected static readonly Faker faker = new();
+    }
 }

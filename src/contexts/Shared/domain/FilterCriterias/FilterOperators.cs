@@ -1,14 +1,15 @@
-namespace FlowTrack.Shared.Domain.FilterCriterias;
-
-public enum FilterOperators
+namespace FlowTrack.Shared.Domain.FilterCriterias
 {
-    Equals,
-    NotEquals,
-    GreaterThan,
-    GreaterThanOrEqual,
-    LessThan,
-    LessThanOrEqual,
-    Contains,
-    StartsWith,
-    EndsWith,
+    public enum FilterOperators
+    {
+        Equals,
+        NotEquals,
+        GreaterThan,
+        GreaterThanOrEqual,
+        LessThan,
+        LessThanOrEqual,
+        Contains,
+        StartsWith,
+        EndsWith,
+    }
 }

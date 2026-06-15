@@ -1,207 +1,230 @@
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace FlowTrack.Iam.Test.Auth.Application;
-
-public class ActivateUserByTokenCmdTests
+namespace FlowTrack.Iam.Test.Auth.Application
 {
-    private readonly ActivateUserByTokenCmdHandler _handler;
-    private readonly Mock<IJWTService> _jwtServiceMock = new();
-    private readonly Mock<IEnvStore> _envStoreMock = new();
-    private readonly Mock<IQueryBus> _queryBusMock = new();
-    private readonly Mock<IDomainEventBus> _eventBusMock = new();
-    private readonly Mock<IUserRepository> _userRepositoryMock = new();
-
-    public ActivateUserByTokenCmdTests()
+    public class ActivateUserByTokenCmdTests
     {
-        var service = new ServiceCollection();
-        service.AddSingleton(_jwtServiceMock.Object);
-        service.AddSingleton(_envStoreMock.Object);
-        service.AddSingleton(_queryBusMock.Object);
-        service.AddSingleton(_eventBusMock.Object);
-        service.AddSingleton(_userRepositoryMock.Object);
+        private readonly ActivateUserByTokenCmdHandler _handler;
+        private readonly Mock<IJWTService> _jwtServiceMock = new();
+        private readonly Mock<IEnvStore> _envStoreMock = new();
+        private readonly Mock<IQueryBus> _queryBusMock = new();
+        private readonly Mock<IDomainEventBus> _eventBusMock = new();
+        private readonly Mock<IUserRepository> _userRepositoryMock = new();
 
-        var context = new Context(new DummyTransaction());
-        service.AddKeyedScoped("IAM", (_, _) => context);
+        public ActivateUserByTokenCmdTests()
+        {
+            var service = new ServiceCollection();
+            service.AddSingleton(_jwtServiceMock.Object);
+            service.AddSingleton(_envStoreMock.Object);
+            service.AddSingleton(_queryBusMock.Object);
+            service.AddSingleton(_eventBusMock.Object);
+            service.AddSingleton(_userRepositoryMock.Object);
 
-        service.AddSingleton(Mock.Of<IExternalEventBus>());
-        service.AddSingleton<EventBus>();
-        service.AddScoped<ActivateUserByTokenCmdHandler>();
+            var context = new Context(new DummyTransaction());
+            service.AddKeyedScoped("IAM", (_, _) => context);
 
-        _handler = service
-            .BuildServiceProvider()
-            .GetRequiredService<ActivateUserByTokenCmdHandler>();
-    }
+            service.AddSingleton(Mock.Of<IExternalEventBus>());
+            service.AddSingleton<EventBus>();
+            service.AddScoped<ActivateUserByTokenCmdHandler>();
 
-    [Fact]
-    public async Task Should_Get_The_Secret_From_EnvStore()
-    {
-        _envStoreMock
-            .Setup(s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
-            .Returns("secret_key");
+            _handler = service
+                .BuildServiceProvider()
+                .GetRequiredService<ActivateUserByTokenCmdHandler>();
+        }
 
-        _jwtServiceMock.Setup(s => s.Verify(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+        [Fact]
+        public async Task Should_Get_The_Secret_From_EnvStore()
+        {
+            _envStoreMock
+                .Setup(s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
+                .Returns("secret_key");
 
-        _queryBusMock
-            .Setup(q => q.Ask<FindUserByIdQry, User>(It.IsAny<FindUserByIdQry>()))
-            .ReturnsAsync(UserMother.Inactive());
+            _jwtServiceMock
+                .Setup(s => s.Verify(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(true);
 
-        var cmd = new ActivateUserByTokenCmd("valid_token");
-        await _handler.Handle(cmd);
+            _queryBusMock
+                .Setup(q => q.Ask<FindUserByIdQry, User>(It.IsAny<FindUserByIdQry>()))
+                .ReturnsAsync(UserMother.Inactive());
 
-        _envStoreMock.Verify(
-            s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()),
-            Times.Once
-        );
-    }
+            var cmd = new ActivateUserByTokenCmd("valid_token");
+            await _handler.Handle(cmd);
 
-    [Fact]
-    public async Task Should_Throw_Env_Variable_Missed_Exception()
-    {
-        _envStoreMock
-            .Setup(s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
-            .Returns<string?>(null);
+            _envStoreMock.Verify(
+                s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()),
+                Times.Once
+            );
+        }
 
-        var cmd = new ActivateUserByTokenCmd("valid_token");
-        await Assert.ThrowsAsync<EnvVariableMissed>(() => _handler.Handle(cmd));
-    }
+        [Fact]
+        public async Task Should_Throw_Env_Variable_Missed_Exception()
+        {
+            _envStoreMock
+                .Setup(s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
+                .Returns<string?>(null);
 
-    [Fact]
-    public async Task Should_Validate_The_Token()
-    {
-        var token = "valid_token";
-        var secret = "secret_key";
-        var userId = Guid.NewGuid();
+            var cmd = new ActivateUserByTokenCmd("valid_token");
+            await Assert.ThrowsAsync<EnvVariableMissed>(() => _handler.Handle(cmd));
+        }
 
-        _envStoreMock
-            .Setup(s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
-            .Returns(secret);
+        [Fact]
+        public async Task Should_Validate_The_Token()
+        {
+            var token = "valid_token";
+            var secret = "secret_key";
+            var userId = Guid.NewGuid();
 
-        _jwtServiceMock.Setup(s => s.Verify(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+            _envStoreMock
+                .Setup(s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
+                .Returns(secret);
 
-        _queryBusMock
-            .Setup(q => q.Ask<FindUserByIdQry, User>(It.IsAny<FindUserByIdQry>()))
-            .ReturnsAsync(UserMother.Inactive());
+            _jwtServiceMock
+                .Setup(s => s.Verify(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(true);
 
-        var cmd = new ActivateUserByTokenCmd(token);
-        await _handler.Handle(cmd);
+            _queryBusMock
+                .Setup(q => q.Ask<FindUserByIdQry, User>(It.IsAny<FindUserByIdQry>()))
+                .ReturnsAsync(UserMother.Inactive());
 
-        _jwtServiceMock.Verify(s => s.Verify(token, secret), Times.Once);
-    }
+            var cmd = new ActivateUserByTokenCmd(token);
+            await _handler.Handle(cmd);
 
-    [Fact]
-    public async Task Should_Throw_Unauthorized_Exception()
-    {
-        _envStoreMock
-            .Setup(s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
-            .Returns("secret_key");
+            _jwtServiceMock.Verify(s => s.Verify(token, secret), Times.Once);
+        }
 
-        _jwtServiceMock.Setup(s => s.Verify(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+        [Fact]
+        public async Task Should_Throw_Unauthorized_Exception()
+        {
+            _envStoreMock
+                .Setup(s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
+                .Returns("secret_key");
 
-        var cmd = new ActivateUserByTokenCmd("invalid_token");
-        await Assert.ThrowsAsync<UnAuthenticatedException>(() => _handler.Handle(cmd));
-    }
+            _jwtServiceMock
+                .Setup(s => s.Verify(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(false);
 
-    [Fact]
-    public async Task Should_Find_The_User()
-    {
-        var userId = Guid.NewGuid().ToString();
+            var cmd = new ActivateUserByTokenCmd("invalid_token");
+            await Assert.ThrowsAsync<UnAuthenticatedException>(() => _handler.Handle(cmd));
+        }
 
-        _envStoreMock
-            .Setup(s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
-            .Returns("secret_key");
-        _jwtServiceMock.Setup(s => s.Verify(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
-        _jwtServiceMock
-            .Setup(s => s.Decode(It.IsAny<string>()))
-            .Returns(new JWTPayload(new Dictionary<string, string> { { "id", userId } }));
+        [Fact]
+        public async Task Should_Find_The_User()
+        {
+            var userId = Guid.NewGuid().ToString();
 
-        _queryBusMock
-            .Setup(q => q.Ask<FindUserByIdQry, User>(It.IsAny<FindUserByIdQry>()))
-            .ReturnsAsync(UserMother.Inactive());
+            _envStoreMock
+                .Setup(s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
+                .Returns("secret_key");
+            _jwtServiceMock
+                .Setup(s => s.Verify(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(true);
+            _jwtServiceMock
+                .Setup(s => s.Decode(It.IsAny<string>()))
+                .Returns(new JWTPayload(new Dictionary<string, string> { { "id", userId } }));
 
-        var cmd = new ActivateUserByTokenCmd("valid_token");
-        await _handler.Handle(cmd);
+            _queryBusMock
+                .Setup(q => q.Ask<FindUserByIdQry, User>(It.IsAny<FindUserByIdQry>()))
+                .ReturnsAsync(UserMother.Inactive());
 
-        _queryBusMock.Verify(
-            q => q.Ask<FindUserByIdQry, User>(It.Is<FindUserByIdQry>(qry => qry.Id == userId)),
-            Times.Once
-        );
-    }
+            var cmd = new ActivateUserByTokenCmd("valid_token");
+            await _handler.Handle(cmd);
 
-    [Fact]
-    public async Task Should_Activate_User()
-    {
-        var user = UserMother.Inactive();
-        _envStoreMock
-            .Setup(s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
-            .Returns("secret_key");
+            _queryBusMock.Verify(
+                q => q.Ask<FindUserByIdQry, User>(It.Is<FindUserByIdQry>(qry => qry.Id == userId)),
+                Times.Once
+            );
+        }
 
-        _jwtServiceMock.Setup(s => s.Verify(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
-        _jwtServiceMock
-            .Setup(s => s.Decode(It.IsAny<string>()))
-            .Returns(new JWTPayload(new Dictionary<string, string> { { "id", user.Id.Value } }));
+        [Fact]
+        public async Task Should_Activate_User()
+        {
+            var user = UserMother.Inactive();
+            _envStoreMock
+                .Setup(s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
+                .Returns("secret_key");
 
-        _queryBusMock
-            .Setup(q => q.Ask<FindUserByIdQry, User>(It.IsAny<FindUserByIdQry>()))
-            .ReturnsAsync(user);
+            _jwtServiceMock
+                .Setup(s => s.Verify(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(true);
+            _jwtServiceMock
+                .Setup(s => s.Decode(It.IsAny<string>()))
+                .Returns(
+                    new JWTPayload(new Dictionary<string, string> { { "id", user.Id.Value } })
+                );
 
-        var cmd = new ActivateUserByTokenCmd("valid_token");
-        await _handler.Handle(cmd);
+            _queryBusMock
+                .Setup(q => q.Ask<FindUserByIdQry, User>(It.IsAny<FindUserByIdQry>()))
+                .ReturnsAsync(user);
 
-        Assert.True(user.IsActive);
-    }
+            var cmd = new ActivateUserByTokenCmd("valid_token");
+            await _handler.Handle(cmd);
 
-    [Fact]
-    public async Task Should_Publish_UserActivated_Event()
-    {
-        var user = UserMother.Inactive();
+            Assert.True(user.IsActive);
+        }
 
-        _envStoreMock
-            .Setup(s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
-            .Returns("secret_key");
+        [Fact]
+        public async Task Should_Publish_UserActivated_Event()
+        {
+            var user = UserMother.Inactive();
 
-        _jwtServiceMock.Setup(s => s.Verify(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
-        _jwtServiceMock
-            .Setup(s => s.Decode(It.IsAny<string>()))
-            .Returns(new JWTPayload(new Dictionary<string, string> { { "id", user.Id.Value } }));
+            _envStoreMock
+                .Setup(s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
+                .Returns("secret_key");
 
-        _queryBusMock
-            .Setup(q => q.Ask<FindUserByIdQry, User>(It.IsAny<FindUserByIdQry>()))
-            .ReturnsAsync(user);
+            _jwtServiceMock
+                .Setup(s => s.Verify(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(true);
+            _jwtServiceMock
+                .Setup(s => s.Decode(It.IsAny<string>()))
+                .Returns(
+                    new JWTPayload(new Dictionary<string, string> { { "id", user.Id.Value } })
+                );
 
-        var cmd = new ActivateUserByTokenCmd("valid_token");
-        await _handler.Handle(cmd);
+            _queryBusMock
+                .Setup(q => q.Ask<FindUserByIdQry, User>(It.IsAny<FindUserByIdQry>()))
+                .ReturnsAsync(user);
 
-        _eventBusMock.Verify(
-            e =>
-                e.Publish(
-                    It.Is<IEnumerable<DomainEvent>>(events => events.Any(e => e is UserActivated))
-                ),
-            Times.Once
-        );
-    }
+            var cmd = new ActivateUserByTokenCmd("valid_token");
+            await _handler.Handle(cmd);
 
-    [Fact]
-    public async Task Should_Save_User()
-    {
-        var user = UserMother.Inactive();
+            _eventBusMock.Verify(
+                e =>
+                    e.Publish(
+                        It.Is<IEnumerable<DomainEvent>>(events =>
+                            events.Any(e => e is UserActivated)
+                        )
+                    ),
+                Times.Once
+            );
+        }
 
-        _envStoreMock
-            .Setup(s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
-            .Returns("secret_key");
+        [Fact]
+        public async Task Should_Save_User()
+        {
+            var user = UserMother.Inactive();
 
-        _jwtServiceMock.Setup(s => s.Verify(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
-        _jwtServiceMock
-            .Setup(s => s.Decode(It.IsAny<string>()))
-            .Returns(new JWTPayload(new Dictionary<string, string> { { "id", user.Id.Value } }));
+            _envStoreMock
+                .Setup(s => s.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()))
+                .Returns("secret_key");
 
-        _queryBusMock
-            .Setup(q => q.Ask<FindUserByIdQry, User>(It.IsAny<FindUserByIdQry>()))
-            .ReturnsAsync(user);
+            _jwtServiceMock
+                .Setup(s => s.Verify(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(true);
+            _jwtServiceMock
+                .Setup(s => s.Decode(It.IsAny<string>()))
+                .Returns(
+                    new JWTPayload(new Dictionary<string, string> { { "id", user.Id.Value } })
+                );
 
-        var cmd = new ActivateUserByTokenCmd("valid_token");
-        await _handler.Handle(cmd);
+            _queryBusMock
+                .Setup(q => q.Ask<FindUserByIdQry, User>(It.IsAny<FindUserByIdQry>()))
+                .ReturnsAsync(user);
 
-        _userRepositoryMock.Verify(r => r.Update(user), Times.Once);
+            var cmd = new ActivateUserByTokenCmd("valid_token");
+            await _handler.Handle(cmd);
+
+            _userRepositoryMock.Verify(r => r.Update(user), Times.Once);
+        }
     }
 }

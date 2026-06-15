@@ -1,39 +1,44 @@
-namespace FlowTrack.Shared.Domain.Bus.Command;
-
-public sealed class CommandHandlerInformation
+namespace FlowTrack.Shared.Domain.Bus.Command
 {
-    private readonly Dictionary<Type, Type> _handlers = new();
-
-    public void Add(Type commandType, Type handlerType)
+    public sealed class CommandHandlerInformation
     {
-        if (!typeof(ICommand).IsAssignableFrom(commandType))
-            throw new ArgumentException(
-                $"Type '{commandType.FullName}' does not implement ICommand.",
-                nameof(commandType)
-            );
+        private readonly Dictionary<Type, Type> _handlers = new();
 
-        if (!typeof(ICommandHandler<>).MakeGenericType(commandType).IsAssignableFrom(handlerType))
-            throw new ArgumentException(
-                $"Handler type '{handlerType.FullName}' does not implement ICommandHandler<{commandType.Name}>.",
-                nameof(handlerType)
-            );
+        public void Add(Type commandType, Type handlerType)
+        {
+            if (!typeof(ICommand).IsAssignableFrom(commandType))
+                throw new ArgumentException(
+                    $"Type '{commandType.FullName}' does not implement ICommand.",
+                    nameof(commandType)
+                );
 
-        if (_handlers.ContainsKey(commandType))
-            throw new InvalidOperationException(
-                $"Command '{commandType.Name}' is already registered."
-            );
+            if (
+                !typeof(ICommandHandler<>)
+                    .MakeGenericType(commandType)
+                    .IsAssignableFrom(handlerType)
+            )
+                throw new ArgumentException(
+                    $"Handler type '{handlerType.FullName}' does not implement ICommandHandler<{commandType.Name}>.",
+                    nameof(handlerType)
+                );
 
-        _handlers[commandType] = handlerType;
-    }
+            if (_handlers.ContainsKey(commandType))
+                throw new InvalidOperationException(
+                    $"Command '{commandType.Name}' is already registered."
+                );
 
-    public Type Get<C>()
-        where C : ICommand
-    {
-        var commandType = typeof(C);
+            _handlers[commandType] = handlerType;
+        }
 
-        if (_handlers.TryGetValue(commandType, out var handlerType))
-            return handlerType;
+        public Type Get<C>()
+            where C : ICommand
+        {
+            var commandType = typeof(C);
 
-        throw new InvalidOperationException($"Command '{commandType.Name}' is not registered.");
+            if (_handlers.TryGetValue(commandType, out var handlerType))
+                return handlerType;
+
+            throw new InvalidOperationException($"Command '{commandType.Name}' is not registered.");
+        }
     }
 }

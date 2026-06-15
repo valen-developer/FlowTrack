@@ -1,18 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowTrack.Iam;
-
-internal static class IamServiceCollectionExtensions
+namespace FlowTrack.Iam
 {
-    public static IServiceCollection ProvideIam(this IServiceCollection services)
+    internal static class IamServiceCollectionExtensions
     {
-        var iamDbContext = new IamDbContextFactory().CreateDbContext([]);
-        iamDbContext.Database.Migrate();
-        services.AddDbContext<IamDbContext>(options =>
-            options.UseNpgsql(iamDbContext.Database.GetConnectionString())
-        );
+        public static IServiceCollection ProvideIam(this IServiceCollection services)
+        {
+            var iamDbContext = new IamDbContextFactory().CreateDbContext([]);
+            iamDbContext.Database.Migrate();
+            services.AddDbContext<IamDbContext>(options =>
+                options.UseNpgsql(iamDbContext.Database.GetConnectionString())
+            );
 
-        return services;
+            return services;
+        }
     }
 }

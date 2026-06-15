@@ -1,6 +1,7 @@
-namespace FlowTrack.Shared.Domain.Bus;
-
-public abstract class ActionHandlerExecutionException(System.Exception cause) : System.Exception
+namespace FlowTrack.Shared.Domain.Bus
 {
-    public System.Exception GetCause() => cause;
+    public abstract class ActionHandlerExecutionException(System.Exception cause) : System.Exception
+    {
+        public System.Exception GetCause() => cause;
+    }
 }

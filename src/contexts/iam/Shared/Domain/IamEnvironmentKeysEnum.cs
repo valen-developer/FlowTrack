@@ -1,13 +1,14 @@
-namespace FlowTrack.Iam.Shared.Domain;
-
-internal enum IamEnvironmentKeysEnum
+namespace FlowTrack.Iam.Shared.Domain
 {
-    ACCESS_TOKEN_SECRET,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
-    REFRESH_TOKEN_SECRET,
-    REFRESH_TOKEN_EXPIRE_MINUTES,
-    IAM_DB_CONNECTION_STRING,
-    ACTIVATE_TOKEN_SECRET,
-    IAM_SMTP_FROM,
-    IAM_URL_OF_ACTIVATION,
+    internal enum IamEnvironmentKeysEnum
+    {
+        ACCESS_TOKEN_SECRET,
+        ACCESS_TOKEN_EXPIRE_MINUTES,
+        REFRESH_TOKEN_SECRET,
+        REFRESH_TOKEN_EXPIRE_MINUTES,
+        IAM_DB_CONNECTION_STRING,
+        ACTIVATE_TOKEN_SECRET,
+        IAM_SMTP_FROM,
+        IAM_URL_OF_ACTIVATION,
+    }
 }

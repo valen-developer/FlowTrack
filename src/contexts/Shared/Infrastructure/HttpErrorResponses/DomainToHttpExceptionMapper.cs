@@ -1,21 +1,31 @@
 using FlowTrack.Shared.Domain.Exception;
 
-namespace FlowTrack.Shared.Infrastructure.HttpErrorResponses;
-
-public sealed class DomainToHttpExceptionMapper
+namespace FlowTrack.Shared.Infrastructure.HttpErrorResponses
 {
-    public static (int statusCode, HttpErrorResponse) Map(DomainException exception)
+    public sealed class DomainToHttpExceptionMapper
     {
-        return exception switch
+        public static (int statusCode, HttpErrorResponse) Map(DomainException exception)
         {
-            UnAuthenticatedException => (
-                401,
-                new HttpErrorResponse(exception.Message, exception.Code)
-            ),
-            NotFoundException => (404, new HttpErrorResponse(exception.Message, exception.Code)),
-            InvalidException => (400, new HttpErrorResponse(exception.Message, exception.Code)),
-            InternalException => (500, new HttpErrorResponse(exception.Message, exception.Code)),
-            _ => (500, new HttpErrorResponse("Internal Server Error", "exception.internal.server")),
-        };
+            return exception switch
+            {
+                UnAuthenticatedException => (
+                    401,
+                    new HttpErrorResponse(exception.Message, exception.Code)
+                ),
+                NotFoundException => (
+                    404,
+                    new HttpErrorResponse(exception.Message, exception.Code)
+                ),
+                InvalidException => (400, new HttpErrorResponse(exception.Message, exception.Code)),
+                InternalException => (
+                    500,
+                    new HttpErrorResponse(exception.Message, exception.Code)
+                ),
+                _ => (
+                    500,
+                    new HttpErrorResponse("Internal Server Error", "exception.internal.server")
+                ),
+            };
+        }
     }
 }

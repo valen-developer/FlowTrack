@@ -1,26 +1,27 @@
 using System.Text.RegularExpressions;
 using FlowTrack.Shared.Domain.Exception;
 
-namespace FlowTrack.Shared.Domain.ValueObjects;
-
-public record Email : ValueObject<string>
+namespace FlowTrack.Shared.Domain.ValueObjects
 {
-    public static readonly Regex EmailRegex = new(
-        @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$",
-        RegexOptions.Compiled
-    );
-
-    public Email(string value)
-        : base(value)
+    public record Email : ValueObject<string>
     {
-        EnsureEmail(value);
-    }
+        public static readonly Regex EmailRegex = new(
+            @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$",
+            RegexOptions.Compiled
+        );
 
-    public static void EnsureEmail(string value)
-    {
-        if (!EmailRegex.IsMatch(value))
+        public Email(string value)
+            : base(value)
         {
-            throw new InvalidEmail(value);
+            EnsureEmail(value);
+        }
+
+        public static void EnsureEmail(string value)
+        {
+            if (!EmailRegex.IsMatch(value))
+            {
+                throw new InvalidEmail(value);
+            }
         }
     }
 }

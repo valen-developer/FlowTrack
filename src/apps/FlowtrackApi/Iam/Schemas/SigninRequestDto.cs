@@ -1,7 +1,8 @@
-namespace FlowtrackApi.Iam.Schemas;
-
-public sealed class SigninRequestDto
+namespace FlowtrackApi.Iam.Schemas
 {
-    public string Email { get; set; } = null!;
-    public string Password { get; set; } = null!;
+    public sealed class SigninRequestDto
+    {
+        public string Email { get; set; } = null!;
+        public string Password { get; set; } = null!;
+    }
 }

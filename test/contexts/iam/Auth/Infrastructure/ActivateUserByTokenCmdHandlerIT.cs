@@ -1,84 +1,95 @@
-namespace FlowTrack.Iam.Test.Auth.Infrastructure;
-
-[Service]
-[DomainEventSubscriber(typeof(UserActivated))]
-internal sealed class UserActivatedEventSubscriber
+namespace FlowTrack.Iam.Test.Auth.Infrastructure
 {
-    public UserActivated? CapturedEvent { get; private set; }
-
-    [DomainEventListener]
-    public async Task On(UserActivated domainEvent)
+    [Service]
+    [DomainEventSubscriber(typeof(UserActivated))]
+    internal sealed class UserActivatedEventSubscriber
     {
-        CapturedEvent = domainEvent;
-    }
-}
+        public UserActivated? CapturedEvent { get; private set; }
 
-public class ActivateUserByTokenCmdHandlerIT : IamIntegrationTestCase
-{
-    public ActivateUserByTokenCmdHandlerIT(IamIntegrationFixture fixture)
-        : base(fixture)
-    {
-        fixture.serviceCollection.DiscoverServices(["FlowTrack*.dll"]);
+        [DomainEventListener]
+        public async Task On(UserActivated domainEvent)
+        {
+            CapturedEvent = domainEvent;
+        }
     }
 
-    [Fact]
-    public async Task Should_Save_User_As_Active()
+    public class ActivateUserByTokenCmdHandlerIT : IamIntegrationTestCase
     {
-        var user = UserMother.Inactive();
-        await AddUserToDatabase(user);
+        public ActivateUserByTokenCmdHandlerIT(IamIntegrationFixture fixture)
+            : base(fixture)
+        {
+            fixture.serviceCollection.DiscoverServices(["FlowTrack*.dll"]);
+        }
 
-        var jwtService = _fixture.GetService<IJWTService>();
-        var envStore = _fixture.GetService<IEnvStore>();
+        [Fact]
+        public async Task Should_Save_User_As_Active()
+        {
+            var user = UserMother.Inactive();
+            await AddUserToDatabase(user);
 
-        var activeTokenSecret =
-            envStore.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString())
-            ?? throw new Exception($"{IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET} is not set");
+            var jwtService = _fixture.GetService<IJWTService>();
+            var envStore = _fixture.GetService<IEnvStore>();
 
-        var activeTokenExpirationMinutes = 60 * 24;
-        var payload = new JWTPayload(new Dictionary<string, string> { ["id"] = user.Id.Value });
-        var activeTokenOptions = new JWTOptions(activeTokenSecret, activeTokenExpirationMinutes);
-        var activeToken = jwtService.Generate(payload, activeTokenOptions);
+            var activeTokenSecret =
+                envStore.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString())
+                ?? throw new Exception(
+                    $"{IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET} is not set"
+                );
 
-        var cmd = new ActivateUserByTokenCmd(activeToken);
-        var handler = _fixture.GetService<ActivateUserByTokenCmdHandler>();
+            var activeTokenExpirationMinutes = 60 * 24;
+            var payload = new JWTPayload(new Dictionary<string, string> { ["id"] = user.Id.Value });
+            var activeTokenOptions = new JWTOptions(
+                activeTokenSecret,
+                activeTokenExpirationMinutes
+            );
+            var activeToken = jwtService.Generate(payload, activeTokenOptions);
 
-        await handler.Handle(cmd);
+            var cmd = new ActivateUserByTokenCmd(activeToken);
+            var handler = _fixture.GetService<ActivateUserByTokenCmdHandler>();
 
-        var sqlResult = await _fixture.ExecuteQueryAsync<UserEntity>(
-            $"SELECT * FROM \"users\" WHERE \"Id\" = '{user.Id.Value}'"
-        );
+            await handler.Handle(cmd);
 
-        var userEntity = sqlResult.FirstOrDefault();
+            var sqlResult = await _fixture.ExecuteQueryAsync<UserEntity>(
+                $"SELECT * FROM \"users\" WHERE \"Id\" = '{user.Id.Value}'"
+            );
 
-        Assert.NotNull(userEntity);
-        Assert.True(userEntity!.IsActive);
-    }
+            var userEntity = sqlResult.FirstOrDefault();
 
-    [Fact]
-    public async Task Should_Publish_UserActivated_Event()
-    {
-        var user = UserMother.Inactive();
-        await AddUserToDatabase(user);
+            Assert.NotNull(userEntity);
+            Assert.True(userEntity!.IsActive);
+        }
 
-        var jwtService = _fixture.GetService<IJWTService>();
-        var envStore = _fixture.GetService<IEnvStore>();
+        [Fact]
+        public async Task Should_Publish_UserActivated_Event()
+        {
+            var user = UserMother.Inactive();
+            await AddUserToDatabase(user);
 
-        var activeTokenSecret =
-            envStore.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString())
-            ?? throw new Exception($"{IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET} is not set");
+            var jwtService = _fixture.GetService<IJWTService>();
+            var envStore = _fixture.GetService<IEnvStore>();
 
-        var activeTokenExpirationMinutes = 60 * 24;
-        var payload = new JWTPayload(new Dictionary<string, string> { ["id"] = user.Id.Value });
-        var activeTokenOptions = new JWTOptions(activeTokenSecret, activeTokenExpirationMinutes);
-        var activeToken = jwtService.Generate(payload, activeTokenOptions);
+            var activeTokenSecret =
+                envStore.Get(IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString())
+                ?? throw new Exception(
+                    $"{IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET} is not set"
+                );
 
-        var cmd = new ActivateUserByTokenCmd(activeToken);
-        var handler = _fixture.GetService<ActivateUserByTokenCmdHandler>();
-        var eventSubscriber = _fixture.GetService<UserActivatedEventSubscriber>();
+            var activeTokenExpirationMinutes = 60 * 24;
+            var payload = new JWTPayload(new Dictionary<string, string> { ["id"] = user.Id.Value });
+            var activeTokenOptions = new JWTOptions(
+                activeTokenSecret,
+                activeTokenExpirationMinutes
+            );
+            var activeToken = jwtService.Generate(payload, activeTokenOptions);
 
-        await handler.Handle(cmd);
+            var cmd = new ActivateUserByTokenCmd(activeToken);
+            var handler = _fixture.GetService<ActivateUserByTokenCmdHandler>();
+            var eventSubscriber = _fixture.GetService<UserActivatedEventSubscriber>();
 
-        Assert.NotNull(eventSubscriber.CapturedEvent);
-        Assert.Equal(user.Id.Value, eventSubscriber.CapturedEvent!.Id);
+            await handler.Handle(cmd);
+
+            Assert.NotNull(eventSubscriber.CapturedEvent);
+            Assert.Equal(user.Id.Value, eventSubscriber.CapturedEvent!.Id);
+        }
     }
 }

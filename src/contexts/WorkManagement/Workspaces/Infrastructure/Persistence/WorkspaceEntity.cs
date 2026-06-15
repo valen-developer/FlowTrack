@@ -1,29 +1,30 @@
 using FlowTrack.WorkManagement.Workspaces.Domain;
 
-namespace FlowTrack.WorkManagement.Workspaces.Infrastructure.Persistence;
-
-internal class WorkspaceEntity
+namespace FlowTrack.WorkManagement.Workspaces.Infrastructure.Persistence
 {
-    public required Guid Id { get; set; }
-    public required Guid OwnerId { get; set; }
-    public required string Name { get; set; }
-
-    public static WorkspaceEntity FromDomain(Workspace workspace)
+    internal class WorkspaceEntity
     {
-        return new WorkspaceEntity()
+        public required Guid Id { get; set; }
+        public required Guid OwnerId { get; set; }
+        public required string Name { get; set; }
+
+        public static WorkspaceEntity FromDomain(Workspace workspace)
         {
-            Id = new Guid(workspace.Id.Value),
-            OwnerId = new Guid(workspace.OwnerId.Value),
-            Name = workspace.Name.Value,
-        };
-    }
+            return new WorkspaceEntity()
+            {
+                Id = new Guid(workspace.Id.Value),
+                OwnerId = new Guid(workspace.OwnerId.Value),
+                Name = workspace.Name.Value,
+            };
+        }
 
-    public Workspace ToDomain()
-    {
-        return new Workspace(
-            new WorkspaceId(Id.ToString()),
-            new WorkspaceOwnerId(OwnerId.ToString()),
-            new WorkspaceName(Name)
-        );
+        public Workspace ToDomain()
+        {
+            return new Workspace(
+                new WorkspaceId(Id.ToString()),
+                new WorkspaceOwnerId(OwnerId.ToString()),
+                new WorkspaceName(Name)
+            );
+        }
     }
 }

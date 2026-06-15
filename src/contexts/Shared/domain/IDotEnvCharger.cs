@@ -1,6 +1,7 @@
-namespace FlowTrack.Shared.Domain;
-
-public interface IDotEnvCharger
+namespace FlowTrack.Shared.Domain
 {
-    void Load(string[] paths);
+    public interface IDotEnvCharger
+    {
+        void Load(string[] paths);
+    }
 }

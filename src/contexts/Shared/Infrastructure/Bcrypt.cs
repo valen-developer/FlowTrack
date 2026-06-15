@@ -1,24 +1,25 @@
 using FlowTrack.Shared.Domain;
 
-namespace FlowTrack.Shared.Infrastructure;
-
-[Provider(typeof(IBcrypt))]
-public class Bcrypt : IBcrypt
+namespace FlowTrack.Shared.Infrastructure
 {
-    public bool Compare(string value, string hash)
+    [Provider(typeof(IBcrypt))]
+    public class Bcrypt : IBcrypt
     {
-        try
+        public bool Compare(string value, string hash)
         {
-            return BCrypt.Net.BCrypt.Verify(value, hash);
+            try
+            {
+                return BCrypt.Net.BCrypt.Verify(value, hash);
+            }
+            catch
+            {
+                return false;
+            }
         }
-        catch
-        {
-            return false;
-        }
-    }
 
-    public string Hash(string v)
-    {
-        return BCrypt.Net.BCrypt.HashPassword(v);
+        public string Hash(string v)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(v);
+        }
     }
 }

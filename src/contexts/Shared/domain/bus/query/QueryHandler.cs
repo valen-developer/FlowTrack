@@ -1,7 +1,8 @@
-namespace FlowTrack.Shared.Domain.Bus.Query;
-
-public interface IQueryHandler<Q, R>
-    where Q : IQuery<R>
+namespace FlowTrack.Shared.Domain.Bus.Query
 {
-    Task<R> Handle(Q query);
+    public interface IQueryHandler<Q, R>
+        where Q : IQuery<R>
+    {
+        Task<R> Handle(Q query);
+    }
 }

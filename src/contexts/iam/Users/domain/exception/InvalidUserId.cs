@@ -1,7 +1,9 @@
-namespace FlowTrack.Iam.Users.Domain;
-
-internal sealed class InvalidUserId : InvalidException
+namespace FlowTrack.Iam.Users.Domain
 {
-    public InvalidUserId()
-        : base("Invalid user id. It must be a valid UUID string.", "exception.user.id.invalid") { }
+    internal sealed class InvalidUserId : InvalidException
+    {
+        public InvalidUserId()
+            : base("Invalid user id. It must be a valid UUID string.", "exception.user.id.invalid")
+        { }
+    }
 }

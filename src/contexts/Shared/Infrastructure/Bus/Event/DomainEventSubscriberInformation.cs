@@ -1,11 +1,12 @@
-namespace FlowTrack.Shared.Infrastructure.Bus.Event;
-
-public class DomainEventSubscriberInformation(DomainEventSubscriberInfo[] Subscribers)
+namespace FlowTrack.Shared.Infrastructure.Bus.Event
 {
-    public IReadOnlyList<DomainEventSubscriberInfo> Subscribers { get; } = Subscribers;
-
-    public DomainEventSubscriberInfo[] GetSubscribersForEvent(Type eventType)
+    public class DomainEventSubscriberInformation(DomainEventSubscriberInfo[] Subscribers)
     {
-        return [.. Subscribers.Where(s => s.EventType == eventType)];
+        public IReadOnlyList<DomainEventSubscriberInfo> Subscribers { get; } = Subscribers;
+
+        public DomainEventSubscriberInfo[] GetSubscribersForEvent(Type eventType)
+        {
+            return [.. Subscribers.Where(s => s.EventType == eventType)];
+        }
     }
 }

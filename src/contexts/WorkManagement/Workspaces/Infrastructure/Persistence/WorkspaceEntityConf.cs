@@ -1,17 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace FlowTrack.WorkManagement.Workspaces.Infrastructure.Persistence;
-
-internal class WorkspaceEntityConf : IEntityTypeConfiguration<WorkspaceEntity>
+namespace FlowTrack.WorkManagement.Workspaces.Infrastructure.Persistence
 {
-    public void Configure(EntityTypeBuilder<WorkspaceEntity> builder)
+    internal class WorkspaceEntityConf : IEntityTypeConfiguration<WorkspaceEntity>
     {
-        builder.ToTable("workspaces");
-        builder.HasKey(w => w.Id);
-        builder.Property(w => w.Name).IsRequired();
-        builder.Property(w => w.OwnerId).IsRequired();
+        public void Configure(EntityTypeBuilder<WorkspaceEntity> builder)
+        {
+            builder.ToTable("workspaces");
+            builder.HasKey(w => w.Id);
+            builder.Property(w => w.Name).IsRequired();
+            builder.Property(w => w.OwnerId).IsRequired();
 
-        builder.HasIndex(w => w.Name).IsUnique();
+            builder.HasIndex(w => w.Name).IsUnique();
+        }
     }
 }

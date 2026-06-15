@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace FlowtrackApi.Shared;
-
-[ApiController]
-public abstract class IController : ControllerBase { }
+namespace FlowtrackApi.Shared
+{
+    [ApiController]
+    public abstract class IController : ControllerBase { }
+}

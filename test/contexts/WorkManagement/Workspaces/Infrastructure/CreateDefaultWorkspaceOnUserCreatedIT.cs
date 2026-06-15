@@ -6,45 +6,46 @@ using FlowTrack.WorkManagement.Test;
 using FlowTrack.WorkManagement.Workspaces.Domain;
 using FlowTrack.WorkManagement.Workspaces.Infrastructure.Persistence;
 
-namespace FlowTrack.WorkManagement.Workspaces.Test.Infrastructure;
-
-public class CreateDefaultWorkspaceOnUserCreatedIT : WorkManagementIntegrationTestCase
+namespace FlowTrack.WorkManagement.Workspaces.Test.Infrastructure
 {
-    private readonly EventBus _eventBus;
-
-    public CreateDefaultWorkspaceOnUserCreatedIT(WorkManagementIntegrationFixture fixture)
-        : base(fixture)
+    public class CreateDefaultWorkspaceOnUserCreatedIT : WorkManagementIntegrationTestCase
     {
-        fixture.serviceCollection.DiscoverServices(["FlowTrack*.dll"]);
+        private readonly EventBus _eventBus;
 
-        _eventBus = fixture.GetService<EventBus>();
-    }
-
-    [Fact]
-    public async Task Should_Create_Default_Workspace_When_User_Is_Created()
-    {
-        var userCreatedEvent = new UserCreated(
-            UserId: Guid.NewGuid().ToString(),
-            Email: "email@email.com",
-            IsActive: true
-        );
-
-        await _fixture.EnsureServicesAsync();
-        await _eventBus.Publish(userCreatedEvent);
-
-        List<WorkspaceEntity> workspaces = [];
-        await WaitForAsync(async () =>
+        public CreateDefaultWorkspaceOnUserCreatedIT(WorkManagementIntegrationFixture fixture)
+            : base(fixture)
         {
-            workspaces = await _fixture.ExecuteQueryAsync<WorkspaceEntity>(
-                $"SELECT * FROM workspaces WHERE \"OwnerId\" = '{userCreatedEvent.UserId}'"
+            fixture.serviceCollection.DiscoverServices(["FlowTrack*.dll"]);
+
+            _eventBus = fixture.GetService<EventBus>();
+        }
+
+        [Fact]
+        public async Task Should_Create_Default_Workspace_When_User_Is_Created()
+        {
+            var userCreatedEvent = new UserCreated(
+                UserId: Guid.NewGuid().ToString(),
+                Email: "email@email.com",
+                IsActive: true
             );
 
-            return workspaces.Count == 1;
-        });
+            await _fixture.EnsureServicesAsync();
+            await _eventBus.Publish(userCreatedEvent);
 
-        Assert.Single(workspaces);
+            List<WorkspaceEntity> workspaces = [];
+            await WaitForAsync(async () =>
+            {
+                workspaces = await _fixture.ExecuteQueryAsync<WorkspaceEntity>(
+                    $"SELECT * FROM workspaces WHERE \"OwnerId\" = '{userCreatedEvent.UserId}'"
+                );
 
-        var defaultWorkspace = workspaces.FirstOrDefault();
-        Assert.Equal(Workspace.DefaultName, defaultWorkspace?.Name);
+                return workspaces.Count == 1;
+            });
+
+            Assert.Single(workspaces);
+
+            var defaultWorkspace = workspaces.FirstOrDefault();
+            Assert.Equal(Workspace.DefaultName, defaultWorkspace?.Name);
+        }
     }
 }

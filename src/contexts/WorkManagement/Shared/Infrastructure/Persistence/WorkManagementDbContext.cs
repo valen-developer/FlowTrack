@@ -1,17 +1,18 @@
 using FlowTrack.WorkManagement.Workspaces.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace FlowTrack.WorkManagement.Shared.Infrastructure;
-
-internal class WorkManagementDbContext(DbContextOptions<WorkManagementDbContext> options)
-    : DbContext(options)
+namespace FlowTrack.WorkManagement.Shared.Infrastructure
 {
-    public DbSet<WorkspaceEntity> Workspaces => Set<WorkspaceEntity>();
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    internal class WorkManagementDbContext(DbContextOptions<WorkManagementDbContext> options)
+        : DbContext(options)
     {
-        base.OnModelCreating(modelBuilder);
+        public DbSet<WorkspaceEntity> Workspaces => Set<WorkspaceEntity>();
 
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(WorkManagementDbContext).Assembly);
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(WorkManagementDbContext).Assembly);
+        }
     }
 }

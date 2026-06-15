@@ -1,6 +1,7 @@
-namespace FlowTrack.Shared.Domain;
-
-public interface IDateTimeProvider
+namespace FlowTrack.Shared.Domain
 {
-    DateTime Now { get; }
+    public interface IDateTimeProvider
+    {
+        DateTime Now { get; }
+    }
 }

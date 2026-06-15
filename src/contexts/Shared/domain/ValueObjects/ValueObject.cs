@@ -1,11 +1,12 @@
-namespace FlowTrack.Shared.Domain.ValueObjects;
-
-public record ValueObject<T>
+namespace FlowTrack.Shared.Domain.ValueObjects
 {
-    public T Value { get; }
-
-    public ValueObject(T value)
+    public record ValueObject<T>
     {
-        Value = value;
+        public T Value { get; }
+
+        public ValueObject(T value)
+        {
+            Value = value;
+        }
     }
 }

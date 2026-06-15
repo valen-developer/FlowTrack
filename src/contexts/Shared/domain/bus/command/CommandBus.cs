@@ -1,7 +1,8 @@
-namespace FlowTrack.Shared.Domain.Bus.Command;
-
-public interface ICommandBus
+namespace FlowTrack.Shared.Domain.Bus.Command
 {
-    Task Dispatch<C>(C command)
-        where C : ICommand;
+    public interface ICommandBus
+    {
+        Task Dispatch<C>(C command)
+            where C : ICommand;
+    }
 }

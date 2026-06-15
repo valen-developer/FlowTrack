@@ -1,7 +1,8 @@
-namespace FlowTrack.Iam.Users.Domain;
-
-internal sealed class UserNotFound : NotFoundException
+namespace FlowTrack.Iam.Users.Domain
 {
-    public UserNotFound()
-        : base("User not found", "exception.user.not_found") { }
+    internal sealed class UserNotFound : NotFoundException
+    {
+        public UserNotFound()
+            : base("User not found", "exception.user.not_found") { }
+    }
 }

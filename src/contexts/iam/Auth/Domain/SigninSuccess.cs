@@ -1,3 +1,4 @@
-namespace FlowTrack.Iam.Auth.Domain;
-
-internal record SigninSuccess(string AccessToken, string RefreshToken);
+namespace FlowTrack.Iam.Auth.Domain
+{
+    internal record SigninSuccess(string AccessToken, string RefreshToken);
+}

@@ -1,34 +1,35 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowtrackApi.Test;
-
-[Collection(nameof(FlowtrackApiCollection))]
-public abstract class FlowtrackApiE2E(FlowtrackApiFixture fixture)
+namespace FlowtrackApi.Test
 {
-    protected readonly FlowtrackApiFixture _fixture = fixture;
-    protected HttpClient HttpClient => _fixture.HttpClient;
-    protected IServiceProvider Services => _fixture.Services;
-
-    internal async Task AddUserToDatabase(User user)
+    [Collection(nameof(FlowtrackApiCollection))]
+    public abstract class FlowtrackApiE2E(FlowtrackApiFixture fixture)
     {
-        var dbContext =
-            Services.GetService<IamDbContext>()
-            ?? throw new InvalidOperationException("IamDbContext service not found");
+        protected readonly FlowtrackApiFixture _fixture = fixture;
+        protected HttpClient HttpClient => _fixture.HttpClient;
+        protected IServiceProvider Services => _fixture.Services;
 
-        var bcrypt =
-            Services.GetService<IBcrypt>()
-            ?? throw new InvalidOperationException("BCrypt service not found");
+        internal async Task AddUserToDatabase(User user)
+        {
+            var dbContext =
+                Services.GetService<IamDbContext>()
+                ?? throw new InvalidOperationException("IamDbContext service not found");
 
-        var userDao =
-            Services.GetService<UserDao>()
-            ?? throw new InvalidOperationException("UserDao service not found");
+            var bcrypt =
+                Services.GetService<IBcrypt>()
+                ?? throw new InvalidOperationException("BCrypt service not found");
 
-        var hashedPassword = bcrypt.Hash(user.Password.Value);
-        var userEntity = UserEntity.FromDomain(user);
-        userEntity.Password = hashedPassword;
+            var userDao =
+                Services.GetService<UserDao>()
+                ?? throw new InvalidOperationException("UserDao service not found");
 
-        await userDao.Insert(userEntity);
+            var hashedPassword = bcrypt.Hash(user.Password.Value);
+            var userEntity = UserEntity.FromDomain(user);
+            userEntity.Password = hashedPassword;
 
-        dbContext.SaveChanges();
+            await userDao.Insert(userEntity);
+
+            dbContext.SaveChanges();
+        }
     }
 }

@@ -1,6 +1,7 @@
-namespace FlowTrack.Iam.Auth.Application;
-
-internal interface IActivationEmailSender
+namespace FlowTrack.Iam.Auth.Application
 {
-    Task Send(ActivationEmailSenderParams @params);
+    internal interface IActivationEmailSender
+    {
+        Task Send(ActivationEmailSenderParams @params);
+    }
 }

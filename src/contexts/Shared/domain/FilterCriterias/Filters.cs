@@ -1,45 +1,46 @@
-namespace FlowTrack.Shared.Domain.FilterCriterias;
-
-public class Filters
+namespace FlowTrack.Shared.Domain.FilterCriterias
 {
-    private readonly List<List<Filter>> _groups;
-
-    public IReadOnlyList<IReadOnlyList<Filter>> Groups => _groups;
-
-    public Filters(params Filter[] filters)
+    public class Filters
     {
-        _groups =
-        [
-            [.. filters],
-        ];
-    }
+        private readonly List<List<Filter>> _groups;
 
-    public Filters Or(params Filter[] filters)
-    {
-        _groups.Add([.. filters]);
-        return this;
-    }
+        public IReadOnlyList<IReadOnlyList<Filter>> Groups => _groups;
 
-    public override bool Equals(object? obj)
-    {
-        if (obj is not Filters other || _groups.Count != other._groups.Count)
-            return false;
-
-        for (var i = 0; i < _groups.Count; i++)
+        public Filters(params Filter[] filters)
         {
-            if (!_groups[i].SequenceEqual(other._groups[i]))
-                return false;
+            _groups =
+            [
+                [.. filters],
+            ];
         }
 
-        return true;
-    }
+        public Filters Or(params Filter[] filters)
+        {
+            _groups.Add([.. filters]);
+            return this;
+        }
 
-    public override int GetHashCode()
-    {
-        var hash = new HashCode();
-        foreach (var group in _groups)
-        foreach (var filter in group)
-            hash.Add(filter);
-        return hash.ToHashCode();
+        public override bool Equals(object? obj)
+        {
+            if (obj is not Filters other || _groups.Count != other._groups.Count)
+                return false;
+
+            for (var i = 0; i < _groups.Count; i++)
+            {
+                if (!_groups[i].SequenceEqual(other._groups[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            foreach (var group in _groups)
+            foreach (var filter in group)
+                hash.Add(filter);
+            return hash.ToHashCode();
+        }
     }
 }

@@ -1,43 +1,44 @@
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace FlowTrack.Iam.Test.Users.Application;
-
-public class FindUserByIdQryTest
+namespace FlowTrack.Iam.Test.Users.Application
 {
-    private FindUserByIdQryHandler handler;
-    private Mock<IUserRepository> userRepositoryMock = new();
-
-    public FindUserByIdQryTest()
+    public class FindUserByIdQryTest
     {
-        var services = new ServiceCollection();
+        private FindUserByIdQryHandler handler;
+        private Mock<IUserRepository> userRepositoryMock = new();
 
-        services.AddSingleton(userRepositoryMock.Object);
-        services.AddScoped<FindUserByIdQryHandler>();
+        public FindUserByIdQryTest()
+        {
+            var services = new ServiceCollection();
 
-        var serviceProvider = services.BuildServiceProvider();
-        handler = serviceProvider.GetRequiredService<FindUserByIdQryHandler>();
-    }
+            services.AddSingleton(userRepositoryMock.Object);
+            services.AddScoped<FindUserByIdQryHandler>();
 
-    [Fact]
-    public async Task Should_Return_User()
-    {
-        var user = UserMother.Random();
-        userRepositoryMock.Setup(r => r.FindById(user.Id.Value)).ReturnsAsync(user);
+            var serviceProvider = services.BuildServiceProvider();
+            handler = serviceProvider.GetRequiredService<FindUserByIdQryHandler>();
+        }
 
-        var qry = new FindUserByIdQry(user.Id.Value);
-        var result = await handler.Handle(qry);
+        [Fact]
+        public async Task Should_Return_User()
+        {
+            var user = UserMother.Random();
+            userRepositoryMock.Setup(r => r.FindById(user.Id.Value)).ReturnsAsync(user);
 
-        Assert.Equivalent(user, result);
-    }
+            var qry = new FindUserByIdQry(user.Id.Value);
+            var result = await handler.Handle(qry);
 
-    [Fact]
-    public async Task Should_Throw_UserNotFoundException()
-    {
-        var userId = Guid.NewGuid().ToString();
-        userRepositoryMock.Setup(r => r.FindById(userId)).ReturnsAsync((User)null);
+            Assert.Equivalent(user, result);
+        }
 
-        var qry = new FindUserByIdQry(userId);
-        await Assert.ThrowsAsync<UserNotFound>(() => handler.Handle(qry));
+        [Fact]
+        public async Task Should_Throw_UserNotFoundException()
+        {
+            var userId = Guid.NewGuid().ToString();
+            userRepositoryMock.Setup(r => r.FindById(userId)).ReturnsAsync((User)null);
+
+            var qry = new FindUserByIdQry(userId);
+            await Assert.ThrowsAsync<UserNotFound>(() => handler.Handle(qry));
+        }
     }
 }

@@ -1,28 +1,29 @@
 using FlowTrack.Shared.Domain;
 
-namespace FlowTrack.WorkManagement.Workspaces.Domain;
-
-internal class Workspace(WorkspaceId Id, WorkspaceOwnerId OwnerId, WorkspaceName Name)
-    : AggregatedRoot
+namespace FlowTrack.WorkManagement.Workspaces.Domain
 {
-    public static readonly string DefaultName = "Default";
-
-    public WorkspaceId Id { get; } = Id;
-    public WorkspaceOwnerId OwnerId { get; } = OwnerId;
-    public WorkspaceName Name { get; } = Name;
-
-    public static Workspace Create(WorkspaceId id, WorkspaceOwnerId ownerId, WorkspaceName name)
+    internal class Workspace(WorkspaceId Id, WorkspaceOwnerId OwnerId, WorkspaceName Name)
+        : AggregatedRoot
     {
-        var workspace = new Workspace(id, ownerId, name);
-        var workspaceCreatedEvent = new WorkspaceCreated(id.Value, ownerId.Value, name.Value);
+        public static readonly string DefaultName = "Default";
 
-        workspace.Record(workspaceCreatedEvent);
+        public WorkspaceId Id { get; } = Id;
+        public WorkspaceOwnerId OwnerId { get; } = OwnerId;
+        public WorkspaceName Name { get; } = Name;
 
-        return workspace;
-    }
+        public static Workspace Create(WorkspaceId id, WorkspaceOwnerId ownerId, WorkspaceName name)
+        {
+            var workspace = new Workspace(id, ownerId, name);
+            var workspaceCreatedEvent = new WorkspaceCreated(id.Value, ownerId.Value, name.Value);
 
-    public static Workspace CreateDefault(WorkspaceId Id, WorkspaceOwnerId workspaceOwnerId)
-    {
-        return Create(Id, workspaceOwnerId, new WorkspaceName(DefaultName));
+            workspace.Record(workspaceCreatedEvent);
+
+            return workspace;
+        }
+
+        public static Workspace CreateDefault(WorkspaceId Id, WorkspaceOwnerId workspaceOwnerId)
+        {
+            return Create(Id, workspaceOwnerId, new WorkspaceName(DefaultName));
+        }
     }
 }

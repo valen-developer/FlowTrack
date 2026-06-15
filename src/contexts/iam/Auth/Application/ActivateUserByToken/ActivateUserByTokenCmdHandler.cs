@@ -1,42 +1,43 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowTrack.Iam.Auth.Application;
-
-[Service]
-internal sealed class ActivateUserByTokenCmdHandler(
-    [FromKeyedServices("IAM")] Context context,
-    IEnvStore envStore,
-    IJWTService jwtService,
-    IQueryBus queryBus,
-    EventBus eventBus,
-    IUserRepository userRepository
-) : ICommandHandler<ActivateUserByTokenCmd>
+namespace FlowTrack.Iam.Auth.Application
 {
-    public async Task Handle(ActivateUserByTokenCmd command)
+    [Service]
+    internal sealed class ActivateUserByTokenCmdHandler(
+        [FromKeyedServices("IAM")] Context context,
+        IEnvStore envStore,
+        IJWTService jwtService,
+        IQueryBus queryBus,
+        EventBus eventBus,
+        IUserRepository userRepository
+    ) : ICommandHandler<ActivateUserByTokenCmd>
     {
-        await context.Transaction.RunInTransaction(async () =>
+        public async Task Handle(ActivateUserByTokenCmd command)
         {
-            var secretKey = IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString();
-
-            var secret = envStore.Get(secretKey) ?? throw new EnvVariableMissed(secretKey);
-            var isValid = jwtService.Verify(command.Token, secret);
-
-            if (!isValid)
+            await context.Transaction.RunInTransaction(async () =>
             {
-                throw new UnAuthenticatedException();
-            }
+                var secretKey = IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString();
 
-            var decoded = jwtService.Decode(command.Token);
-            var userId = decoded?.Claims["id"];
+                var secret = envStore.Get(secretKey) ?? throw new EnvVariableMissed(secretKey);
+                var isValid = jwtService.Verify(command.Token, secret);
 
-            var user = await queryBus.Ask<FindUserByIdQry, User>(new FindUserByIdQry(userId!));
+                if (!isValid)
+                {
+                    throw new UnAuthenticatedException();
+                }
 
-            user.Activate();
+                var decoded = jwtService.Decode(command.Token);
+                var userId = decoded?.Claims["id"];
 
-            await userRepository.Update(user);
+                var user = await queryBus.Ask<FindUserByIdQry, User>(new FindUserByIdQry(userId!));
 
-            await eventBus.Publish(user.PullDomainEvents());
-            return true;
-        });
+                user.Activate();
+
+                await userRepository.Update(user);
+
+                await eventBus.Publish(user.PullDomainEvents());
+                return true;
+            });
+        }
     }
 }

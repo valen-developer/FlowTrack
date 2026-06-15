@@ -1,38 +1,39 @@
 using System.Text.RegularExpressions;
 
-namespace FlowTrack.Iam.Test.Users;
-
-public class UserMother : ObjectMother
+namespace FlowTrack.Iam.Test.Users
 {
-    private static readonly Regex PasswordPattern = InvalidPassword.Regex;
-
-    internal static User Random()
+    public class UserMother : ObjectMother
     {
-        return new User(Id(), Email(), Password(), faker.boolean());
-    }
+        private static readonly Regex PasswordPattern = InvalidPassword.Regex;
 
-    internal static User Active()
-    {
-        return new User(Id(), Email(), Password(), true);
-    }
+        internal static User Random()
+        {
+            return new User(Id(), Email(), Password(), faker.boolean());
+        }
 
-    internal static User Inactive()
-    {
-        return new User(Id(), Email(), Password(), false);
-    }
+        internal static User Active()
+        {
+            return new User(Id(), Email(), Password(), true);
+        }
 
-    private static UserId Id()
-    {
-        return new UserId(Guid.NewGuid().ToString());
-    }
+        internal static User Inactive()
+        {
+            return new User(Id(), Email(), Password(), false);
+        }
 
-    private static UserEmail Email()
-    {
-        return new UserEmail(faker.Email());
-    }
+        private static UserId Id()
+        {
+            return new UserId(Guid.NewGuid().ToString());
+        }
 
-    private static UserPassword Password()
-    {
-        return new UserPassword(faker.FromRegex(PasswordPattern));
+        private static UserEmail Email()
+        {
+            return new UserEmail(faker.Email());
+        }
+
+        private static UserPassword Password()
+        {
+            return new UserPassword(faker.FromRegex(PasswordPattern));
+        }
     }
 }

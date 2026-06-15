@@ -1,10 +1,11 @@
-namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus;
-
-public class InMemoryExternalEventBus(DomainEventDispatcher dispatcher) : IExternalEventBus
+namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus
 {
-    public async Task Publish<T>(T @event)
-        where T : DomainEvent
+    public class InMemoryExternalEventBus(DomainEventDispatcher dispatcher) : IExternalEventBus
     {
-        await dispatcher.DispatchAsync(@event);
+        public async Task Publish<T>(T @event)
+            where T : DomainEvent
+        {
+            await dispatcher.DispatchAsync(@event);
+        }
     }
 }

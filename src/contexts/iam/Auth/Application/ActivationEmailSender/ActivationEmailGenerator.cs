@@ -1,23 +1,24 @@
-namespace FlowTrack.Iam.Auth.Application;
-
-[Service]
-internal sealed class ActivationEmailGenerator
+namespace FlowTrack.Iam.Auth.Application
 {
-    private const string Subject = "Activate your account";
-
-    public async Task<Mail> Generate(ActivationEmailGeneratorParams @params)
+    [Service]
+    internal sealed class ActivationEmailGenerator
     {
-        var mail = new Mail(
-            to: @params.To.Value,
-            subject: Subject,
-            body: GenerateBody(@params.Token, @params.ActivationLinkBaseUrl)
-        );
+        private const string Subject = "Activate your account";
 
-        return mail;
-    }
+        public async Task<Mail> Generate(ActivationEmailGeneratorParams @params)
+        {
+            var mail = new Mail(
+                to: @params.To.Value,
+                subject: Subject,
+                body: GenerateBody(@params.Token, @params.ActivationLinkBaseUrl)
+            );
 
-    private string GenerateBody(string token, string baseUrl)
-    {
-        return $"<a href=\"{baseUrl}?token={token}\">Activate your account</a>";
+            return mail;
+        }
+
+        private string GenerateBody(string token, string baseUrl)
+        {
+            return $"<a href=\"{baseUrl}?token={token}\">Activate your account</a>";
+        }
     }
 }

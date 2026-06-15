@@ -1,14 +1,15 @@
 using FlowTrack.Shared.Domain.Iam.Users;
 
-namespace FlowTrack.Iam.Auth.Application;
-
-[Service]
-[DomainEventSubscriber(typeof(UserCreated))]
-internal sealed class SendActivationMailOnUserCreated(IActivationEmailSender emailSender)
+namespace FlowTrack.Iam.Auth.Application
 {
-    [DomainEventListener]
-    public async Task On(UserCreated @event)
+    [Service]
+    [DomainEventSubscriber(typeof(UserCreated))]
+    internal sealed class SendActivationMailOnUserCreated(IActivationEmailSender emailSender)
     {
-        await emailSender.Send(new ActivationEmailSenderParams(@event.UserId, @event.Email));
+        [DomainEventListener]
+        public async Task On(UserCreated @event)
+        {
+            await emailSender.Send(new ActivationEmailSenderParams(@event.UserId, @event.Email));
+        }
     }
 }

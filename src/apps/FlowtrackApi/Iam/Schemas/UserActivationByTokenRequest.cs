@@ -1,6 +1,7 @@
-namespace FlowtrackApi.Iam.Schemas;
-
-public sealed record UserActivationByTokenRequest
+namespace FlowtrackApi.Iam.Schemas
 {
-    public string Token { get; init; } = string.Empty;
+    public sealed record UserActivationByTokenRequest
+    {
+        public string Token { get; init; } = string.Empty;
+    }
 }

@@ -1,20 +1,21 @@
-namespace FlowTrack.Shared.Infrastructure.Bus.Event;
-
-[Provider(typeof(IDomainEventBus))]
-public class InMemoryDomainEventBus(DomainEventDispatcher dispatcher) : IDomainEventBus
+namespace FlowTrack.Shared.Infrastructure.Bus.Event
 {
-    public async Task Publish<T>(T @event)
-        where T : DomainEvent
+    [Provider(typeof(IDomainEventBus))]
+    public class InMemoryDomainEventBus(DomainEventDispatcher dispatcher) : IDomainEventBus
     {
-        await Publish([@event]);
-    }
-
-    public async Task Publish<T>(IEnumerable<T> events)
-        where T : DomainEvent
-    {
-        foreach (var @event in events)
+        public async Task Publish<T>(T @event)
+            where T : DomainEvent
         {
-            await dispatcher.DispatchAsync(@event);
+            await Publish([@event]);
+        }
+
+        public async Task Publish<T>(IEnumerable<T> events)
+            where T : DomainEvent
+        {
+            foreach (var @event in events)
+            {
+                await dispatcher.DispatchAsync(@event);
+            }
         }
     }
 }

@@ -2,17 +2,18 @@ using FlowtrackApi.Iam.Schemas;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FlowtrackApi.Iam.Controllers.Auth;
-
-[Route("user-activations")]
-public sealed class UserActivationsPostController(ICommandBus commandBus) : IController
+namespace FlowtrackApi.Iam.Controllers.Auth
 {
-    [AllowAnonymous]
-    [HttpPost]
-    public async Task<IActionResult> Post([FromBody] UserActivationByTokenRequest request)
+    [Route("user-activations")]
+    public sealed class UserActivationsPostController(ICommandBus commandBus) : IController
     {
-        var command = new ActivateUserByTokenCmd(request.Token);
-        await commandBus.Dispatch(command);
-        return Created();
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] UserActivationByTokenRequest request)
+        {
+            var command = new ActivateUserByTokenCmd(request.Token);
+            await commandBus.Dispatch(command);
+            return Created();
+        }
     }
 }

@@ -1,6 +1,7 @@
-namespace FlowTrack.Shared.Domain.Contexts;
-
-public class Context(Transaction transaction)
+namespace FlowTrack.Shared.Domain.Contexts
 {
-    public Transaction Transaction { get; } = transaction;
+    public class Context(Transaction transaction)
+    {
+        public Transaction Transaction { get; } = transaction;
+    }
 }

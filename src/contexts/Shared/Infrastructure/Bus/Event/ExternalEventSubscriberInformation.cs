@@ -1,11 +1,14 @@
-namespace FlowTrack.Shared.Infrastructure.Bus.Event;
-
-public sealed class ExternalEventSubscriberInformation(ExternalEventSubscriberInfo[] Subscribers)
+namespace FlowTrack.Shared.Infrastructure.Bus.Event
 {
-    public IReadOnlyList<ExternalEventSubscriberInfo> Subscribers { get; } = Subscribers;
-
-    public ExternalEventSubscriberInfo[] GetSubscribersForEvent(Type eventType)
+    public sealed class ExternalEventSubscriberInformation(
+        ExternalEventSubscriberInfo[] Subscribers
+    )
     {
-        return [.. Subscribers.Where(s => s.EventType == eventType)];
+        public IReadOnlyList<ExternalEventSubscriberInfo> Subscribers { get; } = Subscribers;
+
+        public ExternalEventSubscriberInfo[] GetSubscribersForEvent(Type eventType)
+        {
+            return [.. Subscribers.Where(s => s.EventType == eventType)];
+        }
     }
 }

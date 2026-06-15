@@ -1,17 +1,18 @@
-namespace FlowTrack.Iam.Auth.Domain;
-
-internal class Password(string value)
+namespace FlowTrack.Iam.Auth.Domain
 {
-    public string Value { get; } = value;
-
-    public static Password EnsurePassword(string value)
+    internal class Password(string value)
     {
-        var regex = InvalidPassword.Regex;
-        if (!regex.IsMatch(value))
-        {
-            throw new InvalidPassword();
-        }
+        public string Value { get; } = value;
 
-        return new Password(value);
+        public static Password EnsurePassword(string value)
+        {
+            var regex = InvalidPassword.Regex;
+            if (!regex.IsMatch(value))
+            {
+                throw new InvalidPassword();
+            }
+
+            return new Password(value);
+        }
     }
 }

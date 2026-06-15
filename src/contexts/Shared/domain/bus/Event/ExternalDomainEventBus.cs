@@ -1,7 +1,8 @@
-namespace FlowTrack.Shared.Domain.Bus.Event;
-
-public interface IExternalEventBus
+namespace FlowTrack.Shared.Domain.Bus.Event
 {
-    Task Publish<T>(T @event)
-        where T : DomainEvent;
+    public interface IExternalEventBus
+    {
+        Task Publish<T>(T @event)
+            where T : DomainEvent;
+    }
 }

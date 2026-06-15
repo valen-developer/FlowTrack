@@ -1,18 +1,19 @@
-namespace FlowTrack.Shared.Domain;
-
-public abstract class AggregatedRoot
+namespace FlowTrack.Shared.Domain
 {
-    private readonly List<DomainEvent> _domainEvents = [];
-
-    public List<DomainEvent> PullDomainEvents()
+    public abstract class AggregatedRoot
     {
-        var events = _domainEvents.ToList();
-        _domainEvents.Clear();
-        return events;
-    }
+        private readonly List<DomainEvent> _domainEvents = [];
 
-    public void Record(DomainEvent domainEvent)
-    {
-        _domainEvents.Add(domainEvent);
+        public List<DomainEvent> PullDomainEvents()
+        {
+            var events = _domainEvents.ToList();
+            _domainEvents.Clear();
+            return events;
+        }
+
+        public void Record(DomainEvent domainEvent)
+        {
+            _domainEvents.Add(domainEvent);
+        }
     }
 }

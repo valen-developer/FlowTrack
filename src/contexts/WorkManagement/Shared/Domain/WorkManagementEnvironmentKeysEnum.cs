@@ -1,6 +1,7 @@
-namespace FlowTrack.WorkManagement.Shared.Domain;
-
-internal enum WorkManagementEnvironmentKeysEnum
+namespace FlowTrack.WorkManagement.Shared.Domain
 {
-    WORK_MANAGEMENT_DB_CONNECTION_STRING,
+    internal enum WorkManagementEnvironmentKeysEnum
+    {
+        WORK_MANAGEMENT_DB_CONNECTION_STRING,
+    }
 }

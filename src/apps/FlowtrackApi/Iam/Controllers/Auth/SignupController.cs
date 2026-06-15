@@ -2,21 +2,24 @@ using FlowtrackApi.Iam.Schemas;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FlowtrackApi.Iam.Controllers.Auth;
-
-public class SignupController([FromKeyedServices("IAM")] Context context, ICommandBus commandBus)
-    : AuthController
+namespace FlowtrackApi.Iam.Controllers.Auth
 {
-    [AllowAnonymous]
-    [HttpPost("signup")]
-    public async Task<IActionResult> Execute([FromBody] SignupRequest request)
+    public class SignupController(
+        [FromKeyedServices("IAM")] Context context,
+        ICommandBus commandBus
+    ) : AuthController
     {
-        return await context.Transaction.RunInTransaction(async () =>
+        [AllowAnonymous]
+        [HttpPost("signup")]
+        public async Task<IActionResult> Execute([FromBody] SignupRequest request)
         {
-            SignupCmd cmd = new(request.Id, request.Email, request.Password);
-            await commandBus.Dispatch(cmd);
+            return await context.Transaction.RunInTransaction(async () =>
+            {
+                SignupCmd cmd = new(request.Id, request.Email, request.Password);
+                await commandBus.Dispatch(cmd);
 
-            return StatusCode(201);
-        });
+                return StatusCode(201);
+            });
+        }
     }
 }

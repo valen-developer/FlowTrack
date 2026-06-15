@@ -1,6 +1,7 @@
-namespace FlowTrack.Shared.Domain;
-
-public interface IEnvStore
+namespace FlowTrack.Shared.Domain
 {
-    string? Get(string key);
+    public interface IEnvStore
+    {
+        string? Get(string key);
+    }
 }

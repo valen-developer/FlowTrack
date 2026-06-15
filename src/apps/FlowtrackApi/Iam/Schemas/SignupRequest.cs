@@ -1,8 +1,9 @@
-namespace FlowtrackApi.Iam.Schemas;
-
-public sealed class SignupRequest
+namespace FlowtrackApi.Iam.Schemas
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
-    public string Email { get; set; } = null!;
-    public string Password { get; set; } = null!;
+    public sealed class SignupRequest
+    {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string Email { get; set; } = null!;
+        public string Password { get; set; } = null!;
+    }
 }

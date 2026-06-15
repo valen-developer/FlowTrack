@@ -1,59 +1,61 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowTrack.Shared.Infrastructure.Bus.Command;
-
-public static class DicoverCommandsServiceCollectionExtensions
+namespace FlowTrack.Shared.Infrastructure.Bus.Command
 {
-    internal static IServiceCollection DiscoverCommands(
-        this IServiceCollection services,
-        params string[] stringMatch
-    )
+    public static class DicoverCommandsServiceCollectionExtensions
     {
-        var assemblies = stringMatch
-            .Select(s => Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, s))
-            .SelectMany(f => f)
-            .Select(Assembly.LoadFrom)
-            .Where(a => !a.IsDynamic)
-            .ToArray();
-
-        services.DiscoverCommands(assemblies);
-
-        return services;
-    }
-
-    internal static IServiceCollection DiscoverCommands(
-        this IServiceCollection services,
-        params Assembly[] assemblies
-    )
-    {
-        CommandHandlerInformation commandHandlerInfo = new();
-
-        var commandHandlerTypes = assemblies
-            .SelectMany(a => a.GetTypes())
-            .Where(t => t.IsClass && !t.IsAbstract)
-            .Where(t =>
-                t.GetInterfaces()
-                    .Any(i =>
-                        i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommandHandler<>)
-                    )
-            )
-            .ToArray();
-
-        foreach (var handlerType in commandHandlerTypes)
+        internal static IServiceCollection DiscoverCommands(
+            this IServiceCollection services,
+            params string[] stringMatch
+        )
         {
-            var commandType = handlerType
-                .GetInterfaces()
-                .First(i =>
-                    i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommandHandler<>)
-                )
-                .GetGenericArguments()[0];
+            var assemblies = stringMatch
+                .Select(s => Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, s))
+                .SelectMany(f => f)
+                .Select(Assembly.LoadFrom)
+                .Where(a => !a.IsDynamic)
+                .ToArray();
 
-            commandHandlerInfo.Add(commandType, handlerType);
+            services.DiscoverCommands(assemblies);
+
+            return services;
         }
 
-        services.AddSingleton(commandHandlerInfo);
+        internal static IServiceCollection DiscoverCommands(
+            this IServiceCollection services,
+            params Assembly[] assemblies
+        )
+        {
+            CommandHandlerInformation commandHandlerInfo = new();
 
-        return services;
+            var commandHandlerTypes = assemblies
+                .SelectMany(a => a.GetTypes())
+                .Where(t => t.IsClass && !t.IsAbstract)
+                .Where(t =>
+                    t.GetInterfaces()
+                        .Any(i =>
+                            i.IsGenericType
+                            && i.GetGenericTypeDefinition() == typeof(ICommandHandler<>)
+                        )
+                )
+                .ToArray();
+
+            foreach (var handlerType in commandHandlerTypes)
+            {
+                var commandType = handlerType
+                    .GetInterfaces()
+                    .First(i =>
+                        i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommandHandler<>)
+                    )
+                    .GetGenericArguments()[0];
+
+                commandHandlerInfo.Add(commandType, handlerType);
+            }
+
+            services.AddSingleton(commandHandlerInfo);
+
+            return services;
+        }
     }
 }

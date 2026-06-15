@@ -1,13 +1,14 @@
-namespace FlowTrack.Shared.Infrastructure.Mailer;
-
-[Provider(typeof(IMailer))]
-public sealed class DummyMailer : IMailer
+namespace FlowTrack.Shared.Infrastructure.Mailer
 {
-    public override Task Send(Mail mail)
+    [Provider(typeof(IMailer))]
+    public sealed class DummyMailer : IMailer
     {
-        Console.WriteLine(
-            $"[DummyMailer] Sending mail to {mail.To} with subject '{mail.Subject}' and body '{mail.Body}'"
-        );
-        return Task.CompletedTask;
+        public override Task Send(Mail mail)
+        {
+            Console.WriteLine(
+                $"[DummyMailer] Sending mail to {mail.To} with subject '{mail.Subject}' and body '{mail.Body}'"
+            );
+            return Task.CompletedTask;
+        }
     }
 }

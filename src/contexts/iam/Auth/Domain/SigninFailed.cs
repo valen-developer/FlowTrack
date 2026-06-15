@@ -1,7 +1,8 @@
-namespace FlowTrack.Iam.Auth.Domain;
-
-internal class SigninFailed()
-    : UnAuthenticatedException(
-        "Invalid Signin credentials.",
-        "exception.iam.auth.signin_failed"
-    ) { }
+namespace FlowTrack.Iam.Auth.Domain
+{
+    internal class SigninFailed()
+        : UnAuthenticatedException(
+            "Invalid Signin credentials.",
+            "exception.iam.auth.signin_failed"
+        ) { }
+}

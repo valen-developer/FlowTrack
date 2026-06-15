@@ -1,23 +1,24 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace FlowTrack.Iam.Shared.Infrastructure;
-
-internal class IamDbContextFactory : IDesignTimeDbContextFactory<IamDbContext>
+namespace FlowTrack.Iam.Shared.Infrastructure
 {
-    public IamDbContext CreateDbContext(string[] args)
+    internal class IamDbContextFactory : IDesignTimeDbContextFactory<IamDbContext>
     {
-        var connectionString =
-            Environment.GetEnvironmentVariable(
-                IamEnvironmentKeysEnum.IAM_DB_CONNECTION_STRING.ToString()
-            )
-            ?? throw new InvalidOperationException(
-                $"Environment variable '{IamEnvironmentKeysEnum.IAM_DB_CONNECTION_STRING}' is not set."
-            );
+        public IamDbContext CreateDbContext(string[] args)
+        {
+            var connectionString =
+                Environment.GetEnvironmentVariable(
+                    IamEnvironmentKeysEnum.IAM_DB_CONNECTION_STRING.ToString()
+                )
+                ?? throw new InvalidOperationException(
+                    $"Environment variable '{IamEnvironmentKeysEnum.IAM_DB_CONNECTION_STRING}' is not set."
+                );
 
-        var optionsBuilder = new DbContextOptionsBuilder<IamDbContext>();
-        optionsBuilder.UseNpgsql(connectionString);
+            var optionsBuilder = new DbContextOptionsBuilder<IamDbContext>();
+            optionsBuilder.UseNpgsql(connectionString);
 
-        return new IamDbContext(optionsBuilder.Options);
+            return new IamDbContext(optionsBuilder.Options);
+        }
     }
 }

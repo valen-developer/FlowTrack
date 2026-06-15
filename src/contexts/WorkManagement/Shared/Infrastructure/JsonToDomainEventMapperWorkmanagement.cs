@@ -2,19 +2,20 @@ using FlowTrack.Shared.Domain.Bus.Event;
 using FlowTrack.Shared.Domain.Dic;
 using FlowTrack.Shared.Domain.Iam.Users;
 
-namespace FlowTrack.WorkManagement.Shared.Infrastructure;
-
-[Provider(typeof(JsonToDomainEventMapper), Lifetime.Singleton)]
-public sealed class JsonToDomainEventMapperWorkmanagement : JsonToDomainEventMapper
+namespace FlowTrack.WorkManagement.Shared.Infrastructure
 {
-    public override DomainEvent? Map(string json)
+    [Provider(typeof(JsonToDomainEventMapper), Lifetime.Singleton)]
+    public sealed class JsonToDomainEventMapperWorkmanagement : JsonToDomainEventMapper
     {
-        var code = GetCode(json);
-        if (code == UserCreated.Code)
+        public override DomainEvent? Map(string json)
         {
-            return Serialize<UserCreated>(json);
-        }
+            var code = GetCode(json);
+            if (code == UserCreated.Code)
+            {
+                return Serialize<UserCreated>(json);
+            }
 
-        return null;
+            return null;
+        }
     }
 }

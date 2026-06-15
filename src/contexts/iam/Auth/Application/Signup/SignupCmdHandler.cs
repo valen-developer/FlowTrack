@@ -1,32 +1,33 @@
-namespace FlowTrack.Iam.Auth.Application;
-
-[Service]
-internal sealed class SignupCmdHandler(
-    IUserRepository repository,
-    EventBus eventBus,
-    IBcrypt bcrypt
-) : ICommandHandler<SignupCmd>
+namespace FlowTrack.Iam.Auth.Application
 {
-    public async Task Handle(SignupCmd command)
+    [Service]
+    internal sealed class SignupCmdHandler(
+        IUserRepository repository,
+        EventBus eventBus,
+        IBcrypt bcrypt
+    ) : ICommandHandler<SignupCmd>
     {
-        var currentUser = await repository.FindByEmail(command.Email);
-        if (currentUser is not null)
+        public async Task Handle(SignupCmd command)
         {
-            return;
+            var currentUser = await repository.FindByEmail(command.Email);
+            if (currentUser is not null)
+            {
+                return;
+            }
+
+            Password password = Password.EnsurePassword(command.Password);
+            UserEmail email = new(command.Email);
+
+            string hashedPassword = bcrypt.Hash(password.Value);
+
+            var user = User.Create(
+                id: new UserId(command.Id),
+                password: new UserPassword(hashedPassword),
+                email: email
+            );
+            await repository.Create(user);
+
+            await eventBus.Publish(user.PullDomainEvents());
         }
-
-        Password password = Password.EnsurePassword(command.Password);
-        UserEmail email = new(command.Email);
-
-        string hashedPassword = bcrypt.Hash(password.Value);
-
-        var user = User.Create(
-            id: new UserId(command.Id),
-            password: new UserPassword(hashedPassword),
-            email: email
-        );
-        await repository.Create(user);
-
-        await eventBus.Publish(user.PullDomainEvents());
     }
 }

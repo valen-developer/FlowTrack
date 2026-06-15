@@ -1,38 +1,39 @@
 using FlowTrack.Shared.Domain.Iam.Users;
 
-namespace FlowTrack.Iam.Users.Domain;
-
-internal class User(UserId id, UserEmail email, UserPassword password, bool isActive = false)
-    : AggregatedRoot
+namespace FlowTrack.Iam.Users.Domain
 {
-    public UserId Id { get; } = id;
-    public UserEmail Email { get; } = email;
-    public UserPassword Password { get; } = password;
-    public bool IsActive { get; private set; } = isActive;
-
-    public static User Create(UserId id, UserEmail email, UserPassword password)
+    internal class User(UserId id, UserEmail email, UserPassword password, bool isActive = false)
+        : AggregatedRoot
     {
-        var user = new User(id, email, password, false);
-        UserCreated userCreatedEvent = new(
-            UserId: user.Id.Value,
-            Email: user.Email.Value,
-            IsActive: user.IsActive
-        );
+        public UserId Id { get; } = id;
+        public UserEmail Email { get; } = email;
+        public UserPassword Password { get; } = password;
+        public bool IsActive { get; private set; } = isActive;
 
-        user.Record(userCreatedEvent);
+        public static User Create(UserId id, UserEmail email, UserPassword password)
+        {
+            var user = new User(id, email, password, false);
+            UserCreated userCreatedEvent = new(
+                UserId: user.Id.Value,
+                Email: user.Email.Value,
+                IsActive: user.IsActive
+            );
 
-        return user;
-    }
+            user.Record(userCreatedEvent);
 
-    public void Activate()
-    {
-        if (IsActive)
-            return;
+            return user;
+        }
 
-        IsActive = true;
+        public void Activate()
+        {
+            if (IsActive)
+                return;
 
-        var activatedEvent = new UserActivated(Id: Id.Value);
+            IsActive = true;
 
-        Record(activatedEvent);
+            var activatedEvent = new UserActivated(Id: Id.Value);
+
+            Record(activatedEvent);
+        }
     }
 }

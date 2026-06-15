@@ -1,13 +1,14 @@
 using FlowTrack.Shared.Domain.Iam.Users;
 
-namespace FlowTrack.Iam.Shared.Infrastructure;
-
-[Provider(typeof(JsonToDomainEventMapper), Lifetime.Singleton)]
-public sealed class JsonToDomainEventMapperIam : JsonToDomainEventMapper
+namespace FlowTrack.Iam.Shared.Infrastructure
 {
-    public override DomainEvent? Map(string json)
+    [Provider(typeof(JsonToDomainEventMapper), Lifetime.Singleton)]
+    public sealed class JsonToDomainEventMapperIam : JsonToDomainEventMapper
     {
-        var code = GetCode(json);
-        return code == UserCreated.Code ? Serialize<UserCreated>(json) : null;
+        public override DomainEvent? Map(string json)
+        {
+            var code = GetCode(json);
+            return code == UserCreated.Code ? Serialize<UserCreated>(json) : null;
+        }
     }
 }

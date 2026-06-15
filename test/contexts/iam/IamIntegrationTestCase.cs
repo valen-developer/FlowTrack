@@ -1,24 +1,25 @@
-namespace FlowTrack.Iam.Test;
-
-public abstract class IamIntegrationTestCase(IamIntegrationFixture fixture)
-    : IClassFixture<IamIntegrationFixture>
+namespace FlowTrack.Iam.Test
 {
-    public readonly IamIntegrationFixture _fixture = fixture;
-
-    protected Transaction GenerateTransaction()
+    public abstract class IamIntegrationTestCase(IamIntegrationFixture fixture)
+        : IClassFixture<IamIntegrationFixture>
     {
-        var dbcontext = _fixture.GetService<IamDbContext>();
-        return new EfCoreTransaction(dbcontext);
-    }
+        public readonly IamIntegrationFixture _fixture = fixture;
 
-    internal async Task AddUserToDatabase(User user)
-    {
-        var dbcontext = _fixture.GetService<IamDbContext>();
-        var userDao = _fixture.GetService<UserDao>();
-        var userEntity = UserEntity.FromDomain(user);
-        userEntity.Password = BCrypt.Net.BCrypt.HashPassword(user.Password.Value);
-        await userDao.Insert(userEntity);
+        protected Transaction GenerateTransaction()
+        {
+            var dbcontext = _fixture.GetService<IamDbContext>();
+            return new EfCoreTransaction(dbcontext);
+        }
 
-        dbcontext.SaveChanges();
+        internal async Task AddUserToDatabase(User user)
+        {
+            var dbcontext = _fixture.GetService<IamDbContext>();
+            var userDao = _fixture.GetService<UserDao>();
+            var userEntity = UserEntity.FromDomain(user);
+            userEntity.Password = BCrypt.Net.BCrypt.HashPassword(user.Password.Value);
+            await userDao.Insert(userEntity);
+
+            dbcontext.SaveChanges();
+        }
     }
 }

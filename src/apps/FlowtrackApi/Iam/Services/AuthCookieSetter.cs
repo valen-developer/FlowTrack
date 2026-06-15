@@ -1,41 +1,42 @@
-namespace FlowtrackApi.Iam.Services;
-
-[Service]
-public sealed class AuthCookieSetter(
-    IHttpContextAccessor contextAccessor,
-    IDateTimeProvider dateTimeProvider
-)
+namespace FlowtrackApi.Iam.Services
 {
-    internal void SetAuthCookies(SigninSuccess signinSuccess)
+    [Service]
+    public sealed class AuthCookieSetter(
+        IHttpContextAccessor contextAccessor,
+        IDateTimeProvider dateTimeProvider
+    )
     {
-        var context =
-            contextAccessor.HttpContext
-            ?? throw new InvalidOperationException("No HttpContext available");
+        internal void SetAuthCookies(SigninSuccess signinSuccess)
+        {
+            var context =
+                contextAccessor.HttpContext
+                ?? throw new InvalidOperationException("No HttpContext available");
 
-        var now = dateTimeProvider.Now;
+            var now = dateTimeProvider.Now;
 
-        context.Response.Cookies.Append(
-            "ACCESS_TOKEN",
-            signinSuccess.AccessToken,
-            new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = now.AddMinutes(60),
-            }
-        );
+            context.Response.Cookies.Append(
+                "ACCESS_TOKEN",
+                signinSuccess.AccessToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = now.AddMinutes(60),
+                }
+            );
 
-        context.Response.Cookies.Append(
-            "REFRESH_TOKEN",
-            signinSuccess.RefreshToken,
-            new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = now.AddMinutes(60 * 24 * 30),
-            }
-        );
+            context.Response.Cookies.Append(
+                "REFRESH_TOKEN",
+                signinSuccess.RefreshToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = now.AddMinutes(60 * 24 * 30),
+                }
+            );
+        }
     }
 }

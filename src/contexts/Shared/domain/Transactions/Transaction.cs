@@ -1,60 +1,61 @@
-namespace FlowTrack.Shared.Domain.Transactions;
-
-public abstract class Transaction
+namespace FlowTrack.Shared.Domain.Transactions
 {
-    private readonly List<Func<Task>> _onFailedCallbacks = new();
-    private readonly List<Func<Task>> _runOutsideOfTransactionCallbacks = new();
-
-    public void OnFailed(Func<Task> callback)
+    public abstract class Transaction
     {
-        _onFailedCallbacks.Add(callback);
-    }
+        private readonly List<Func<Task>> _onFailedCallbacks = new();
+        private readonly List<Func<Task>> _runOutsideOfTransactionCallbacks = new();
 
-    public void RunOutsideOfTransaction(Func<Task> callback)
-    {
-        _runOutsideOfTransactionCallbacks.Add(callback);
-    }
+        public void OnFailed(Func<Task> callback)
+        {
+            _onFailedCallbacks.Add(callback);
+        }
 
-    public async Task<T> RunInTransaction<T>(Func<Task<T>> action)
-    {
-        try
+        public void RunOutsideOfTransaction(Func<Task> callback)
         {
-            await Initialize();
-            var result = await action();
-            await Commit();
-            return result;
+            _runOutsideOfTransactionCallbacks.Add(callback);
         }
-        catch
-        {
-            await Rollback();
-            await ExecuteOnFailedCallbacks();
-            throw;
-        }
-        finally
-        {
-            await ExecuteRunOutsideOfTransactionCallbacks();
-            await Release();
-        }
-    }
 
-    private async Task ExecuteOnFailedCallbacks()
-    {
-        foreach (var callback in _onFailedCallbacks)
+        public async Task<T> RunInTransaction<T>(Func<Task<T>> action)
         {
-            await callback();
+            try
+            {
+                await Initialize();
+                var result = await action();
+                await Commit();
+                return result;
+            }
+            catch
+            {
+                await Rollback();
+                await ExecuteOnFailedCallbacks();
+                throw;
+            }
+            finally
+            {
+                await ExecuteRunOutsideOfTransactionCallbacks();
+                await Release();
+            }
         }
-    }
 
-    private async Task ExecuteRunOutsideOfTransactionCallbacks()
-    {
-        foreach (var callback in _runOutsideOfTransactionCallbacks)
+        private async Task ExecuteOnFailedCallbacks()
         {
-            await callback();
+            foreach (var callback in _onFailedCallbacks)
+            {
+                await callback();
+            }
         }
-    }
 
-    protected abstract Task Initialize();
-    protected abstract Task Commit();
-    protected abstract Task Rollback();
-    protected abstract Task Release();
+        private async Task ExecuteRunOutsideOfTransactionCallbacks()
+        {
+            foreach (var callback in _runOutsideOfTransactionCallbacks)
+            {
+                await callback();
+            }
+        }
+
+        protected abstract Task Initialize();
+        protected abstract Task Commit();
+        protected abstract Task Rollback();
+        protected abstract Task Release();
+    }
 }

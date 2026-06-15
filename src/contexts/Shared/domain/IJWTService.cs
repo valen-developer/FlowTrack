@@ -1,31 +1,32 @@
-namespace FlowTrack.Shared.Domain;
-
-public record JWTPayload
+namespace FlowTrack.Shared.Domain
 {
-    public IReadOnlyDictionary<string, string> Claims { get; }
-
-    public JWTPayload(IReadOnlyDictionary<string, string> claims)
+    public record JWTPayload
     {
-        Claims = claims;
+        public IReadOnlyDictionary<string, string> Claims { get; }
+
+        public JWTPayload(IReadOnlyDictionary<string, string> claims)
+        {
+            Claims = claims;
+        }
     }
-}
 
-public record JWTOptions
-{
-    public string Secret { get; }
-    public int ExpirationMinutes { get; }
-
-    public JWTOptions(string secret, int expirationMinutes)
+    public record JWTOptions
     {
-        Secret = secret;
-        ExpirationMinutes = expirationMinutes;
-    }
-}
+        public string Secret { get; }
+        public int ExpirationMinutes { get; }
 
-public interface IJWTService
-{
-    // Decode which have Claims
-    JWTPayload? Decode(string token);
-    string Generate(JWTPayload payload, JWTOptions options);
-    bool Verify(string token, string secret);
+        public JWTOptions(string secret, int expirationMinutes)
+        {
+            Secret = secret;
+            ExpirationMinutes = expirationMinutes;
+        }
+    }
+
+    public interface IJWTService
+    {
+        // Decode which have Claims
+        JWTPayload? Decode(string token);
+        string Generate(JWTPayload payload, JWTOptions options);
+        bool Verify(string token, string secret);
+    }
 }

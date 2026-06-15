@@ -4,26 +4,27 @@ using FlowTrack.Shared.Domain.Dic;
 using FlowTrack.WorkManagement.Workspaces.Domain;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowTrack.WorkManagement.Workspaces.Application;
-
-[Service]
-internal class CreateDefaultWorkspaceCmdHandler(
-    WorkspaceCreator workspaceCreator,
-    [FromKeyedServices("WORK_MANAGEMENT")] Context context
-) : ICommandHandler<CreateDefaultWorkspaceCmd>
+namespace FlowTrack.WorkManagement.Workspaces.Application
 {
-    public async Task Handle(CreateDefaultWorkspaceCmd command)
+    [Service]
+    internal class CreateDefaultWorkspaceCmdHandler(
+        WorkspaceCreator workspaceCreator,
+        [FromKeyedServices("WORK_MANAGEMENT")] Context context
+    ) : ICommandHandler<CreateDefaultWorkspaceCmd>
     {
-        await context.Transaction.RunInTransaction(async () =>
+        public async Task Handle(CreateDefaultWorkspaceCmd command)
         {
-            var workspace = Workspace.CreateDefault(
-                new WorkspaceId(Guid.NewGuid().ToString()),
-                new WorkspaceOwnerId(command.UserId)
-            );
+            await context.Transaction.RunInTransaction(async () =>
+            {
+                var workspace = Workspace.CreateDefault(
+                    new WorkspaceId(Guid.NewGuid().ToString()),
+                    new WorkspaceOwnerId(command.UserId)
+                );
 
-            await workspaceCreator.Create(workspace);
+                await workspaceCreator.Create(workspace);
 
-            return true;
-        });
+                return true;
+            });
+        }
     }
 }

@@ -4,42 +4,49 @@ using FlowTrack.WorkManagement.Workspaces.Application;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace FlowTrack.WorkManagement.Workspaces.Test.Application;
-
-public class CreateDefaultWorkspaceOnUserCreatedTests
+namespace FlowTrack.WorkManagement.Workspaces.Test.Application
 {
-    private readonly Mock<ICommandBus> _commandBusMock = new();
-    private readonly CreateDefaultWorkspaceOnUserCreated _subscriber;
-
-    public CreateDefaultWorkspaceOnUserCreatedTests()
+    public class CreateDefaultWorkspaceOnUserCreatedTests
     {
-        var services = new ServiceCollection();
-        services.AddSingleton(_commandBusMock.Object);
+        private readonly Mock<ICommandBus> _commandBusMock = new();
+        private readonly CreateDefaultWorkspaceOnUserCreated _subscriber;
 
-        services.AddScoped<CreateDefaultWorkspaceOnUserCreated>();
+        public CreateDefaultWorkspaceOnUserCreatedTests()
+        {
+            var services = new ServiceCollection();
+            services.AddSingleton(_commandBusMock.Object);
 
-        var serviceProvider = services.BuildServiceProvider();
-        _subscriber = serviceProvider.GetRequiredService<CreateDefaultWorkspaceOnUserCreated>();
-    }
+            services.AddScoped<CreateDefaultWorkspaceOnUserCreated>();
 
-    [Fact]
-    public async Task Should_Call_Command_Bus_With_Command()
-    {
-        var userId = Guid.NewGuid().ToString();
-        var email = "email@email.com";
-        var isActive = false;
+            var serviceProvider = services.BuildServiceProvider();
+            _subscriber = serviceProvider.GetRequiredService<CreateDefaultWorkspaceOnUserCreated>();
+        }
 
-        var userCreatedEvent = new UserCreated(UserId: userId, Email: email, IsActive: isActive);
-        var expectedCommand = new CreateDefaultWorkspaceCmd(userId);
+        [Fact]
+        public async Task Should_Call_Command_Bus_With_Command()
+        {
+            var userId = Guid.NewGuid().ToString();
+            var email = "email@email.com";
+            var isActive = false;
 
-        await _subscriber.On(userCreatedEvent);
+            var userCreatedEvent = new UserCreated(
+                UserId: userId,
+                Email: email,
+                IsActive: isActive
+            );
+            var expectedCommand = new CreateDefaultWorkspaceCmd(userId);
 
-        _commandBusMock.Verify(
-            bus =>
-                bus.Dispatch(
-                    It.Is<CreateDefaultWorkspaceCmd>(cmd => cmd.UserId == expectedCommand.UserId)
-                ),
-            Times.Once
-        );
+            await _subscriber.On(userCreatedEvent);
+
+            _commandBusMock.Verify(
+                bus =>
+                    bus.Dispatch(
+                        It.Is<CreateDefaultWorkspaceCmd>(cmd =>
+                            cmd.UserId == expectedCommand.UserId
+                        )
+                    ),
+                Times.Once
+            );
+        }
     }
 }

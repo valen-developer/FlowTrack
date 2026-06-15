@@ -2,32 +2,33 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowtrackApi.Test.Iam.Controllers.Auth;
-
-[Collection(nameof(FlowtrackApiCollection))]
-public class SignupControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(fixture)
+namespace FlowtrackApi.Test.Iam.Controllers.Auth
 {
-    [Fact]
-    public async Task Should_Save_User_In_DB()
+    [Collection(nameof(FlowtrackApiCollection))]
+    public class SignupControllerE2E(FlowtrackApiFixture fixture) : FlowtrackApiE2E(fixture)
     {
-        UserDao userDao =
-            Services.GetService<UserDao>()
-            ?? throw new InvalidOperationException(
-                "UserDao not registered in the service provider."
-            );
-
-        var request = new
+        [Fact]
+        public async Task Should_Save_User_In_DB()
         {
-            Id = Guid.NewGuid().ToString(),
-            Email = "validemail@email.com",
-            Password = "validPassword123",
-        };
-        var response = await HttpClient.PostAsJsonAsync("/auth/signup", request);
+            UserDao userDao =
+                Services.GetService<UserDao>()
+                ?? throw new InvalidOperationException(
+                    "UserDao not registered in the service provider."
+                );
 
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            var request = new
+            {
+                Id = Guid.NewGuid().ToString(),
+                Email = "validemail@email.com",
+                Password = "validPassword123",
+            };
+            var response = await HttpClient.PostAsJsonAsync("/auth/signup", request);
 
-        var user = await userDao.FindById(request.Id);
-        Assert.NotNull(user);
-        Assert.Equal(request.Email, user.Email);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            var user = await userDao.FindById(request.Id);
+            Assert.NotNull(user);
+            Assert.Equal(request.Email, user.Email);
+        }
     }
 }

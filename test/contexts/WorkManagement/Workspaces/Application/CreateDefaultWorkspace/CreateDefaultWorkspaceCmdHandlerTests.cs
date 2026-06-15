@@ -7,134 +7,145 @@ using FlowTrack.WorkManagement.Workspaces.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace FlowTrack.WorkManagement.Workspaces.Test.Application;
-
-public class CreateDefaultWorkspaceCmdHandlerTests
+namespace FlowTrack.WorkManagement.Workspaces.Test.Application
 {
-    private readonly string DEFAULT_WORKSPACE_NAME = "Default";
-
-    private readonly Mock<IWorkspaceRepository> _workspaceRepositoryMock = new();
-    private readonly Mock<IDomainEventBus> _domainEventBusMock = new();
-    private readonly Mock<IExternalEventBus> _externalEventBusMock = new();
-    private readonly CreateDefaultWorkspaceCmdHandler _handler;
-
-    public CreateDefaultWorkspaceCmdHandlerTests()
+    public class CreateDefaultWorkspaceCmdHandlerTests
     {
-        var services = new ServiceCollection();
+        private readonly string DEFAULT_WORKSPACE_NAME = "Default";
 
-        services.AddSingleton(_workspaceRepositoryMock.Object);
-        services.AddSingleton(_domainEventBusMock.Object);
-        services.AddSingleton(_externalEventBusMock.Object);
-        services.AddSingleton<EventBus>();
-        services.AddKeyedScoped("WORK_MANAGEMENT", (_, _) => new Context(new DummyTransaction()));
+        private readonly Mock<IWorkspaceRepository> _workspaceRepositoryMock = new();
+        private readonly Mock<IDomainEventBus> _domainEventBusMock = new();
+        private readonly Mock<IExternalEventBus> _externalEventBusMock = new();
+        private readonly CreateDefaultWorkspaceCmdHandler _handler;
 
-        services.AddScoped<WorkspaceCreator>();
-        services.AddScoped<CreateDefaultWorkspaceCmdHandler>();
+        public CreateDefaultWorkspaceCmdHandlerTests()
+        {
+            var services = new ServiceCollection();
 
-        var serviceProvider = services.BuildServiceProvider();
-        _handler = serviceProvider.GetRequiredService<CreateDefaultWorkspaceCmdHandler>();
+            services.AddSingleton(_workspaceRepositoryMock.Object);
+            services.AddSingleton(_domainEventBusMock.Object);
+            services.AddSingleton(_externalEventBusMock.Object);
+            services.AddSingleton<EventBus>();
+            services.AddKeyedScoped(
+                "WORK_MANAGEMENT",
+                (_, _) => new Context(new DummyTransaction())
+            );
 
-        _workspaceRepositoryMock
-            .Setup(repo => repo.Matching(It.IsAny<FilterCriteria>()))
-            .ReturnsAsync([]);
-    }
+            services.AddScoped<WorkspaceCreator>();
+            services.AddScoped<CreateDefaultWorkspaceCmdHandler>();
 
-    [Fact]
-    public async Task Should_Save_Default_Workspace_On_Repository()
-    {
-        var userId = Guid.NewGuid().ToString();
-        var command = new CreateDefaultWorkspaceCmd(userId);
+            var serviceProvider = services.BuildServiceProvider();
+            _handler = serviceProvider.GetRequiredService<CreateDefaultWorkspaceCmdHandler>();
 
-        var expectedWorkspace = WorkspaceMother.WithNameAndOwner(DEFAULT_WORKSPACE_NAME, userId);
+            _workspaceRepositoryMock
+                .Setup(repo => repo.Matching(It.IsAny<FilterCriteria>()))
+                .ReturnsAsync([]);
+        }
 
-        await _handler.Handle(command);
+        [Fact]
+        public async Task Should_Save_Default_Workspace_On_Repository()
+        {
+            var userId = Guid.NewGuid().ToString();
+            var command = new CreateDefaultWorkspaceCmd(userId);
 
-        _workspaceRepositoryMock.Verify(
-            repo =>
-                repo.Save(
-                    It.Is<Workspace>(w =>
-                        w.OwnerId == expectedWorkspace.OwnerId && w.Name == expectedWorkspace.Name
-                    )
+            var expectedWorkspace = WorkspaceMother.WithNameAndOwner(
+                DEFAULT_WORKSPACE_NAME,
+                userId
+            );
+
+            await _handler.Handle(command);
+
+            _workspaceRepositoryMock.Verify(
+                repo =>
+                    repo.Save(
+                        It.Is<Workspace>(w =>
+                            w.OwnerId == expectedWorkspace.OwnerId
+                            && w.Name == expectedWorkspace.Name
+                        )
+                    ),
+                Times.Once
+            );
+        }
+
+        [Fact]
+        public async Task Should_Not_Save_Workspace_If_Already_Exists()
+        {
+            var userId = Guid.NewGuid().ToString();
+            var command = new CreateDefaultWorkspaceCmd(userId);
+
+            var filters = new Filters([
+                new Filter(
+                    new FilterField("ownerId"),
+                    new FilterOperator(FilterOperators.Equals),
+                    new FilterValue(userId)
                 ),
-            Times.Once
-        );
-    }
+                new Filter(
+                    new FilterField("name"),
+                    new FilterOperator(FilterOperators.Equals),
+                    new FilterValue(DEFAULT_WORKSPACE_NAME)
+                ),
+            ]);
 
-    [Fact]
-    public async Task Should_Not_Save_Workspace_If_Already_Exists()
-    {
-        var userId = Guid.NewGuid().ToString();
-        var command = new CreateDefaultWorkspaceCmd(userId);
+            var criteria = new FilterCriteria(filters, Order.None);
 
-        var filters = new Filters([
-            new Filter(
-                new FilterField("ownerId"),
-                new FilterOperator(FilterOperators.Equals),
-                new FilterValue(userId)
-            ),
-            new Filter(
-                new FilterField("name"),
-                new FilterOperator(FilterOperators.Equals),
-                new FilterValue(DEFAULT_WORKSPACE_NAME)
-            ),
-        ]);
+            var existingWorkspace = WorkspaceMother.WithNameAndOwner(
+                DEFAULT_WORKSPACE_NAME,
+                userId
+            );
 
-        var criteria = new FilterCriteria(filters, Order.None);
+            _workspaceRepositoryMock
+                .Setup(repo => repo.Matching(It.Is<FilterCriteria>(c => c.Equals(criteria))))
+                .ReturnsAsync([existingWorkspace]);
 
-        var existingWorkspace = WorkspaceMother.WithNameAndOwner(DEFAULT_WORKSPACE_NAME, userId);
+            await _handler.Handle(command);
 
-        _workspaceRepositoryMock
-            .Setup(repo => repo.Matching(It.Is<FilterCriteria>(c => c.Equals(criteria))))
-            .ReturnsAsync([existingWorkspace]);
+            _workspaceRepositoryMock.Verify(repo => repo.Save(It.IsAny<Workspace>()), Times.Never);
+        }
 
-        await _handler.Handle(command);
+        [Fact]
+        public async Task Should_Emit_WorkspaceCreated_Event()
+        {
+            DomainEvent? capturedEvent = null;
+            Workspace? capturedWorkspace = null;
 
-        _workspaceRepositoryMock.Verify(repo => repo.Save(It.IsAny<Workspace>()), Times.Never);
-    }
+            _domainEventBusMock
+                .Setup(bus => bus.Publish(It.IsAny<IEnumerable<DomainEvent>>()))
+                .Callback<IEnumerable<DomainEvent>>(events =>
+                    capturedEvent = events.FirstOrDefault(e => e is WorkspaceCreated)
+                )
+                .Returns(Task.CompletedTask);
 
-    [Fact]
-    public async Task Should_Emit_WorkspaceCreated_Event()
-    {
-        DomainEvent? capturedEvent = null;
-        Workspace? capturedWorkspace = null;
+            _workspaceRepositoryMock
+                .Setup(repo => repo.Save(It.IsAny<Workspace>()))
+                .Callback<Workspace>(workspace => capturedWorkspace = workspace)
+                .Returns(Task.CompletedTask);
 
-        _domainEventBusMock
-            .Setup(bus => bus.Publish(It.IsAny<IEnumerable<DomainEvent>>()))
-            .Callback<IEnumerable<DomainEvent>>(events =>
-                capturedEvent = events.FirstOrDefault(e => e is WorkspaceCreated)
-            )
-            .Returns(Task.CompletedTask);
+            var userId = Guid.NewGuid().ToString();
+            var command = new CreateDefaultWorkspaceCmd(userId);
 
-        _workspaceRepositoryMock
-            .Setup(repo => repo.Save(It.IsAny<Workspace>()))
-            .Callback<Workspace>(workspace => capturedWorkspace = workspace)
-            .Returns(Task.CompletedTask);
+            _workspaceRepositoryMock
+                .Setup(repo => repo.Matching(It.IsAny<FilterCriteria>()))
+                .ReturnsAsync([]);
 
-        var userId = Guid.NewGuid().ToString();
-        var command = new CreateDefaultWorkspaceCmd(userId);
+            await _handler.Handle(command);
 
-        _workspaceRepositoryMock
-            .Setup(repo => repo.Matching(It.IsAny<FilterCriteria>()))
-            .ReturnsAsync([]);
+            var expectedEvent = new WorkspaceCreated(
+                Id: capturedWorkspace!.Id.Value,
+                Name: capturedWorkspace!.Name.Value,
+                OwnerId: capturedWorkspace!.OwnerId.Value
+            );
 
-        await _handler.Handle(command);
+            _domainEventBusMock.Verify(
+                bus => bus.Publish(It.IsAny<IEnumerable<DomainEvent>>()),
+                Times.Once
+            );
 
-        var expectedEvent = new WorkspaceCreated(
-            Id: capturedWorkspace!.Id.Value,
-            Name: capturedWorkspace!.Name.Value,
-            OwnerId: capturedWorkspace!.OwnerId.Value
-        );
-
-        _domainEventBusMock.Verify(
-            bus => bus.Publish(It.IsAny<IEnumerable<DomainEvent>>()),
-            Times.Once
-        );
-
-        WorkspaceCreated workspaceCreatedEvent = (WorkspaceCreated)capturedEvent!;
-        Assert.NotNull(workspaceCreatedEvent);
-        Assert.IsType<WorkspaceCreated>(workspaceCreatedEvent);
-        Assert.Equal(expectedEvent.Id, workspaceCreatedEvent.Id);
-        Assert.Equal(expectedEvent.Name, workspaceCreatedEvent.Name);
-        Assert.Equal(expectedEvent.OwnerId, workspaceCreatedEvent.OwnerId);
+            WorkspaceCreated workspaceCreatedEvent = (WorkspaceCreated)capturedEvent!;
+            Assert.NotNull(workspaceCreatedEvent);
+            Assert.IsType<WorkspaceCreated>(workspaceCreatedEvent);
+            Assert.Equal(expectedEvent.Id, workspaceCreatedEvent.Id);
+            Assert.Equal(expectedEvent.Name, workspaceCreatedEvent.Name);
+            Assert.Equal(expectedEvent.OwnerId, workspaceCreatedEvent.OwnerId);
+        }
     }
 }

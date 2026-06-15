@@ -3,20 +3,22 @@ using FlowtrackApi.Iam.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FlowtrackApi.Iam.Controllers.Auth;
-
-public class SigninController(IQueryBus queryBus, AuthCookieSetter cookieSetter) : AuthController
+namespace FlowtrackApi.Iam.Controllers.Auth
 {
-    [AllowAnonymous]
-    [HttpPost("signin")]
-    public async Task<IActionResult> Execute([FromBody] SigninRequestDto requestDto)
+    public class SigninController(IQueryBus queryBus, AuthCookieSetter cookieSetter)
+        : AuthController
     {
-        var signinSucces = await queryBus.Ask<SigninQry, SigninSuccess>(
-            new SigninQry(requestDto.Email, requestDto.Password)
-        );
+        [AllowAnonymous]
+        [HttpPost("signin")]
+        public async Task<IActionResult> Execute([FromBody] SigninRequestDto requestDto)
+        {
+            var signinSucces = await queryBus.Ask<SigninQry, SigninSuccess>(
+                new SigninQry(requestDto.Email, requestDto.Password)
+            );
 
-        cookieSetter.SetAuthCookies(signinSucces);
+            cookieSetter.SetAuthCookies(signinSucces);
 
-        return StatusCode(200);
+            return StatusCode(200);
+        }
     }
 }

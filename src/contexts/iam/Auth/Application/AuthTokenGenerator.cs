@@ -1,55 +1,60 @@
 using System.Collections.Immutable;
 
-namespace FlowTrack.Iam.Auth.Application;
-
-[Service(Lifetime.Scoped)]
-internal sealed class AuthTokenGenerator(IEnvStore envStore, IJWTService jwtService)
+namespace FlowTrack.Iam.Auth.Application
 {
-    private const int DefaultAccessTokenExpireInMinutes = 60;
-    private const int DefaultRefreshTokenExpireInMinutes = 60 * 24 * 30;
-
-    public SigninSuccess Generate(User user)
+    [Service(Lifetime.Scoped)]
+    internal sealed class AuthTokenGenerator(IEnvStore envStore, IJWTService jwtService)
     {
-        var payload = GeneratePayload(user);
-        var accessTokenOptions = GenerateAccessTokenOptions();
-        var refreshTokenOptions = GenerateRefreshTokenOptions();
+        private const int DefaultAccessTokenExpireInMinutes = 60;
+        private const int DefaultRefreshTokenExpireInMinutes = 60 * 24 * 30;
 
-        var accessToken = jwtService.Generate(payload, accessTokenOptions);
-        var refreshToken = jwtService.Generate(payload, refreshTokenOptions);
+        public SigninSuccess Generate(User user)
+        {
+            var payload = GeneratePayload(user);
+            var accessTokenOptions = GenerateAccessTokenOptions();
+            var refreshTokenOptions = GenerateRefreshTokenOptions();
 
-        return new SigninSuccess(accessToken, refreshToken);
-    }
+            var accessToken = jwtService.Generate(payload, accessTokenOptions);
+            var refreshToken = jwtService.Generate(payload, refreshTokenOptions);
 
-    private JWTPayload GeneratePayload(User user)
-    {
-        return new JWTPayload(
-            new Dictionary<string, string> { { "id", user.Id.Value } }.ToImmutableDictionary()
-        );
-    }
+            return new SigninSuccess(accessToken, refreshToken);
+        }
 
-    private JWTOptions GenerateAccessTokenOptions()
-    {
-        var accessTokenSecret =
-            envStore.Get(IamEnvironmentKeysEnum.ACCESS_TOKEN_SECRET.ToString())
-            ?? throw new EnvVariableMissed(IamEnvironmentKeysEnum.ACCESS_TOKEN_SECRET.ToString());
+        private JWTPayload GeneratePayload(User user)
+        {
+            return new JWTPayload(
+                new Dictionary<string, string> { { "id", user.Id.Value } }.ToImmutableDictionary()
+            );
+        }
 
-        var accessTokenExpireIn =
-            envStore.Get(IamEnvironmentKeysEnum.ACCESS_TOKEN_EXPIRE_MINUTES.ToString())
-            ?? DefaultAccessTokenExpireInMinutes.ToString();
+        private JWTOptions GenerateAccessTokenOptions()
+        {
+            var accessTokenSecret =
+                envStore.Get(IamEnvironmentKeysEnum.ACCESS_TOKEN_SECRET.ToString())
+                ?? throw new EnvVariableMissed(
+                    IamEnvironmentKeysEnum.ACCESS_TOKEN_SECRET.ToString()
+                );
 
-        return new JWTOptions(accessTokenSecret, int.Parse(accessTokenExpireIn));
-    }
+            var accessTokenExpireIn =
+                envStore.Get(IamEnvironmentKeysEnum.ACCESS_TOKEN_EXPIRE_MINUTES.ToString())
+                ?? DefaultAccessTokenExpireInMinutes.ToString();
 
-    private JWTOptions GenerateRefreshTokenOptions()
-    {
-        var refreshTokenSecret =
-            envStore.Get(IamEnvironmentKeysEnum.REFRESH_TOKEN_SECRET.ToString())
-            ?? throw new EnvVariableMissed(IamEnvironmentKeysEnum.REFRESH_TOKEN_SECRET.ToString());
+            return new JWTOptions(accessTokenSecret, int.Parse(accessTokenExpireIn));
+        }
 
-        var refreshTokenExpireIn =
-            envStore.Get(IamEnvironmentKeysEnum.REFRESH_TOKEN_EXPIRE_MINUTES.ToString())
-            ?? DefaultRefreshTokenExpireInMinutes.ToString();
+        private JWTOptions GenerateRefreshTokenOptions()
+        {
+            var refreshTokenSecret =
+                envStore.Get(IamEnvironmentKeysEnum.REFRESH_TOKEN_SECRET.ToString())
+                ?? throw new EnvVariableMissed(
+                    IamEnvironmentKeysEnum.REFRESH_TOKEN_SECRET.ToString()
+                );
 
-        return new JWTOptions(refreshTokenSecret, int.Parse(refreshTokenExpireIn));
+            var refreshTokenExpireIn =
+                envStore.Get(IamEnvironmentKeysEnum.REFRESH_TOKEN_EXPIRE_MINUTES.ToString())
+                ?? DefaultRefreshTokenExpireInMinutes.ToString();
+
+            return new JWTOptions(refreshTokenSecret, int.Parse(refreshTokenExpireIn));
+        }
     }
 }

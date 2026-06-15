@@ -1,9 +1,10 @@
-namespace FlowTrack.Iam.Users.Domain;
-
-internal interface IUserRepository
+namespace FlowTrack.Iam.Users.Domain
 {
-    Task<User?> FindByEmail(string email);
-    Task<User?> FindById(string id);
-    Task Create(User user);
-    Task Update(User user);
+    internal interface IUserRepository
+    {
+        Task<User?> FindByEmail(string email);
+        Task<User?> FindById(string id);
+        Task Create(User user);
+        Task Update(User user);
+    }
 }

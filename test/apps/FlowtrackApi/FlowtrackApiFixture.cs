@@ -8,146 +8,148 @@ using Npgsql;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
 
-namespace FlowtrackApi.Test;
-
-public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
+namespace FlowtrackApi.Test
 {
-    private PostgreSqlContainer? _postgresContainer;
-    private RabbitMqContainer? _rabbitMqContainer;
-    public HttpClient HttpClient { get; private set; } = null!;
-    private readonly Mock<IDateTimeProvider> _dateTimeProviderMock = new();
-
-    public async Task InitializeAsync()
+    public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
     {
-        await RunPostgreSqlContainer();
-        await SetConnectionStrings();
-        await RunRabbitMqContainer();
-        ChargeEnv();
+        private PostgreSqlContainer? _postgresContainer;
+        private RabbitMqContainer? _rabbitMqContainer;
+        public HttpClient HttpClient { get; private set; } = null!;
+        private readonly Mock<IDateTimeProvider> _dateTimeProviderMock = new();
 
-        var httpClientOptions = new WebApplicationFactoryClientOptions
+        public async Task InitializeAsync()
         {
-            BaseAddress = new Uri("http://localhost"),
-            HandleCookies = true,
-        };
+            await RunPostgreSqlContainer();
+            await SetConnectionStrings();
+            await RunRabbitMqContainer();
+            ChargeEnv();
 
-        HttpClient = CreateClient(httpClientOptions);
-    }
-
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
-    {
-        _dateTimeProviderMock.SetupGet(m => m.Now).Returns(DateTime.UtcNow);
-
-        builder.UseEnvironment("Testing");
-        builder.ConfigureServices(services =>
-        {
-            services.AddSingleton(_dateTimeProviderMock.Object);
-        });
-    }
-
-    public override async ValueTask DisposeAsync()
-    {
-        if (_postgresContainer is not null)
-            await _postgresContainer.DisposeAsync();
-
-        if (_rabbitMqContainer is not null)
-            await _rabbitMqContainer.DisposeAsync();
-
-        await base.DisposeAsync();
-    }
-
-    Task IAsyncLifetime.DisposeAsync() => DisposeAsync().AsTask();
-
-    private static void ChargeEnv()
-    {
-        var env = new Dictionary<string, string>()
-        {
-            [IamEnvironmentKeysEnum.IAM_URL_OF_ACTIVATION.ToString()] = "http://localhost/activate",
-            [IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()] =
-                "access_token_secret_super_ultra_mega_strong",
-            [IamEnvironmentKeysEnum.ACCESS_TOKEN_SECRET.ToString()] =
-                "access_token_secret_super_ultra_mega_strong",
-            [IamEnvironmentKeysEnum.REFRESH_TOKEN_SECRET.ToString()] =
-                "access_token_secret_super_ultra_mega_strong",
-        };
-
-        foreach (var item in env)
-        {
-            Environment.SetEnvironmentVariable(item.Key, item.Value);
-        }
-    }
-
-    private async Task RunPostgreSqlContainer()
-    {
-        _postgresContainer = new PostgreSqlBuilder("postgres:18-alpine")
-            .WithDatabase($"flowtrack-api-{Guid.NewGuid():N}")
-            .WithUsername(Environment.GetEnvironmentVariable("POSTGRES_USER") ?? "postgres")
-            .WithPassword(Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? "password")
-            .Build();
-
-        await _postgresContainer.StartAsync();
-        await WaitForAsync(
-            async () =>
+            var httpClientOptions = new WebApplicationFactoryClientOptions
             {
-                try
+                BaseAddress = new Uri("http://localhost"),
+                HandleCookies = true,
+            };
+
+            HttpClient = CreateClient(httpClientOptions);
+        }
+
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        {
+            _dateTimeProviderMock.SetupGet(m => m.Now).Returns(DateTime.UtcNow);
+
+            builder.UseEnvironment("Testing");
+            builder.ConfigureServices(services =>
+            {
+                services.AddSingleton(_dateTimeProviderMock.Object);
+            });
+        }
+
+        public override async ValueTask DisposeAsync()
+        {
+            if (_postgresContainer is not null)
+                await _postgresContainer.DisposeAsync();
+
+            if (_rabbitMqContainer is not null)
+                await _rabbitMqContainer.DisposeAsync();
+
+            await base.DisposeAsync();
+        }
+
+        Task IAsyncLifetime.DisposeAsync() => DisposeAsync().AsTask();
+
+        private static void ChargeEnv()
+        {
+            var env = new Dictionary<string, string>()
+            {
+                [IamEnvironmentKeysEnum.IAM_URL_OF_ACTIVATION.ToString()] =
+                    "http://localhost/activate",
+                [IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()] =
+                    "access_token_secret_super_ultra_mega_strong",
+                [IamEnvironmentKeysEnum.ACCESS_TOKEN_SECRET.ToString()] =
+                    "access_token_secret_super_ultra_mega_strong",
+                [IamEnvironmentKeysEnum.REFRESH_TOKEN_SECRET.ToString()] =
+                    "access_token_secret_super_ultra_mega_strong",
+            };
+
+            foreach (var item in env)
+            {
+                Environment.SetEnvironmentVariable(item.Key, item.Value);
+            }
+        }
+
+        private async Task RunPostgreSqlContainer()
+        {
+            _postgresContainer = new PostgreSqlBuilder("postgres:18-alpine")
+                .WithDatabase($"flowtrack-api-{Guid.NewGuid():N}")
+                .WithUsername(Environment.GetEnvironmentVariable("POSTGRES_USER") ?? "postgres")
+                .WithPassword(Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? "password")
+                .Build();
+
+            await _postgresContainer.StartAsync();
+            await WaitForAsync(
+                async () =>
                 {
-                    await using var connection = new NpgsqlConnection(
-                        _postgresContainer.GetConnectionString()
-                    );
-                    await connection.OpenAsync();
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
-            },
-            timeoutMs: 5000,
-            pollIntervalMs: 250
-        );
-    }
+                    try
+                    {
+                        await using var connection = new NpgsqlConnection(
+                            _postgresContainer.GetConnectionString()
+                        );
+                        await connection.OpenAsync();
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                },
+                timeoutMs: 5000,
+                pollIntervalMs: 250
+            );
+        }
 
-    private Task SetConnectionStrings()
-    {
-        if (_postgresContainer is null)
-            throw new InvalidOperationException("PostgreSQL container is not initialized");
+        private Task SetConnectionStrings()
+        {
+            if (_postgresContainer is null)
+                throw new InvalidOperationException("PostgreSQL container is not initialized");
 
-        var connectionString = _postgresContainer.GetConnectionString();
-        Environment.SetEnvironmentVariable(
-            IamEnvironmentKeysEnum.IAM_DB_CONNECTION_STRING.ToString(),
-            connectionString
-        );
-        Environment.SetEnvironmentVariable(
-            WorkManagementEnvironmentKeysEnum.WORK_MANAGEMENT_DB_CONNECTION_STRING.ToString(),
-            connectionString
-        );
+            var connectionString = _postgresContainer.GetConnectionString();
+            Environment.SetEnvironmentVariable(
+                IamEnvironmentKeysEnum.IAM_DB_CONNECTION_STRING.ToString(),
+                connectionString
+            );
+            Environment.SetEnvironmentVariable(
+                WorkManagementEnvironmentKeysEnum.WORK_MANAGEMENT_DB_CONNECTION_STRING.ToString(),
+                connectionString
+            );
 
-        return Task.CompletedTask;
-    }
+            return Task.CompletedTask;
+        }
 
-    private async Task RunRabbitMqContainer()
-    {
-        _rabbitMqContainer = new RabbitMqBuilder("rabbitmq:3.11-management-alpine")
-            .WithUsername("guest")
-            .WithPassword("guest")
-            .Build();
+        private async Task RunRabbitMqContainer()
+        {
+            _rabbitMqContainer = new RabbitMqBuilder("rabbitmq:3.11-management-alpine")
+                .WithUsername("guest")
+                .WithPassword("guest")
+                .Build();
 
-        await _rabbitMqContainer.StartAsync();
+            await _rabbitMqContainer.StartAsync();
 
-        Environment.SetEnvironmentVariable("RABBITMQ_HOST", _rabbitMqContainer.Hostname);
-        Environment.SetEnvironmentVariable(
-            "RABBITMQ_PORT",
-            _rabbitMqContainer.GetMappedPublicPort(5672).ToString()
-        );
-        Environment.SetEnvironmentVariable("RABBITMQ_USERNAME", "guest");
-        Environment.SetEnvironmentVariable("RABBITMQ_PASSWORD", "guest");
-        Environment.SetEnvironmentVariable("EXTERNAL_EVENT_EXCHANGE_NAME", "domain_events");
-    }
+            Environment.SetEnvironmentVariable("RABBITMQ_HOST", _rabbitMqContainer.Hostname);
+            Environment.SetEnvironmentVariable(
+                "RABBITMQ_PORT",
+                _rabbitMqContainer.GetMappedPublicPort(5672).ToString()
+            );
+            Environment.SetEnvironmentVariable("RABBITMQ_USERNAME", "guest");
+            Environment.SetEnvironmentVariable("RABBITMQ_PASSWORD", "guest");
+            Environment.SetEnvironmentVariable("EXTERNAL_EVENT_EXCHANGE_NAME", "domain_events");
+        }
 
-    public async Task<List<T>> ExecuteQueryAsync<T>(string sqlQuery)
-        where T : class
-    {
-        var dbContext = Services.GetRequiredService<IamDbContext>();
+        public async Task<List<T>> ExecuteQueryAsync<T>(string sqlQuery)
+            where T : class
+        {
+            var dbContext = Services.GetRequiredService<IamDbContext>();
 
-        return await dbContext.Set<T>().FromSqlRaw(sqlQuery).AsNoTracking().ToListAsync();
+            return await dbContext.Set<T>().FromSqlRaw(sqlQuery).AsNoTracking().ToListAsync();
+        }
     }
 }

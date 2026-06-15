@@ -1,20 +1,21 @@
-namespace FlowTrack.Iam.Users.Domain;
-
-internal sealed record UserActivated(string Id) : DomainEvent, IDomainEvent
+namespace FlowTrack.Iam.Users.Domain
 {
-    public string Id { get; init; } = Id;
-
-    public static bool External => false;
-
-    public static string Code => "flowtrack.iam.1.event.user.activated";
-
-    public override string GetCode()
+    internal sealed record UserActivated(string Id) : DomainEvent, IDomainEvent
     {
-        return Code;
-    }
+        public string Id { get; init; } = Id;
 
-    public override bool IsExternal()
-    {
-        return External;
+        public static bool External => false;
+
+        public static string Code => "flowtrack.iam.1.event.user.activated";
+
+        public override string GetCode()
+        {
+            return Code;
+        }
+
+        public override bool IsExternal()
+        {
+            return External;
+        }
     }
 }
