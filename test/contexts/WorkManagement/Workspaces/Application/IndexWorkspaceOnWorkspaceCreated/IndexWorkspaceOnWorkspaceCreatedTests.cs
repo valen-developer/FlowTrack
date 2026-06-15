@@ -30,11 +30,12 @@ namespace FlowTrack.WorkManagement.Workspaces.Test.Application
         public async Task Should_Index_In_Search_Engine()
         {
             var workspace = WorkspaceMother.WithId(Guid.NewGuid().ToString());
+            var otherWorkspace = WorkspaceMother.WithId(Guid.NewGuid().ToString());
 
             var @event = new WorkspaceCreated(
-                Id: Guid.NewGuid().ToString(),
-                OwnerId: Guid.NewGuid().ToString(),
-                Name: "Test Workspace"
+                Id: workspace.Id.Value,
+                OwnerId: workspace.OwnerId.Value,
+                Name: workspace.Name.Value
             );
 
             var filters = new Filters([
@@ -42,7 +43,9 @@ namespace FlowTrack.WorkManagement.Workspaces.Test.Application
             ]);
             var criteria = new FilterCriteria(filters, Order.None);
 
-            _repositoryMock.Setup(r => r.MatchingOne(criteria)).ReturnsAsync(workspace);
+            _repositoryMock
+                .Setup(r => r.MatchingOne(It.Is<FilterCriteria>(c => c.Equals(criteria))))
+                .ReturnsAsync(workspace);
 
             await _handler.On(@event);
 

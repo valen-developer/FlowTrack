@@ -27,8 +27,12 @@ namespace FlowTrack.Shared.Domain.FilterCriterias
 
             for (var i = 0; i < _groups.Count; i++)
             {
-                if (!_groups[i].SequenceEqual(other._groups[i]))
-                    return false;
+                foreach (var filter in _groups[i])
+                {
+                    var otherFilter = other._groups[i].FirstOrDefault(f => f.Equals(filter));
+                    if (otherFilter is null)
+                        return false;
+                }
             }
 
             return true;
