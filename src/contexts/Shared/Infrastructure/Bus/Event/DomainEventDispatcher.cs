@@ -18,12 +18,7 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event
                     ?? throw new InvalidOperationException(
                         $"Unable to resolve an instance of {handler.SubscriberType.FullName} for handling domain event {eventType.FullName}."
                     );
-                var result = handler.HandlerMethod.Invoke(instance, [domainEvent]);
-
-                if (result is Task taskResult)
-                {
-                    await taskResult;
-                }
+                handler.HandlerMethod.Invoke(instance, [domainEvent]);
             }
         }
 
