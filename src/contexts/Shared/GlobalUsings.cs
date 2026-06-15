@@ -4,7 +4,6 @@ global using FlowTrack.Shared.Domain.Bus.Query;
 global using FlowTrack.Shared.Domain.Dic;
 global using FlowTrack.Shared.Domain.Mailer;
 global using FlowTrack.Shared.Domain.Transactions;
-global using static FlowTrack.Shared.Domain.Utils.AsyncWaiter;
 global using FlowTrack.Shared.Infrastructure.Bus.Command;
 global using FlowTrack.Shared.Infrastructure.Bus.Event;
 global using FlowTrack.Shared.Infrastructure.Bus.Query;

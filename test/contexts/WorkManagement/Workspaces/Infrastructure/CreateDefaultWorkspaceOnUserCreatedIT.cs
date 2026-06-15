@@ -1,7 +1,5 @@
 using FlowTrack.Shared.Domain.Bus.Event;
 using FlowTrack.Shared.Domain.Iam.Users;
-using FlowTrack.Shared.Domain.Utils;
-using FlowTrack.Shared.Infrastructure;
 using FlowTrack.WorkManagement.Test;
 using FlowTrack.WorkManagement.Workspaces.Domain;
 using FlowTrack.WorkManagement.Workspaces.Infrastructure.Persistence;
@@ -15,8 +13,6 @@ namespace FlowTrack.WorkManagement.Workspaces.Test.Infrastructure
         public CreateDefaultWorkspaceOnUserCreatedIT(WorkManagementIntegrationFixture fixture)
             : base(fixture)
         {
-            fixture.serviceCollection.DiscoverServices(["FlowTrack*.dll"]);
-
             _eventBus = fixture.GetService<EventBus>();
         }
 
