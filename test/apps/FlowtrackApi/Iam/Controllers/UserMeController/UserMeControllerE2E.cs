@@ -32,28 +32,5 @@ namespace FlowtrackApi.Test.Iam.Controllers.Users
             Assert.Equal(user.Id.Value, userInfo.Id);
             Assert.Equal(user.Email.Value, userInfo.Email);
         }
-
-        private async Task AddUserToDatabase(User user)
-        {
-            var dbContext =
-                Services.GetService<IamDbContext>()
-                ?? throw new InvalidOperationException("IamDbContext service not found");
-
-            var bcrypt =
-                Services.GetService<IBcrypt>()
-                ?? throw new InvalidOperationException("BCrypt service not found");
-
-            var userDao =
-                Services.GetService<UserDao>()
-                ?? throw new InvalidOperationException("UserDao service not found");
-
-            var hashedPassword = bcrypt.Hash(user.Password.Value);
-            var userEntity = UserEntity.FromDomain(user);
-            userEntity.Password = hashedPassword;
-
-            await userDao.Insert(userEntity);
-
-            dbContext.SaveChanges();
-        }
     }
 }

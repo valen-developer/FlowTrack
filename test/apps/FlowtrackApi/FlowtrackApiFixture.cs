@@ -1,3 +1,4 @@
+using DotNet.Testcontainers.Builders;
 using FlowTrack.WorkManagement.Shared.Domain;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -5,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Npgsql;
+using Testcontainers.Elasticsearch;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
 
@@ -14,6 +16,7 @@ namespace FlowtrackApi.Test
     {
         private PostgreSqlContainer? _postgresContainer;
         private RabbitMqContainer? _rabbitMqContainer;
+        private ElasticsearchContainer? _elasticSearchContainer;
         public HttpClient HttpClient { get; private set; } = null!;
         private readonly Mock<IDateTimeProvider> _dateTimeProviderMock = new();
 
@@ -22,6 +25,8 @@ namespace FlowtrackApi.Test
             await RunPostgreSqlContainer();
             await SetConnectionStrings();
             await RunRabbitMqContainer();
+            await RunElasticSearchContainer();
+
             ChargeEnv();
 
             var httpClientOptions = new WebApplicationFactoryClientOptions
@@ -51,6 +56,9 @@ namespace FlowtrackApi.Test
 
             if (_rabbitMqContainer is not null)
                 await _rabbitMqContainer.DisposeAsync();
+
+            if (_elasticSearchContainer is not null)
+                await _elasticSearchContainer.DisposeAsync();
 
             await base.DisposeAsync();
         }
@@ -142,6 +150,24 @@ namespace FlowtrackApi.Test
             Environment.SetEnvironmentVariable("RABBITMQ_USERNAME", "guest");
             Environment.SetEnvironmentVariable("RABBITMQ_PASSWORD", "guest");
             Environment.SetEnvironmentVariable("EXTERNAL_EVENT_EXCHANGE_NAME", "domain_events");
+        }
+
+        private async Task RunElasticSearchContainer()
+        {
+            _elasticSearchContainer = new ElasticsearchBuilder("elasticsearch:9.4.2")
+                .WithEnvironment("discovery.type", "single-node")
+                .WithEnvironment("xpack.security.enabled", "false")
+                .WithEnvironment("ES_JAVA_OPTS", "-Xms512m -Xmx512m")
+                .WithPortBinding(9200, true)
+                .WithWaitStrategy(Wait.ForUnixContainer().UntilInternalTcpPortIsAvailable(9200))
+                .Build();
+
+            await _elasticSearchContainer.StartAsync();
+
+            Environment.SetEnvironmentVariable(
+                WorkManagementEnvironmentKeysEnum.WORK_MANAGEMENT_ELASTICSEARCH_URL.ToString(),
+                $"http://{_elasticSearchContainer.Hostname}:{_elasticSearchContainer.GetMappedPublicPort(9200)}"
+            );
         }
 
         public async Task<List<T>> ExecuteQueryAsync<T>(string sqlQuery)

@@ -15,7 +15,6 @@ services:
     volumes:
       - flowtrack:/var/lib/postgresql
 
-
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: flowtrack-rabbitmq
@@ -42,6 +41,26 @@ services:
     ports:
       - '8081:8080'
 
+  elasticsearch:
+    image: elasticsearch:9.4.2
+    container_name: flowtrack-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.ml.enabled=false
+      - xpack.graph.enabled=false
+      - xpack.watcher.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    networks:
+      flowtrack:
+        aliases:
+          - flowtrack-elasticsearch
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+
 networks:
   flowtrack:
     driver: bridge
@@ -49,4 +68,6 @@ networks:
 
 volumes:
   flowtrack:
+    driver: local
+  elasticsearch-data:
     driver: local

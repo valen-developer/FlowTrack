@@ -28,5 +28,14 @@ namespace FlowTrack.WorkManagement.Workspaces.Test
                 RandomWorkspaceName()
             );
         }
+
+        internal static Workspace Random()
+        {
+            return new Workspace(
+                RandomWorkspaceId(),
+                RandomWorkspaceOwnerId(),
+                RandomWorkspaceName()
+            );
+        }
     }
 }
