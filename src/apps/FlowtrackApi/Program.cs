@@ -1,6 +1,5 @@
 using FlowTrack.Shared.Infrastructure.Bus.Event;
 using FlowTrack.WorkManagement.Shared.Infrastructure;
-using FlowtrackApi.Shared;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
@@ -21,6 +20,7 @@ try
                 .Enrich.WithProperty("Application", "FlowTrack")
                 .Enrich.WithMachineName()
                 .Enrich.WithEnvironmentName()
+                .Enrich.FromLogContext()
                 .WriteTo.Console(new Serilog.Formatting.Elasticsearch.ElasticsearchJsonFormatter());
         }
     );

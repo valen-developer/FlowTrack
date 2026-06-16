@@ -63,6 +63,37 @@ services:
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
 
+  kibana:
+    image: kibana:9.4.2
+    container_name: flowtrack-kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - XPACK_FLEET_ENABLED=false
+    ports:
+      - '5601:5601'
+    networks:
+      flowtrack:
+        aliases:
+          - flowtrack-kibana
+    depends_on:
+      - elasticsearch
+
+  filebeat:
+    image: elastic/filebeat:9.4.2
+    container_name: flowtrack-filebeat
+    environment:
+      - xpack.monitoring.enabled=false
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./logs:/var/log/flowtrack
+    networks:
+      flowtrack:
+        aliases:
+          - flowtrack-filebeat
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
   elasticvue:
     image: cars10/elasticvue
     container_name: flowtrack-elasticvue
