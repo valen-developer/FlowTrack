@@ -2,7 +2,6 @@ using Elastic.Clients.Elasticsearch;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Dic;
 using FlowTrack.Shared.Domain.Exception;
-using FlowTrack.Shared.Infrastructure;
 using FlowTrack.WorkManagement.Shared.Domain;
 using FlowTrack.WorkManagement.Workspaces.Domain;
 
