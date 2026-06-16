@@ -1,29 +1,29 @@
 using FlowTrack.Shared.Infrastructure.Bus.Event;
 using FlowTrack.WorkManagement.Shared.Infrastructure;
+using FlowtrackApi.Shared;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Serilog;
-using FlowtrackApi.Shared;
 
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .CreateBootstrapLogger();
+Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
 
 try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Host.UseSerilog((context, services, configuration) =>
-    {
-        configuration
-            .ReadFrom.Configuration(context.Configuration)
-            .ReadFrom.Services(services)
-            .Enrich.WithProperty("Application", "FlowTrack")
-            .Enrich.WithMachineName()
-            .Enrich.WithEnvironmentName()
-            .WriteTo.Console(new Serilog.Formatting.Elasticsearch.ElasticsearchJsonFormatter());
-    });
+    builder.Host.UseSerilog(
+        (context, services, configuration) =>
+        {
+            configuration
+                .ReadFrom.Configuration(context.Configuration)
+                .ReadFrom.Services(services)
+                .Enrich.WithProperty("Application", "FlowTrack")
+                .Enrich.WithMachineName()
+                .Enrich.WithEnvironmentName()
+                .WriteTo.Console(new Serilog.Formatting.Elasticsearch.ElasticsearchJsonFormatter());
+        }
+    );
 
     new DotEnvCharger().Load(["../../../.env"]);
 
@@ -61,7 +61,10 @@ try
             options.DefaultAuthenticateScheme = "IamCookie";
             options.DefaultChallengeScheme = "IamCookie";
         })
-        .AddScheme<AuthenticationSchemeOptions, IamAuthenticationHandler>("IamCookie", options => { });
+        .AddScheme<AuthenticationSchemeOptions, IamAuthenticationHandler>(
+            "IamCookie",
+            options => { }
+        );
 
     builder
         .Services.AddAuthorizationBuilder()
@@ -92,8 +95,12 @@ try
                 return;
 
             var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-            logger.LogError(exception, "Unhandled exception processing {Method} {Path}",
-                context.Request.Method, context.Request.Path);
+            logger.LogError(
+                exception,
+                "Unhandled exception processing {Method} {Path}",
+                context.Request.Method,
+                context.Request.Path
+            );
 
             if (exception is ActionHandlerExecutionException actionHandlerExecutionException)
             {
@@ -109,7 +116,9 @@ try
 
             if (exception is DomainException domainException)
             {
-                var (statusCode, httpErrorException) = DomainToHttpExceptionMapper.Map(domainException);
+                var (statusCode, httpErrorException) = DomainToHttpExceptionMapper.Map(
+                    domainException
+                );
                 context.Response.StatusCode = statusCode;
                 await context.Response.WriteAsJsonAsync(httpErrorException);
                 return;

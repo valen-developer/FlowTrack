@@ -16,7 +16,7 @@ global using FlowTrack.Shared.Infrastructure;
 global using FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus;
 global using FlowTrack.Shared.Infrastructure.DotEnv;
 global using FlowTrack.Shared.Infrastructure.HttpErrorResponses;
+global using FlowTrack.Shared.Infrastructure.Logging;
 global using FlowTrack.Shared.Infrastructure.Transactions;
 global using FlowTrack.WorkManagement;
 global using FlowtrackApi.Shared;
-global using FlowTrack.Shared.Infrastructure.Logging;

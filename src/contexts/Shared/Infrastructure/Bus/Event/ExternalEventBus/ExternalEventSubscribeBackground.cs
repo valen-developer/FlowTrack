@@ -120,9 +120,11 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus
             {
                 using var doc = JsonDocument.Parse(messageJson);
                 var root = doc.RootElement;
-                if (root.TryGetProperty("data", out var data)
+                if (
+                    root.TryGetProperty("data", out var data)
                     && data.TryGetProperty("meta", out var meta)
-                    && meta.TryGetProperty("correlation_id", out var correlationId))
+                    && meta.TryGetProperty("correlation_id", out var correlationId)
+                )
                 {
                     return correlationId.GetString();
                 }

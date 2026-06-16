@@ -36,11 +36,7 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Command
             }
             catch (Exception ex)
             {
-                _logger.LogError(
-                    ex,
-                    "Command {CommandType} failed",
-                    commandType
-                );
+                _logger.LogError(ex, "Command {CommandType} failed", commandType);
                 throw new CommandHandlerExecutionException(ex);
             }
         }

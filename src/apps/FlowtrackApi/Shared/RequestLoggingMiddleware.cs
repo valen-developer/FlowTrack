@@ -15,7 +15,8 @@ public sealed class RequestLoggingMiddleware
     public async Task InvokeAsync(HttpContext context, ILogger<RequestLoggingMiddleware> logger)
     {
         // 1. Tomar o generar CorrelationId
-        var correlationId = CorrelationContext.Get()
+        var correlationId =
+            CorrelationContext.Get()
             ?? context.Request.Headers["X-Correlation-Id"].FirstOrDefault()
             ?? CorrelationContext.Generate();
 
