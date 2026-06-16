@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Microsoft.Extensions.Logging;
 
 namespace FlowTrack.Shared.Infrastructure.Bus.Query
 {
@@ -7,12 +6,12 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Query
     public class InMemoryQueryBus(
         IServiceProvider serviceProvider,
         QueryHandlerInformation queryHandlerInformation,
-        ILogger<InMemoryQueryBus> logger
+        IDomainLogger logger
     ) : IQueryBus
     {
         private readonly IServiceProvider _serviceProvider = serviceProvider;
         private readonly QueryHandlerInformation _queryHandlerInformation = queryHandlerInformation;
-        private readonly ILogger<InMemoryQueryBus> _logger = logger;
+        private readonly IDomainLogger _logger = logger;
 
         public async Task<R> Ask<Q, R>(Q query)
             where Q : IQuery<R>
@@ -28,17 +27,21 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Query
                 var result = await handler.Handle(query);
                 sw.Stop();
 
-                _logger.LogInformation(
-                    "Query {QueryType} handled in {ElapsedMs}ms",
-                    queryType,
-                    sw.ElapsedMilliseconds
-                );
+                _logger.Info(new LogMessage(
+                    Action: "Query handled",
+                    Message: $"{queryType} handled in {sw.ElapsedMilliseconds}ms",
+                    Attributes: new { QueryType = queryType, ElapsedMs = sw.ElapsedMilliseconds }
+                ));
 
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Query {QueryType} failed", queryType);
+                _logger.Error(new LogMessage(
+                    Action: "Query handled",
+                    Message: $"{queryType} failed",
+                    Attributes: new { QueryType = queryType }
+                ), ex);
                 throw new QueryHandlerExecutionException(ex);
             }
         }

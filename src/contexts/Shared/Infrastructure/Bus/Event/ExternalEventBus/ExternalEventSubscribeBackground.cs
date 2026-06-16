@@ -3,7 +3,6 @@ using System.Text.Json;
 using FlowTrack.Shared.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Serilog.Context;
@@ -17,7 +16,7 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus
         ExternalEventSubscriberInformation subscriberInformation,
         IServiceScopeFactory serviceScopeFactory,
         RabbitMqConnection connection,
-        ILogger<ExternalEventSubscribeBackground> logger
+        IDomainLogger logger
     ) : BackgroundService
     {
         private const int MaxRetries = 3;
@@ -76,10 +75,11 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus
                             .FirstOrDefault(e => e != null);
                         if (domainEvent == null)
                         {
-                            logger.LogWarning(
-                                "Unmappable event {RoutingKey}, sending to DLQ",
-                                routingKey
-                            );
+                            logger.Warning(new LogMessage(
+                                Action: "Event consumed",
+                                Message: $"Unmappable event {routingKey}, sending to DLQ",
+                                Attributes: new { RoutingKey = routingKey }
+                            ));
                             await PublishToDlq(channel, dlxName, routingKey, args);
                             return;
                         }
@@ -96,12 +96,11 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError(
-                            ex,
-                            "Error processing event {RoutingKey} from queue {QueueName}",
-                            routingKey,
-                            queueName
-                        );
+                        logger.Error(new LogMessage(
+                            Action: "Event consumed",
+                            Message: $"Error processing event {routingKey} from queue {queueName}",
+                            Attributes: new { RoutingKey = routingKey, QueueName = queueName }
+                        ), ex);
                         await HandleProcessingFailure(
                             channel,
                             args,
@@ -206,21 +205,25 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus
 
                 await channel.BasicAckAsync(args.DeliveryTag, false);
 
-                logger.LogWarning(
-                    "Event {RoutingKey} failed. Scheduled retry {RetryCount}/{MaxRetries} with delay {DelayMs}ms",
-                    routingKey,
-                    newRetryCount,
-                    MaxRetries,
-                    delayMs
-                );
+                logger.Warning(new LogMessage(
+                    Action: "Event consumed",
+                    Message: $"Event {routingKey} failed. Scheduled retry {newRetryCount}/{MaxRetries} with delay {delayMs}ms",
+                    Attributes: new
+                    {
+                        RoutingKey = routingKey,
+                        RetryCount = newRetryCount,
+                        MaxRetries = MaxRetries,
+                        DelayMs = delayMs
+                    }
+                ));
             }
             else
             {
-                logger.LogCritical(
-                    "Event {RoutingKey} sent to DLQ after exhausting {MaxRetries} retries",
-                    routingKey,
-                    MaxRetries
-                );
+                logger.Error(new LogMessage(
+                    Action: "Event consumed",
+                    Message: $"Event {routingKey} sent to DLQ after exhausting {MaxRetries} retries",
+                    Attributes: new { RoutingKey = routingKey, MaxRetries = MaxRetries }
+                ));
 
                 await PublishToDlq(channel, dlxName, routingKey, args);
             }

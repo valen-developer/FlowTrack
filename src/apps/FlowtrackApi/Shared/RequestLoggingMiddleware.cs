@@ -12,7 +12,7 @@ public sealed class RequestLoggingMiddleware
         _next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context, ILogger<RequestLoggingMiddleware> logger)
+    public async Task InvokeAsync(HttpContext context, IDomainLogger logger)
     {
         // 1. Tomar o generar CorrelationId
         var correlationId =
@@ -25,41 +25,46 @@ public sealed class RequestLoggingMiddleware
         // 2. Scope de Serilog para enriquecer todos los logs de esta request
         using var _ = LogContext.PushProperty("CorrelationId", correlationId);
 
-        // 3. Scope de ILogger para los logs que usen ILogger<T> directamente
-        using var scope = logger.BeginScope(new { CorrelationId = correlationId });
-
         var sw = Stopwatch.StartNew();
+        var method = context.Request.Method;
+        var path = context.Request.Path;
 
-        logger.LogInformation(
-            "HTTP {Method} {Path} started",
-            context.Request.Method,
-            context.Request.Path
-        );
+        logger.Info(new LogMessage(
+            Action: "Http Request",
+            Message: $"{method} {path} started"
+        ));
 
         try
         {
             await _next(context);
 
             sw.Stop();
-            logger.LogInformation(
-                "HTTP {Method} {Path} completed {StatusCode} in {ElapsedMs}ms",
-                context.Request.Method,
-                context.Request.Path,
-                context.Response.StatusCode,
-                sw.ElapsedMilliseconds
-            );
+            logger.Info(new LogMessage(
+                Action: "Http Request",
+                Message: $"{context.Response.StatusCode} {method} {path} completed in {sw.ElapsedMilliseconds}ms",
+                Attributes: new
+                {
+                    Method = method,
+                    Path = path,
+                    StatusCode = context.Response.StatusCode,
+                    ElapsedMs = sw.ElapsedMilliseconds
+                }
+            ));
         }
         catch (Exception ex)
         {
             sw.Stop();
-            logger.LogError(
-                ex,
-                "HTTP {Method} {Path} failed with exception in {ElapsedMs}ms",
-                context.Request.Method,
-                context.Request.Path,
-                sw.ElapsedMilliseconds
-            );
-            throw; // El ExceptionHandler de ASP.NET Core se encarga del resto
+            logger.Error(new LogMessage(
+                Action: "Http Request",
+                Message: $"{method} {path} failed in {sw.ElapsedMilliseconds}ms",
+                Attributes: new
+                {
+                    Method = method,
+                    Path = path,
+                    ElapsedMs = sw.ElapsedMilliseconds
+                }
+            ), ex);
+            throw;
         }
     }
 }

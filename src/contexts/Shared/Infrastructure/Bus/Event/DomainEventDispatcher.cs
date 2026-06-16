@@ -1,12 +1,10 @@
-using Microsoft.Extensions.Logging;
-
 namespace FlowTrack.Shared.Infrastructure.Bus.Event
 {
     [Service]
     public class DomainEventDispatcher(
         DomainEventSubscriberInformation subscriberInformation,
         IServiceProvider serviceProvider,
-        ILogger<DomainEventDispatcher> logger
+        IDomainLogger logger
     )
     {
         public async Task DispatchAsync(DomainEvent domainEvent)
@@ -16,15 +14,14 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event
 
             if (handlers.Length == 0)
             {
-                logger.LogDebug("No subscribers for domain event {EventType}", eventType);
+                logger.Info(
+                    new LogMessage(
+                        Action: "Event dispatched",
+                        Message: $"{eventType} has no subscribers"
+                    )
+                );
                 return;
             }
-
-            logger.LogDebug(
-                "Dispatching domain event {EventType} to {SubscriberCount} subscriber(s)",
-                eventType,
-                handlers.Length
-            );
 
             foreach (var handler in handlers)
             {
@@ -42,19 +39,32 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event
                         await taskResult;
                     }
 
-                    logger.LogDebug(
-                        "Domain event {EventType} handled by {Subscriber}",
-                        eventType,
-                        handler.SubscriberType.Name
+                    logger.Info(
+                        new LogMessage(
+                            Action: "Event dispatched",
+                            Message: $"{eventType} dispatched to subscriber {handler.SubscriberType.Name}",
+                            Attributes: new
+                            {
+                                EventType = eventType,
+                                EventContent = domainEvent,
+                                Subscriber = handler.SubscriberType.Name,
+                            }
+                        )
                     );
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(
-                        ex,
-                        "Domain event {EventType} failed in subscriber {Subscriber}",
-                        eventType,
-                        handler.SubscriberType.Name
+                    logger.Error(
+                        new LogMessage(
+                            Action: "Event dispatched",
+                            Message: $"{eventType} failed in subscriber {handler.SubscriberType.Name}",
+                            Attributes: new
+                            {
+                                EventType = eventType,
+                                Subscriber = handler.SubscriberType.Name,
+                            }
+                        ),
+                        ex
                     );
                 }
             }
@@ -69,10 +79,17 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event
 
             try
             {
-                logger.LogDebug(
-                    "Dispatching external event {EventType} to {Subscriber}",
-                    eventType,
-                    info.SubscriberType.Name
+                logger.Info(
+                    new LogMessage(
+                        Action: "Event consumed",
+                        Message: $"Dispatching external {eventType} to {info.SubscriberType.Name}",
+                        Attributes: new
+                        {
+                            EventType = eventType,
+                            EventContent = domainEvent,
+                            Subscriber = info.SubscriberType.Name,
+                        }
+                    )
                 );
 
                 var instance =
@@ -86,20 +103,20 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event
                 {
                     await taskResult;
                 }
-
-                logger.LogInformation(
-                    "External event {EventType} handled by {Subscriber}",
-                    eventType,
-                    info.SubscriberType.Name
-                );
             }
             catch (Exception ex)
             {
-                logger.LogError(
-                    ex,
-                    "External event {EventType} failed in subscriber {Subscriber}",
-                    eventType,
-                    info.SubscriberType.Name
+                logger.Error(
+                    new LogMessage(
+                        Action: "Event consumed",
+                        Message: $"External {eventType} failed in subscriber {info.SubscriberType.Name}",
+                        Attributes: new
+                        {
+                            EventType = eventType,
+                            Subscriber = info.SubscriberType.Name,
+                        }
+                    ),
+                    ex
                 );
                 throw;
             }

@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Microsoft.Extensions.Logging;
 
 namespace FlowTrack.Shared.Infrastructure.Bus.Command
 {
@@ -7,13 +6,13 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Command
     public sealed class InMemoryCommandBus(
         IServiceProvider serviceProvider,
         CommandHandlerInformation commandHandlerInformation,
-        ILogger<InMemoryCommandBus> logger
+        IDomainLogger logger
     ) : ICommandBus
     {
         private readonly IServiceProvider _serviceProvider = serviceProvider;
         private readonly CommandHandlerInformation _commandHandlerInformation =
             commandHandlerInformation;
-        private readonly ILogger<InMemoryCommandBus> _logger = logger;
+        private readonly IDomainLogger _logger = logger;
 
         public async Task Dispatch<C>(C command)
             where C : ICommand
@@ -28,15 +27,19 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Command
                 await handler.Handle(command);
                 sw.Stop();
 
-                _logger.LogInformation(
-                    "Command {CommandType} handled in {ElapsedMs}ms",
-                    commandType,
-                    sw.ElapsedMilliseconds
-                );
+                _logger.Info(new LogMessage(
+                    Action: "Command handled",
+                    Message: $"{commandType} handled in {sw.ElapsedMilliseconds}ms",
+                    Attributes: new { CommandType = commandType, ElapsedMs = sw.ElapsedMilliseconds }
+                ));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Command {CommandType} failed", commandType);
+                _logger.Error(new LogMessage(
+                    Action: "Command handled",
+                    Message: $"{commandType} failed",
+                    Attributes: new { CommandType = commandType }
+                ), ex);
                 throw new CommandHandlerExecutionException(ex);
             }
         }
