@@ -29,41 +29,43 @@ public sealed class RequestLoggingMiddleware
         var method = context.Request.Method;
         var path = context.Request.Path;
 
-        logger.Info(new LogMessage(
-            Action: "Http Request",
-            Message: $"{method} {path} started"
-        ));
+        logger.Info(new LogMessage(Action: "Http Request", Message: $"{method} {path} started"));
 
         try
         {
             await _next(context);
 
             sw.Stop();
-            logger.Info(new LogMessage(
-                Action: "Http Request",
-                Message: $"{context.Response.StatusCode} {method} {path} completed in {sw.ElapsedMilliseconds}ms",
-                Attributes: new
-                {
-                    Method = method,
-                    Path = path,
-                    StatusCode = context.Response.StatusCode,
-                    ElapsedMs = sw.ElapsedMilliseconds
-                }
-            ));
+            logger.Info(
+                new LogMessage(
+                    Action: "Http Request",
+                    Message: $"{context.Response.StatusCode} {method} {path} completed in {sw.ElapsedMilliseconds}ms",
+                    Attributes: new
+                    {
+                        Method = method,
+                        Path = path,
+                        StatusCode = context.Response.StatusCode,
+                        ElapsedMs = sw.ElapsedMilliseconds,
+                    }
+                )
+            );
         }
         catch (Exception ex)
         {
             sw.Stop();
-            logger.Error(new LogMessage(
-                Action: "Http Request",
-                Message: $"{method} {path} failed in {sw.ElapsedMilliseconds}ms",
-                Attributes: new
-                {
-                    Method = method,
-                    Path = path,
-                    ElapsedMs = sw.ElapsedMilliseconds
-                }
-            ), ex);
+            logger.Error(
+                new LogMessage(
+                    Action: "Http Request",
+                    Message: $"{method} {path} failed in {sw.ElapsedMilliseconds}ms",
+                    Attributes: new
+                    {
+                        Method = method,
+                        Path = path,
+                        ElapsedMs = sw.ElapsedMilliseconds,
+                    }
+                ),
+                ex
+            );
             throw;
         }
     }

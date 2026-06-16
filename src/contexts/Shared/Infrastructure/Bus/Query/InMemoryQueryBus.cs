@@ -27,21 +27,30 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Query
                 var result = await handler.Handle(query);
                 sw.Stop();
 
-                _logger.Info(new LogMessage(
-                    Action: "Query handled",
-                    Message: $"{queryType} handled in {sw.ElapsedMilliseconds}ms",
-                    Attributes: new { QueryType = queryType, ElapsedMs = sw.ElapsedMilliseconds }
-                ));
+                _logger.Info(
+                    new LogMessage(
+                        Action: "Query handled",
+                        Message: $"{queryType} handled in {sw.ElapsedMilliseconds}ms",
+                        Attributes: new
+                        {
+                            QueryType = queryType,
+                            ElapsedMs = sw.ElapsedMilliseconds,
+                        }
+                    )
+                );
 
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error(new LogMessage(
-                    Action: "Query handled",
-                    Message: $"{queryType} failed",
-                    Attributes: new { QueryType = queryType }
-                ), ex);
+                _logger.Error(
+                    new LogMessage(
+                        Action: "Query handled",
+                        Message: $"{queryType} failed",
+                        Attributes: new { QueryType = queryType }
+                    ),
+                    ex
+                );
                 throw new QueryHandlerExecutionException(ex);
             }
         }

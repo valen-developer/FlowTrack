@@ -27,19 +27,28 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Command
                 await handler.Handle(command);
                 sw.Stop();
 
-                _logger.Info(new LogMessage(
-                    Action: "Command handled",
-                    Message: $"{commandType} handled in {sw.ElapsedMilliseconds}ms",
-                    Attributes: new { CommandType = commandType, ElapsedMs = sw.ElapsedMilliseconds }
-                ));
+                _logger.Info(
+                    new LogMessage(
+                        Action: "Command handled",
+                        Message: $"{commandType} handled in {sw.ElapsedMilliseconds}ms",
+                        Attributes: new
+                        {
+                            CommandType = commandType,
+                            ElapsedMs = sw.ElapsedMilliseconds,
+                        }
+                    )
+                );
             }
             catch (Exception ex)
             {
-                _logger.Error(new LogMessage(
-                    Action: "Command handled",
-                    Message: $"{commandType} failed",
-                    Attributes: new { CommandType = commandType }
-                ), ex);
+                _logger.Error(
+                    new LogMessage(
+                        Action: "Command handled",
+                        Message: $"{commandType} failed",
+                        Attributes: new { CommandType = commandType }
+                    ),
+                    ex
+                );
                 throw new CommandHandlerExecutionException(ex);
             }
         }

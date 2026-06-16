@@ -75,11 +75,13 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus
                             .FirstOrDefault(e => e != null);
                         if (domainEvent == null)
                         {
-                            logger.Warning(new LogMessage(
-                                Action: "Event consumed",
-                                Message: $"Unmappable event {routingKey}, sending to DLQ",
-                                Attributes: new { RoutingKey = routingKey }
-                            ));
+                            logger.Warning(
+                                new LogMessage(
+                                    Action: "Event consumed",
+                                    Message: $"Unmappable event {routingKey}, sending to DLQ",
+                                    Attributes: new { RoutingKey = routingKey }
+                                )
+                            );
                             await PublishToDlq(channel, dlxName, routingKey, args);
                             return;
                         }
@@ -96,11 +98,14 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus
                     }
                     catch (Exception ex)
                     {
-                        logger.Error(new LogMessage(
-                            Action: "Event consumed",
-                            Message: $"Error processing event {routingKey} from queue {queueName}",
-                            Attributes: new { RoutingKey = routingKey, QueueName = queueName }
-                        ), ex);
+                        logger.Error(
+                            new LogMessage(
+                                Action: "Event consumed",
+                                Message: $"Error processing event {routingKey} from queue {queueName}",
+                                Attributes: new { RoutingKey = routingKey, QueueName = queueName }
+                            ),
+                            ex
+                        );
                         await HandleProcessingFailure(
                             channel,
                             args,
@@ -205,25 +210,29 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus
 
                 await channel.BasicAckAsync(args.DeliveryTag, false);
 
-                logger.Warning(new LogMessage(
-                    Action: "Event consumed",
-                    Message: $"Event {routingKey} failed. Scheduled retry {newRetryCount}/{MaxRetries} with delay {delayMs}ms",
-                    Attributes: new
-                    {
-                        RoutingKey = routingKey,
-                        RetryCount = newRetryCount,
-                        MaxRetries = MaxRetries,
-                        DelayMs = delayMs
-                    }
-                ));
+                logger.Warning(
+                    new LogMessage(
+                        Action: "Event consumed",
+                        Message: $"Event {routingKey} failed. Scheduled retry {newRetryCount}/{MaxRetries} with delay {delayMs}ms",
+                        Attributes: new
+                        {
+                            RoutingKey = routingKey,
+                            RetryCount = newRetryCount,
+                            MaxRetries = MaxRetries,
+                            DelayMs = delayMs,
+                        }
+                    )
+                );
             }
             else
             {
-                logger.Error(new LogMessage(
-                    Action: "Event consumed",
-                    Message: $"Event {routingKey} sent to DLQ after exhausting {MaxRetries} retries",
-                    Attributes: new { RoutingKey = routingKey, MaxRetries = MaxRetries }
-                ));
+                logger.Error(
+                    new LogMessage(
+                        Action: "Event consumed",
+                        Message: $"Event {routingKey} sent to DLQ after exhausting {MaxRetries} retries",
+                        Attributes: new { RoutingKey = routingKey, MaxRetries = MaxRetries }
+                    )
+                );
 
                 await PublishToDlq(channel, dlxName, routingKey, args);
             }
