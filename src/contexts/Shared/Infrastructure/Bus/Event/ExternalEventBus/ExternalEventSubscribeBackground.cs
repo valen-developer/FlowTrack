@@ -23,18 +23,13 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var scope = serviceScopeFactory.CreateScope();
-            var dispatcher = scope.ServiceProvider.GetRequiredService<DomainEventDispatcher>();
             var subscribeTasks = subscriberInformation.Subscribers.Select(subscriberInfo =>
-                HandleSusbcription(subscriberInfo, dispatcher)
+                HandleSusbcription(subscriberInfo)
             );
             await Task.WhenAll(subscribeTasks);
         }
 
-        private async Task HandleSusbcription(
-            ExternalEventSubscriberInfo subscriberInfo,
-            DomainEventDispatcher dispatcher
-        )
+        private async Task HandleSusbcription(ExternalEventSubscriberInfo subscriberInfo)
         {
             var exchangeName = env.Get("EXTERNAL_EVENT_EXCHANGE_NAME") ?? "";
             var queueName = subscriberInfo.QueueName;
@@ -80,6 +75,13 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus
                             await PublishToDlq(channel, dlxName, routingKey, args);
                             return;
                         }
+
+                        // Crear un scope por cada mensaje para evitar
+                        // conflictos de concurrencia en DbContext
+                        using var messageScope = serviceScopeFactory.CreateScope();
+                        var dispatcher =
+                            messageScope.ServiceProvider.GetRequiredService<DomainEventDispatcher>();
+
                         await dispatcher.DispatchExternal(subscriberInfo, domainEvent);
 
                         await channel.BasicAckAsync(args.DeliveryTag, false);
