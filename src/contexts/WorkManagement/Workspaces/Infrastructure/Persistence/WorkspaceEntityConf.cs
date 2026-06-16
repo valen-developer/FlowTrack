@@ -12,7 +12,7 @@ namespace FlowTrack.WorkManagement.Workspaces.Infrastructure.Persistence
             builder.Property(w => w.Name).IsRequired();
             builder.Property(w => w.OwnerId).IsRequired();
 
-            builder.HasIndex(w => w.Name).IsUnique();
+            builder.HasIndex(w => new { w.OwnerId, w.Name }).IsUnique();
         }
     }
 }

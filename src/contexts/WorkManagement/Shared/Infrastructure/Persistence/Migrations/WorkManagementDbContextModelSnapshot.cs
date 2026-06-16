@@ -37,10 +37,10 @@ namespace FlowTrack.WorkManagement.Shared.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
+                    b.HasIndex("OwnerId", "Name")
                         .IsUnique();
 
-                    b.ToTable("workspaces");
+                    b.ToTable("workspaces", (string)null);
                 });
 #pragma warning restore 612, 618
         }
