@@ -48,7 +48,10 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus
                     code = @event.GetCode(),
                     ocurred_at = @event.OccurredOn.ToUniversalTime(),
                     attributes = (object)@event,
-                    meta = new { },
+                    meta = new
+                    {
+                        correlation_id = CorrelationContext.Get() ?? string.Empty,
+                    },
                 },
             };
 

@@ -1,10 +1,12 @@
 using System.Text;
+using System.Text.Json;
 using FlowTrack.Shared.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using Serilog.Context;
 
 namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus
 {
@@ -61,6 +63,12 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus
                     var body = args.Body.ToArray();
                     var message = Encoding.UTF8.GetString(body);
 
+                    // Extraer CorrelationId del meta del mensaje JSON
+                    var correlationId = ExtractCorrelationId(message);
+                    CorrelationContext.Set(correlationId);
+
+                    using var _ = LogContext.PushProperty("CorrelationId", correlationId);
+
                     try
                     {
                         var domainEvent = jsonToDomainEventMappers
@@ -104,6 +112,26 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus
                     }
                 }
             );
+        }
+
+        private static string? ExtractCorrelationId(string messageJson)
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(messageJson);
+                var root = doc.RootElement;
+                if (root.TryGetProperty("data", out var data)
+                    && data.TryGetProperty("meta", out var meta)
+                    && meta.TryGetProperty("correlation_id", out var correlationId))
+                {
+                    return correlationId.GetString();
+                }
+            }
+            catch
+            {
+                // Si el JSON no se puede parsear, no hay CorrelationId
+            }
+            return null;
         }
 
         private async Task DeclareRetryInfrastructure(

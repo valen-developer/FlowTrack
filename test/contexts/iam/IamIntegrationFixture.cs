@@ -41,6 +41,10 @@ namespace FlowTrack.Iam.Test
                 }
             )
         {
+            serviceCollection.AddLogging(builder =>
+                builder.AddConsole().SetMinimumLevel(LogLevel.Warning)
+            );
+
             serviceCollection.AddHostedService<ExternalEventSubscribeBackground>();
             serviceCollection.AddHostedService<DomainEventSubscribeBackground>();
 
@@ -93,9 +97,6 @@ namespace FlowTrack.Iam.Test
             Environment.SetEnvironmentVariable("RABBITMQ_PASSWORD", "guest");
             Environment.SetEnvironmentVariable("EXTERNAL_EVENT_EXCHANGE_NAME", "domain_events");
 
-            serviceCollection.AddLogging(builder =>
-                builder.AddConsole().SetMinimumLevel(LogLevel.Warning)
-            );
             serviceCollection.AddSingleton<JsonToDomainEventMapper>(
                 _ => new TestJsonToDomainEventMapper()
             );

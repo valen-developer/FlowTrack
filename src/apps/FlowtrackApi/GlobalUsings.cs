@@ -19,3 +19,4 @@ global using FlowTrack.Shared.Infrastructure.HttpErrorResponses;
 global using FlowTrack.Shared.Infrastructure.Transactions;
 global using FlowTrack.WorkManagement;
 global using FlowtrackApi.Shared;
+global using FlowTrack.Shared.Infrastructure.Logging;

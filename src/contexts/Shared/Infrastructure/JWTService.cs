@@ -1,11 +1,12 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using FlowTrack.Shared.Domain;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+
 namespace FlowTrack.Shared.Infrastructure
 {
-    using System.IdentityModel.Tokens.Jwt;
-    using System.Security.Claims;
-    using System.Text;
-    using FlowTrack.Shared.Domain;
-    using Microsoft.IdentityModel.Tokens;
-
     [Provider(typeof(IJWTService))]
     public class JWTService(IDateTimeProvider datetimeProvider) : IJWTService
     {
@@ -68,9 +69,8 @@ namespace FlowTrack.Shared.Infrastructure
 
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Token validation failed: {ex.Message}");
                 return false;
             }
         }
