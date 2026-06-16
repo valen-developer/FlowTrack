@@ -1,5 +1,6 @@
 using DotNet.Testcontainers.Builders;
 using FlowTrack.Shared.Domain.Contexts;
+using FlowTrack.Shared.Infrastructure.Bus.Event;
 using FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus;
 using FlowTrack.Shared.Infrastructure.Transactions;
 using FlowTrack.Shared.Test;
@@ -109,6 +110,7 @@ namespace FlowTrack.WorkManagement.Test
             Environment.SetEnvironmentVariable("EXTERNAL_EVENT_EXCHANGE_NAME", "domain_events");
 
             serviceCollection.AddHostedService<ExternalEventSubscribeBackground>();
+            serviceCollection.AddHostedService<DomainEventSubscribeBackground>();
 
             using var provider = serviceCollection.BuildServiceProvider();
             using var scope = provider.CreateScope();

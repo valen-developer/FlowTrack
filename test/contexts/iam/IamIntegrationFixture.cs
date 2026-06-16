@@ -41,11 +41,8 @@ namespace FlowTrack.Iam.Test
                 }
             )
         {
-            AddScoped<IJWTService, JWTService>();
-            AddScoped<IEnvStore, EnvStore>();
-            AddScoped<IBcrypt, Bcrypt>();
-            AddScoped<IUserRepository, EfUserRepository>();
-            AddScoped<UserDao, UserDao>();
+            serviceCollection.AddHostedService<ExternalEventSubscribeBackground>();
+            serviceCollection.AddHostedService<DomainEventSubscribeBackground>();
 
             serviceCollection.AddKeyedScoped(
                 "IAM",
@@ -103,6 +100,7 @@ namespace FlowTrack.Iam.Test
                 _ => new TestJsonToDomainEventMapper()
             );
             serviceCollection.AddHostedService<ExternalEventSubscribeBackground>();
+            serviceCollection.AddHostedService<DomainEventSubscribeBackground>();
 
             using var provider = serviceCollection.BuildServiceProvider();
             using var scope = provider.CreateScope();

@@ -88,6 +88,16 @@ namespace FlowTrack.Iam.Test.Auth.Infrastructure
 
             await handler.Handle(cmd);
 
+            await WaitForAsync(async () =>
+            {
+                if (eventSubscriber.CapturedEvent is null)
+                {
+                    return false;
+                }
+
+                return true;
+            });
+
             Assert.NotNull(eventSubscriber.CapturedEvent);
             Assert.Equal(user.Id.Value, eventSubscriber.CapturedEvent!.Id);
         }

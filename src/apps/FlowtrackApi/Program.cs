@@ -1,3 +1,4 @@
+using FlowTrack.Shared.Infrastructure.Bus.Event;
 using FlowTrack.WorkManagement.Shared.Infrastructure;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -55,6 +56,7 @@ builder
     );
 
 builder.Services.AddHostedService<ExternalEventSubscribeBackground>();
+builder.Services.AddHostedService<DomainEventSubscribeBackground>();
 
 var app = builder.Build();
 
