@@ -1,9 +1,18 @@
 namespace FlowTrack.Iam.Test
 {
-    public abstract class IamIntegrationTestCase(IamIntegrationFixture fixture)
-        : IClassFixture<IamIntegrationFixture>
+    public abstract class IamIntegrationTestCase : IClassFixture<IamIntegrationFixture>
     {
-        public readonly IamIntegrationFixture _fixture = fixture;
+        public readonly IamIntegrationFixture _fixture;
+
+        public IamIntegrationTestCase(IamIntegrationFixture fixture)
+        {
+            _fixture = fixture;
+
+            fixture.serviceCollection.DiscoverServices([
+                "FlowTrack.Iam*.dll",
+                "FlowTrack.Shared*.dll",
+            ]);
+        }
 
         protected Transaction GenerateTransaction()
         {

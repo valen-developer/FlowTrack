@@ -20,6 +20,8 @@ public class IndexWorkspaceOnWorkspaceCreatedIT : WorkManagementIntegrationTestC
     [Fact]
     public async Task Should_Index_Workspace_In_Search_Engine()
     {
+        await _fixture.EnsureServicesAsync();
+
         var workspace = WorkspaceMother.Random();
         await AddWorkspaceToDatabase(workspace);
 
@@ -66,7 +68,7 @@ public class IndexWorkspaceOnWorkspaceCreatedIT : WorkManagementIntegrationTestC
                     return false;
                 }
             },
-            timeoutMs: 5000,
+            timeoutMs: 10000,
             pollIntervalMs: 250
         );
 

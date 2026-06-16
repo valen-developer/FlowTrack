@@ -5,6 +5,7 @@ namespace FlowTrack.Shared.Test
 {
     public abstract class IntegrationTestCase
     {
+        private DateTime mockedNow = DateTime.UtcNow;
         public readonly ServiceCollection serviceCollection = new();
         protected ServiceProvider? serviceProvider;
         protected IServiceScope? serviceScope;
@@ -13,8 +14,7 @@ namespace FlowTrack.Shared.Test
 
         public IntegrationTestCase(Dictionary<string, string>? env = null)
         {
-            datetimeProviderMock.SetupGet(m => m.Now).Returns(DateTime.UtcNow);
-            serviceCollection.AddSingleton<IDateTimeProvider>(datetimeProviderMock.Object);
+            datetimeProviderMock.SetupGet(m => m.Now).Returns(mockedNow);
 
             LoadEnv(env);
         }
@@ -78,6 +78,7 @@ namespace FlowTrack.Shared.Test
             if (serviceProvider is not null)
                 return;
 
+            serviceCollection.AddSingleton<IDateTimeProvider>(datetimeProviderMock.Object);
             serviceProvider = serviceCollection.BuildServiceProvider();
             serviceScope = serviceProvider.CreateScope();
         }

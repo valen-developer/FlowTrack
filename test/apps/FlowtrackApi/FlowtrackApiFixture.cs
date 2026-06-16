@@ -14,6 +14,8 @@ namespace FlowtrackApi.Test
 {
     public class FlowtrackApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
     {
+        private DateTime mockedDateTime = DateTime.UtcNow;
+
         private PostgreSqlContainer? _postgresContainer;
         private RabbitMqContainer? _rabbitMqContainer;
         private ElasticsearchContainer? _elasticSearchContainer;
@@ -40,7 +42,7 @@ namespace FlowtrackApi.Test
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            _dateTimeProviderMock.SetupGet(m => m.Now).Returns(DateTime.UtcNow);
+            _dateTimeProviderMock.SetupGet(m => m.Now).Returns(mockedDateTime);
 
             builder.UseEnvironment("Testing");
             builder.ConfigureServices(services =>

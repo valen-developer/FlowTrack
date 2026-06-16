@@ -1,6 +1,6 @@
 namespace FlowTrack.Iam.Test.Auth.Infrastructure
 {
-    [Service]
+    [Service(Lifetime.Singleton)]
     [DomainEventSubscriber(typeof(UserActivated))]
     internal sealed class UserActivatedEventSubscriber
     {
@@ -16,14 +16,13 @@ namespace FlowTrack.Iam.Test.Auth.Infrastructure
     public class ActivateUserByTokenCmdHandlerIT : IamIntegrationTestCase
     {
         public ActivateUserByTokenCmdHandlerIT(IamIntegrationFixture fixture)
-            : base(fixture)
-        {
-            fixture.serviceCollection.DiscoverServices(["FlowTrack*.dll"]);
-        }
+            : base(fixture) { }
 
         [Fact]
         public async Task Should_Save_User_As_Active()
         {
+            await _fixture.EnsureServicesAsync();
+
             var user = UserMother.Inactive();
             await AddUserToDatabase(user);
 
@@ -62,6 +61,8 @@ namespace FlowTrack.Iam.Test.Auth.Infrastructure
         [Fact]
         public async Task Should_Publish_UserActivated_Event()
         {
+            await _fixture.EnsureServicesAsync();
+
             var user = UserMother.Inactive();
             await AddUserToDatabase(user);
 

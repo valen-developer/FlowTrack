@@ -1,5 +1,6 @@
 using DotNet.Testcontainers.Builders;
 using FlowTrack.Shared.Domain.Contexts;
+using FlowTrack.Shared.Infrastructure;
 using FlowTrack.Shared.Infrastructure.Bus.Event;
 using FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus;
 using FlowTrack.Shared.Infrastructure.Transactions;
@@ -112,6 +113,10 @@ namespace FlowTrack.WorkManagement.Test
             serviceCollection.AddHostedService<ExternalEventSubscribeBackground>();
             serviceCollection.AddHostedService<DomainEventSubscribeBackground>();
 
+            serviceCollection.DiscoverServices([
+                "FlowTrack.WorkManagement*.dll",
+                "FlowTrack.Shared*.dll",
+            ]);
             using var provider = serviceCollection.BuildServiceProvider();
             using var scope = provider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<WorkManagementDbContext>();

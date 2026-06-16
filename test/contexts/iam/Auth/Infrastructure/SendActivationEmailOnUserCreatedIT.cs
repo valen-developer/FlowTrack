@@ -12,7 +12,6 @@ namespace FlowTrack.Iam.Test.Auth.Infrastructure
         public SendActivationEmailOnUserCreatedIT(IamIntegrationFixture fixture)
             : base(fixture)
         {
-            fixture.serviceCollection.DiscoverServices(["FlowTrack*.dll"]);
             fixture.serviceCollection.AddSingleton(_mailerMock.Object);
 
             _eventBus = fixture.GetService<EventBus>();

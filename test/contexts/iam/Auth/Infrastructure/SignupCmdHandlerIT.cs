@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowTrack.Iam.Test.Auth.Infrastructure
 {
-    [Service]
+    [Service(Lifetime.Singleton)]
     [DomainEventSubscriber(typeof(UserCreated))]
     internal sealed class OnUserCreatedDomainEventSubscriber
     {
