@@ -10,29 +10,27 @@ namespace FlowTrack.WorkManagement.Shared.Infrastructure.Persistence.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropIndex(
-                name: "IX_workspaces_Name",
-                table: "workspaces");
+            migrationBuilder.DropIndex(name: "IX_workspaces_Name", table: "workspaces");
 
             migrationBuilder.CreateIndex(
                 name: "IX_workspaces_OwnerId_Name",
                 table: "workspaces",
                 columns: new[] { "OwnerId", "Name" },
-                unique: true);
+                unique: true
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropIndex(
-                name: "IX_workspaces_OwnerId_Name",
-                table: "workspaces");
+            migrationBuilder.DropIndex(name: "IX_workspaces_OwnerId_Name", table: "workspaces");
 
             migrationBuilder.CreateIndex(
                 name: "IX_workspaces_Name",
                 table: "workspaces",
                 column: "Name",
-                unique: true);
+                unique: true
+            );
         }
     }
 }
