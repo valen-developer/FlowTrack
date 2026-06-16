@@ -14,6 +14,11 @@ try
     builder.Host.UseSerilog(
         (context, services, configuration) =>
         {
+            var formatter = new Serilog.Formatting.Elasticsearch.ElasticsearchJsonFormatter(
+                inlineFields: true,
+                renderMessageTemplate: false
+            );
+
             configuration
                 .ReadFrom.Configuration(context.Configuration)
                 .ReadFrom.Services(services)
@@ -21,7 +26,16 @@ try
                 .Enrich.WithMachineName()
                 .Enrich.WithEnvironmentName()
                 .Enrich.FromLogContext()
-                .WriteTo.Console(new Serilog.Formatting.Elasticsearch.ElasticsearchJsonFormatter());
+                .WriteTo.Console(formatter);
+
+            if (context.HostingEnvironment.IsDevelopment())
+            {
+                configuration.WriteTo.File(
+                    path: "./logs/flowtrack-.json",
+                    rollingInterval: RollingInterval.Day,
+                    formatter: formatter
+                );
+            }
         }
     );
 
