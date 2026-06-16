@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog.Context;
 
 namespace FlowTrack.Shared.Infrastructure.Bus.Event;
 
@@ -17,7 +18,13 @@ public sealed class DomainEventSubscribeBackground(
             {
                 using var scope = serviceScopeFactory.CreateScope();
                 var dispatcher = scope.ServiceProvider.GetRequiredService<DomainEventDispatcher>();
-                await dispatcher.DispatchAsync(@event);
+
+                var correlationId = @event.CorrelationId;
+                CorrelationContext.Set(correlationId);
+
+                using var _ = LogContext.PushProperty("CorrelationId", correlationId);
+
+                await dispatcher.DispatchAsync(@event.Event);
             }
 
             await Task.Delay(500, stoppingToken);

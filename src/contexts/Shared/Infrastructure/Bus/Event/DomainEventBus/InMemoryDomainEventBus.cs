@@ -1,3 +1,5 @@
+using FlowTrack.Shared.Infrastructure.Bus.Event.DomainEventBus;
+
 namespace FlowTrack.Shared.Infrastructure.Bus.Event
 {
     [Provider(typeof(IDomainEventBus))]
@@ -12,7 +14,14 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event
         public async Task Publish<T>(IEnumerable<T> events)
             where T : DomainEvent
         {
-            queue.Enqueue(events);
+            var items = events
+                .Select(@event => new DomainEventQueueItem(
+                    @event,
+                    CorrelationContext.Get() ?? string.Empty
+                ))
+                .ToList();
+
+            queue.Enqueue(items);
         }
     }
 }
