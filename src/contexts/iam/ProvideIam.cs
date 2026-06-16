@@ -7,11 +7,18 @@ namespace FlowTrack.Iam
     {
         public static IServiceCollection ProvideIam(this IServiceCollection services)
         {
-            var iamDbContext = new IamDbContextFactory().CreateDbContext([]);
-            iamDbContext.Database.Migrate();
-            services.AddDbContext<IamDbContext>(options =>
-                options.UseNpgsql(iamDbContext.Database.GetConnectionString())
-            );
+            string connectionString;
+            using (var iamDbContext = new IamDbContextFactory().CreateDbContext([]))
+            {
+                iamDbContext.Database.Migrate();
+                connectionString =
+                    iamDbContext.Database.GetConnectionString()
+                    ?? throw new InvalidOperationException(
+                        "IAM_DB_CONNECTION_STRING is not set or could not be resolved."
+                    );
+            }
+
+            services.AddDbContext<IamDbContext>(options => options.UseNpgsql(connectionString));
 
             return services;
         }

@@ -8,10 +8,19 @@ namespace FlowTrack.WorkManagement
     {
         public static IServiceCollection ProvideWorkManagement(this IServiceCollection services)
         {
-            var dbContext = new WorkManagementDbContextFactory().CreateDbContext([]);
-            dbContext.Database.Migrate();
+            string connectionString;
+            using (var dbContext = new WorkManagementDbContextFactory().CreateDbContext([]))
+            {
+                dbContext.Database.Migrate();
+                connectionString =
+                    dbContext.Database.GetConnectionString()
+                    ?? throw new InvalidOperationException(
+                        "WORK_MANAGEMENT_DB_CONNECTION_STRING is not set or could not be resolved."
+                    );
+            }
+
             services.AddDbContext<WorkManagementDbContext>(options =>
-                options.UseNpgsql(dbContext.Database.GetConnectionString())
+                options.UseNpgsql(connectionString)
             );
 
             return services;
