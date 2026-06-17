@@ -46,18 +46,17 @@ public class Application
         {
             handler.Run(async context =>
             {
+                var logger = context.RequestServices.GetRequiredService<IDomainLogger>();
+
                 var feature = context.Features.Get<IExceptionHandlerFeature>();
                 var exception = feature?.Error;
                 if (exception == null)
                     return;
 
-                var logger =
-                    context.RequestServices.GetRequiredService<Microsoft.Extensions.Logging.ILogger>();
-                logger.LogError(
-                    exception,
-                    "Unhandled exception processing {Method} {Path}",
-                    context.Request.Method,
-                    context.Request.Path
+                var httpStatusCode = 500;
+                var httpErrorResponse = new HttpErrorResponse(
+                    "Internal Server Error",
+                    "exception.internal.server"
                 );
 
                 if (exception is ActionHandlerExecutionException actionHandlerExecutionException)
@@ -66,9 +65,8 @@ public class Application
                     if (cause is DomainException ex)
                     {
                         var (statusCode, httpErrorException) = DomainToHttpExceptionMapper.Map(ex);
-                        context.Response.StatusCode = statusCode;
-                        await context.Response.WriteAsJsonAsync(httpErrorException);
-                        return;
+                        httpStatusCode = statusCode;
+                        httpErrorResponse = httpErrorException;
                     }
                 }
 
@@ -77,15 +75,21 @@ public class Application
                     var (statusCode, httpErrorException) = DomainToHttpExceptionMapper.Map(
                         domainException
                     );
-                    context.Response.StatusCode = statusCode;
-                    await context.Response.WriteAsJsonAsync(httpErrorException);
-                    return;
+                    httpStatusCode = statusCode;
+                    httpErrorResponse = httpErrorException;
                 }
 
-                context.Response.StatusCode = 500;
-                await context.Response.WriteAsJsonAsync(
-                    new HttpErrorResponse("Internal Server Error", "exception.internal.server")
+                logger.Error(
+                    new LogMessage(
+                        Action: "ExceptionHandler",
+                        Message: "An exception occurred",
+                        Attributes: httpErrorResponse
+                    ),
+                    exception
                 );
+
+                context.Response.StatusCode = httpStatusCode;
+                await context.Response.WriteAsJsonAsync(httpErrorResponse);
             });
         });
 

@@ -5,6 +5,39 @@ namespace FlowTrack.Shared.Infrastructure
 {
     public static class ServicesDiscoverApplicationBuilderExtensions
     {
+        public static IServiceCollection DiscoverServices(
+            this IServiceCollection services,
+            params string[] assembliesStringMatch
+        )
+        {
+            var assemblies = assembliesStringMatch
+                .Select(s => Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, s))
+                .SelectMany(f => f)
+                .Select(Assembly.LoadFrom)
+                .Where(a => !a.IsDynamic)
+                .ToArray();
+
+            services.DiscoverServices(assemblies);
+
+            return services;
+        }
+
+        public static IServiceCollection DiscoverServices(
+            this IServiceCollection services,
+            params Assembly[] assemblies
+        )
+        {
+            var types = assemblies.SelectMany(a => a.GetTypes());
+
+            DiscoverServices(services, types);
+            DiscoverProviders(services, types);
+            services.DiscoverCommands(assemblies);
+            services.DiscoverQueries(assemblies);
+            services.DiscoverDomainEventSubscribers(assemblies);
+
+            return services;
+        }
+
         public static ApplicationBuilder DiscoverServices(
             this ApplicationBuilder builder,
             params Assembly[] assemblies
@@ -13,12 +46,7 @@ namespace FlowTrack.Shared.Infrastructure
             var services = builder.Services;
 
             var types = assemblies.SelectMany(a => a.GetTypes());
-
-            DiscoverServices(services, types);
-            DiscoverProviders(services, types);
-            services.DiscoverCommands(assemblies);
-            services.DiscoverQueries(assemblies);
-            services.DiscoverDomainEventSubscribers(assemblies);
+            services.DiscoverServices(assemblies);
 
             return builder;
         }

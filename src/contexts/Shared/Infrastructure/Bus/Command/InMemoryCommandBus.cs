@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using FlowTrack.Shared.Domain.Exception;
 
 namespace FlowTrack.Shared.Infrastructure.Bus.Command
 {
@@ -45,10 +46,16 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Command
                     new LogMessage(
                         Action: "Command handled",
                         Message: $"{commandType} failed",
-                        Attributes: new { CommandType = commandType }
+                        Attributes: new Dictionary<string, object> { [commandType] = command }
                     ),
                     ex
                 );
+
+                if (ex is DomainException)
+                {
+                    throw;
+                }
+
                 throw new CommandHandlerExecutionException(ex);
             }
         }

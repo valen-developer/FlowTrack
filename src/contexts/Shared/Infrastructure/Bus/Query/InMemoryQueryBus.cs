@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using FlowTrack.Shared.Domain.Exception;
 
 namespace FlowTrack.Shared.Infrastructure.Bus.Query
 {
@@ -47,10 +48,16 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Query
                     new LogMessage(
                         Action: "Query handled",
                         Message: $"{queryType} failed",
-                        Attributes: new { QueryType = queryType }
+                        Attributes: new Dictionary<string, object> { [queryType] = query }
                     ),
                     ex
                 );
+
+                if (ex is DomainException)
+                {
+                    throw;
+                }
+
                 throw new QueryHandlerExecutionException(ex);
             }
         }

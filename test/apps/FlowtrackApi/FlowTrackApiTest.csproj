@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../src/apps/FlowtrackApi/FlowtrackApi.csproj" />
+    <ProjectReference Include="../../../src/apps/FlowtrackApi/FlowTrackApi.csproj" />
     <ProjectReference Include="../../../src/contexts/Shared/FlowTrack.Shared.csproj" />
     <ProjectReference Include="../../contexts/Iam/FlowTrack.Iam.Test.csproj" />
   </ItemGroup>

@@ -1,7 +1,7 @@
 <Solution>
   <Folder Name="/src/" />
   <Folder Name="/src/apps/">
-    <Project Path="src/apps/FlowtrackApi/FlowtrackApi.csproj" />
+    <Project Path="src/apps/FlowtrackApi/FlowTrackApi.csproj" />
   </Folder>
   <Folder Name="/src/contexts/">
     <Project Path="src/contexts/Shared/FlowTrack.Shared.csproj" />
@@ -12,7 +12,7 @@
   </Folder>
   <Folder Name="/test/" />
   <Folder Name="/test/apps/">
-    <Project Path="test/apps/FlowtrackApi/FlowtrackApiTest.csproj" />
+    <Project Path="test/apps/FlowtrackApi/FlowTrackApiTest.csproj" />
   </Folder>
   <Folder Name="/test/contexts/">
     <Project Path="test/contexts/Iam/FlowTrack.Iam.Test.csproj" />
