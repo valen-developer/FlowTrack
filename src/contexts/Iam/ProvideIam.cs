@@ -1,12 +1,15 @@
+using FlowTrack.Shared.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowTrack.Iam
 {
-    internal static class IamServiceCollectionExtensions
+    internal static class IamApplicationBuilderExtensions
     {
-        public static IServiceCollection ProvideIam(this IServiceCollection services)
+        public static ApplicationBuilder ProvideIam(this ApplicationBuilder builder)
         {
+            var services = builder.Services;
+
             string connectionString;
             using (var iamDbContext = new IamDbContextFactory().CreateDbContext([]))
             {
@@ -20,7 +23,7 @@ namespace FlowTrack.Iam
 
             services.AddDbContext<IamDbContext>(options => options.UseNpgsql(connectionString));
 
-            return services;
+            return builder;
         }
     }
 }

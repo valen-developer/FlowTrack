@@ -3,13 +3,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowTrack.Shared.Infrastructure
 {
-    public static class ServicesDiscoverCollectionExtensions
+    public static class ServicesDiscoverApplicationBuilderExtensions
     {
-        public static IServiceCollection DiscoverServices(
-            this IServiceCollection services,
+        public static ApplicationBuilder DiscoverServices(
+            this ApplicationBuilder builder,
             params Assembly[] assemblies
         )
         {
+            var services = builder.Services;
+
             var types = assemblies.SelectMany(a => a.GetTypes());
 
             DiscoverServices(services, types);
@@ -18,7 +20,7 @@ namespace FlowTrack.Shared.Infrastructure
             services.DiscoverQueries(assemblies);
             services.DiscoverDomainEventSubscribers(assemblies);
 
-            return services;
+            return builder;
         }
 
         /// <summary>
@@ -29,7 +31,7 @@ namespace FlowTrack.Shared.Infrastructure
         /// appropriate lifetimes.
         /// </summary>
         /// <param name="services">The service collection.</param>
-        /// <param name="stringMatch">
+        /// <param name="assembliesStringMatch">
         /// One or more assembly search patterns using wildcards (e.g., <c>"Assembly*.dll"</c>).
         /// These patterns are passed directly to <see cref="Directory.GetFiles(string, string)"/>.
         /// </param>
@@ -40,21 +42,21 @@ namespace FlowTrack.Shared.Infrastructure
         /// builder.Services.DiscoverServices(["Assembly*.dll", "MyApp.Infrastructure*.dll"]);
         /// </code>
         /// </remarks>
-        public static IServiceCollection DiscoverServices(
-            this IServiceCollection services,
-            params string[] stringMatch
+        public static ApplicationBuilder DiscoverServices(
+            this ApplicationBuilder builder,
+            params string[] assembliesStringMatch
         )
         {
-            var assemblies = stringMatch
+            var assemblies = assembliesStringMatch
                 .Select(s => Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, s))
                 .SelectMany(f => f)
                 .Select(Assembly.LoadFrom)
                 .Where(a => !a.IsDynamic)
                 .ToArray();
 
-            services.DiscoverServices(assemblies);
+            builder.DiscoverServices(assemblies);
 
-            return services;
+            return builder;
         }
 
         private static void DiscoverProviders(IServiceCollection services, IEnumerable<Type> types)

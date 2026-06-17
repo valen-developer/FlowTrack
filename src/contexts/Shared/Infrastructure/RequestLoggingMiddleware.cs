@@ -1,7 +1,8 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Serilog.Context;
 
-namespace FlowtrackApi.Shared;
+namespace FlowTrack.Shared.Infrastructure;
 
 public sealed class RequestLoggingMiddleware
 {

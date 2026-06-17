@@ -1,13 +1,16 @@
+using FlowTrack.Shared.Infrastructure;
 using FlowTrack.WorkManagement.Shared.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowTrack.WorkManagement
 {
-    internal static class WorkManagementServiceCollectionExtensions
+    internal static class WorkManagementApplicationBuilderExtensions
     {
-        public static IServiceCollection ProvideWorkManagement(this IServiceCollection services)
+        public static ApplicationBuilder ProvideWorkManagement(this ApplicationBuilder builder)
         {
+            var services = builder.Services;
+
             string connectionString;
             using (var dbContext = new WorkManagementDbContextFactory().CreateDbContext([]))
             {
@@ -23,7 +26,7 @@ namespace FlowTrack.WorkManagement
                 options.UseNpgsql(connectionString)
             );
 
-            return services;
+            return builder;
         }
     }
 }
