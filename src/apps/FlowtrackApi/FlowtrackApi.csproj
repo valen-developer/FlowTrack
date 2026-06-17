@@ -12,6 +12,7 @@
     <PackageReference Include="Serilog.Formatting.Elasticsearch" Version="10.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="../../contexts/Iam/FlowTrack.Iam.csproj" />
     <ProjectReference Include="../../contexts/WorkManagement/FlowTrack.WorkManagement.csproj" />
   </ItemGroup>
   <Target Name="Husky" AfterTargets="Restore" Condition="'$(HUSKY)' != 0" Inputs="../../../.config/dotnet-tools.json" Outputs="../../../.husky/_/install.stamp">
