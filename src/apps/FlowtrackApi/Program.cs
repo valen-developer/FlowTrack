@@ -1,3 +1,4 @@
+using FlowTrack.Shared.Infrastructure.Auth;
 using FlowTrack.WorkManagement.Shared.Infrastructure;
 using Serilog;
 using ApplicationBuilder = FlowTrack.Shared.Infrastructure.ApplicationBuilder;
@@ -10,7 +11,7 @@ try
 
     var app = new ApplicationBuilder("FlowTrackApi", args)
         .AddLogger("./logs/flowtrack-.json")
-        .AddAuthentication<IamAuthenticationHandler>("IamCookie")
+        .AddAuthentication<CookieAuthenticationHandler>("Cookie")
         .AddContext<IamDbContext>("IAM")
         .AddContext<WorkManagementDbContext>("WORK_MANAGEMENT")
         .DiscoverServices(["FlowTrack*.dll"])
