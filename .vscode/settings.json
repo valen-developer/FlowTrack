@@ -20,7 +20,7 @@
     "**/.[Tt]emp": true,
     // Logs y diagnóstico
     "**/*.log": true,
-    "**/logs": true,
+    // "**/logs": true,
     "**/*.appboy": true,
     // Carpeta de git y VS Code
     "**/.git": true,

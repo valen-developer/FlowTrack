@@ -15,32 +15,6 @@ services:
     volumes:
       - flowtrack:/var/lib/postgresql
 
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: flowtrack-rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: flowtrack
-      RABBITMQ_DEFAULT_PASS: flowtrack
-    ports:
-      - '5672:5672'
-      - '15672:15672'
-    networks:
-      flowtrack:
-        aliases:
-          - flowtrack-rabbitmq
-    volumes:
-      - ./rabbitmq_plugins:/etc/rabbitmq/enabled_plugins
-
-  adminer:
-    image: adminer
-    container_name: adminer
-    networks:
-      flowtrack:
-        aliases:
-          - adminer
-    ports:
-      - '8081:8080'
-
   elasticsearch:
     image: elasticsearch:9.4.2
     container_name: flowtrack-elasticsearch
@@ -54,29 +28,14 @@ services:
       - http.cors.enabled=true
       - "http.cors.allow-origin=http://localhost:8082"
     ports:
-      - '9200:9200'
-      - '9300:9300'
+      - '9201:9200'
+      - '9301:9300'
     networks:
       flowtrack:
         aliases:
           - flowtrack-elasticsearch
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
-
-  kibana:
-    image: kibana:9.4.2
-    container_name: flowtrack-kibana
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - XPACK_FLEET_ENABLED=false
-    ports:
-      - '5601:5601'
-    networks:
-      flowtrack:
-        aliases:
-          - flowtrack-kibana
-    depends_on:
-      - elasticsearch
 
   filebeat:
     image: elastic/filebeat:9.4.2
@@ -87,11 +46,9 @@ services:
       - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
       - ./logs:/var/log/flowtrack
     networks:
-      flowtrack:
+      flowtrack-monitoring:
         aliases:
           - flowtrack-filebeat
-    depends_on:
-      - elasticsearch
     restart: unless-stopped
 
   elasticvue:
@@ -106,8 +63,9 @@ services:
 
 networks:
   flowtrack:
-    driver: bridge
-    name: flowtrack
+    external: true
+  flowtrack-monitoring:
+    external: true
 
 volumes:
   flowtrack:

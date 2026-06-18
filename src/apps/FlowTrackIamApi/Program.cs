@@ -14,6 +14,7 @@ try
         .AddLogger(logFilePath: "./logs/flowtrack-iam-.json")
         .AddAuthentication<CookieAuthenticationHandler>("Cookie")
         .AddContext<IamDbContext>()
+        .AddContext<IamDbContext>("IAM")
         .DiscoverServices(["FlowTrack*.dll"])
         .ProvideIam()
         .Build();

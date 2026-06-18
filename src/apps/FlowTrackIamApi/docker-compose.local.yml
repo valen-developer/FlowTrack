@@ -1,0 +1,34 @@
+services:
+  postgres-iam:
+    image: postgres:18-alpine
+    container_name: flowtrack-iam-db
+    environment:
+      POSTGRES_USER: flowtrack
+      POSTGRES_PASSWORD: flowtrack
+      POSTGRES_DB: flowtrack
+    ports:
+      - '5432:5432'
+    networks:
+      flowtrack:
+        aliases:
+          - flowtrack-iam-db
+    volumes:
+      - flowtrack-iam-db:/var/lib/postgresql
+
+  filebeat:
+    image: elastic/filebeat:9.4.2
+    container_name: flowtrack-iam-filebeat
+    environment:
+      - xpack.monitoring.enabled=false
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./logs:/var/log/flowtrack
+    networks:
+      flowtrack-monitoring:
+        aliases:
+          - flowtrack-filebeat
+    restart: unless-stopped
+
+volumes:
+  flowtrack-iam-db:
+    name: flowtrack-iam-db
