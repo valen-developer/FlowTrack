@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowTrackIamApi.Test.Iam.Controllers.Auth;
+namespace FlowTrackIamApi.Test.Auth.Controllers;
 
 [Collection(nameof(FlowTrackIamApiCollection))]
 public class SignupControllerE2E(FlowTrackIamApiFixture fixture) : FlowTrackIamApiE2E(fixture)

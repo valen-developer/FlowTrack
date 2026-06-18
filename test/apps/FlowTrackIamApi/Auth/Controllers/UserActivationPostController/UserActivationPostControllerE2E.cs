@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FlowTrackIamApi.Test.Iam.Controllers.Auth;
+namespace FlowTrackIamApi.Test.Auth.Controllers;
 
 public class UserActivationPostControllerE2E(FlowTrackIamApiFixture fixture)
     : FlowTrackIamApiE2E(fixture)
