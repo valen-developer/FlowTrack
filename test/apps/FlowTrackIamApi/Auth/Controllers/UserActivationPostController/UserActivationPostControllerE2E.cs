@@ -15,7 +15,7 @@ public class UserActivationPostControllerE2E(FlowTrackIamApiFixture fixture)
         var activationToken = GetActivationToken(user);
 
         var request = new { Token = activationToken };
-        var response = await HttpClient.PostAsJsonAsync("/user-activations", request);
+        var response = await HttpClient.PostAsJsonAsync("/user-activation", request);
 
         Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
 
