@@ -1,13 +1,11 @@
 using System.Security.Claims;
 using FlowtrackApi.Iam.Schemas;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlowtrackApi.Iam.Controllers.Users
 {
     public sealed class UserMeController(IQueryBus queryBus) : UserController
     {
-        [Authorize]
         [HttpGet("me")]
         public async Task<ActionResult<UserMeResponse>> Execute()
         {

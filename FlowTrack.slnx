@@ -2,6 +2,7 @@
   <Folder Name="/src/" />
   <Folder Name="/src/apps/">
     <Project Path="src/apps/FlowtrackApi/FlowTrackApi.csproj" />
+    <Project Path="src/apps/FlowTrackIamApi/FlowTrackIamApi.csproj" />
   </Folder>
   <Folder Name="/src/contexts/">
     <Project Path="src/contexts/Shared/FlowTrack.Shared.csproj" />

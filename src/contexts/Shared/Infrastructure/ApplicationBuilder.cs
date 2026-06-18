@@ -37,7 +37,7 @@ public class ApplicationBuilder
         _builder.Services.AddHostedService<DomainEventSubscribeBackground>();
     }
 
-    public ApplicationBuilder AddContext<T>(string? key)
+    public ApplicationBuilder AddContext<T>(string? key = null)
         where T : DbContext
     {
         if (key is not null)
