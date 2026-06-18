@@ -33,7 +33,9 @@ La solution esta organizada por bounded context y por capas internas.
 ```text
 src/
   apps/
-    FlowtrackApi/                    # API HTTP (controllers, middleware, auth)
+    FlowTrackIamApi/                 # API HTTP de IAM (auth, users)
+    FlowTrackWorkManagementApi/      # API HTTP de Work Management (workspaces)
+    FlowTrackApiGateway/             # API Gateway / Reverse Proxy (YARP)
   contexts/
     Shared/
       Domain/
@@ -80,7 +82,7 @@ src/
 
 test/
   apps/
-    FlowtrackApi/                    # E2E tests
+    FlowTrackIamApi/                 # E2E tests contra FlowTrackIamApi
   contexts/
     Shared/                          # Test utilities (fixtures, object mothers)
     Iam/                             # Unit + integration tests
@@ -147,16 +149,20 @@ Ejemplos:
 
 ## Estructura de proyectos
 
-- `src/apps/FlowtrackApi/FlowtrackApi.csproj`
-  - Capa de entrada HTTP: controllers, middleware, esquemas de autenticacion.
+- `src/apps/FlowTrackIamApi/FlowTrackIamApi.csproj`
+  - API HTTP del contexto IAM: controllers, middleware, auth.
+- `src/apps/FlowTrackWorkManagementApi/FlowTrackWorkManagementApi.csproj`
+  - API HTTP del contexto Work Management: controllers, workspaces.
+- `src/apps/FlowTrackApiGateway/FlowTrackApiGateway.csproj`
+  - API Gateway con reverse proxy (YARP).
 - `src/contexts/Shared/FlowTrack.Shared.csproj`
   - Codigo compartido transversal (contratos de bus, service discovery, mailer, value objects, utilidades de infraestructura, RabbitMQ, DotEnv).
 - `src/contexts/Iam/FlowTrack.Iam.csproj`
   - Bounded context de identidad/autenticacion (signup, signin, activacion por email, JWT).
 - `src/contexts/WorkManagement/FlowTrack.WorkManagement.csproj`
   - Bounded context de gestion de workspaces (creacion, indexacion con Elasticsearch, filtros).
-- `test/apps/FlowtrackApi/FlowtrackApiTest.csproj`
-  - Tests E2E contra la API real.
+- `test/apps/FlowTrackIamApi/FlowTrackIamApiTest.csproj`
+  - Tests E2E contra la API real de FlowTrackIamApi.
 - `test/contexts/Shared/FlowTrack.Shared.Test.csproj`
   - Utilidades base para tests (fixture compartida, carga de `.env`, object mother).
 - `test/contexts/Iam/FlowTrack.Iam.Test.csproj`
@@ -181,10 +187,12 @@ Consulta `.env.template` para ver la lista completa de variables requeridas y su
 
 ## Comandos utiles
 
-Levantar servicios locales (PostgreSQL, RabbitMQ, Elasticsearch, Adminer):
+Levantar servicios locales (infraestructura compartida + bases de datos):
 
 ```bash
-docker compose -f src/apps/FlowtrackApi/docker-compose.local.yml up -d
+docker compose -f src/apps/Shared/docker-compose.local.yml up -d
+docker compose -f src/apps/FlowTrackIamApi/docker-compose.local.yml up -d
+docker compose -f src/apps/FlowTrackWorkManagementApi/docker-compose.local.yml up -d
 ```
 
 Desde la raiz de la solution:
@@ -201,7 +209,7 @@ Ejecutar tests por proyecto:
 dotnet test test/contexts/Iam/FlowTrack.Iam.Test.csproj
 dotnet test test/contexts/Shared/FlowTrack.Shared.Test.csproj
 dotnet test test/contexts/WorkManagement/FlowTrack.WorkManagement.Test.csproj
-dotnet test test/apps/FlowtrackApi/FlowtrackApiTest.csproj
+dotnet test test/apps/FlowTrackIamApi/FlowTrackIamApiTest.csproj
 ```
 
 ### Hooks de git (Husky)
