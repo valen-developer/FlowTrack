@@ -1,7 +1,7 @@
 using FlowTrack.Shared.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FlowTrackIamApi.Controllers.Users;
+namespace FlowTrackIamApi.Users.Controllers;
 
 [ApiController]
 [Route("user")]

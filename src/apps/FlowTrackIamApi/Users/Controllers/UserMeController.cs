@@ -3,10 +3,10 @@ using FlowTrack.Iam.Users.Application;
 using FlowTrack.Iam.Users.Domain;
 using FlowTrack.Shared.Domain.Bus.Query;
 using FlowTrack.Shared.Domain.Exception;
-using FlowTrackIamApi.Schemas;
+using FlowTrackIamApi.Users.Schemas;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FlowTrackIamApi.Controllers.Users;
+namespace FlowTrackIamApi.Users.Controllers;
 
 public sealed class UserMeController(IQueryBus queryBus) : UserController
 {
