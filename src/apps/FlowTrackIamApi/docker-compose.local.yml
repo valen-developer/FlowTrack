@@ -26,9 +26,15 @@ services:
     networks:
       flowtrack-monitoring:
         aliases:
-          - flowtrack-filebeat
+          - flowtrack-workmanagement-filebeat
     restart: unless-stopped
 
 volumes:
   flowtrack-iam-db:
     name: flowtrack-iam-db
+
+networks:
+  flowtrack:
+    external: true
+  flowtrack-monitoring:
+    external: true

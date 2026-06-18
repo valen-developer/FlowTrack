@@ -3,6 +3,7 @@
   <Folder Name="/src/apps/">
     <Project Path="src/apps/FlowtrackApi/FlowTrackApi.csproj" />
     <Project Path="src/apps/FlowTrackIamApi/FlowTrackIamApi.csproj" />
+    <Project Path="src/apps/FlowTrackWorkManagementApi/FlowTrackWorkManagementApi.csproj" />
   </Folder>
   <Folder Name="/src/contexts/">
     <Project Path="src/contexts/Shared/FlowTrack.Shared.csproj" />

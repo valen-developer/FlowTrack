@@ -1,0 +1,74 @@
+services:
+  postgres-workmanagement:
+    image: postgres:18-alpine
+    container_name: flowtrack-workmanagement-db
+    environment:
+      POSTGRES_USER: flowtrack
+      POSTGRES_PASSWORD: flowtrack
+      POSTGRES_DB: flowtrack
+    ports:
+      - '5433:5432'
+    networks:
+      flowtrack:
+        aliases:
+          - flowtrack-workmanagement-db
+    volumes:
+      - flowtrack-workmanagement-db:/var/lib/postgresql
+
+  filebeat:
+    image: elastic/filebeat:9.4.2
+    container_name: flowtrack-workmanagement-filebeat
+    environment:
+      - xpack.monitoring.enabled=false
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./logs:/var/log/flowtrack
+    networks:
+      flowtrack-monitoring:
+        aliases:
+          - flowtrack-workmanagement-filebeat
+    restart: unless-stopped
+
+  elasticsearch:
+    image: elasticsearch:9.4.2
+    container_name: flowtrack-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.ml.enabled=false
+      - xpack.graph.enabled=false
+      - xpack.watcher.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - http.cors.enabled=true
+      - "http.cors.allow-origin=http://localhost:8082"
+    ports:
+      - '9201:9200'
+      - '9301:9300'
+    networks:
+      flowtrack:
+        aliases:
+          - flowtrack-elasticsearch
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+
+  elasticvue:
+    image: cars10/elasticvue
+    container_name: flowtrack-elasticvue
+    ports:
+      - '8082:8080'
+    networks:
+      flowtrack:
+        aliases:
+          - flowtrack-elasticvue
+
+volumes:
+  flowtrack-workmanagement-db:
+    driver: local
+  elasticsearch-data:
+    driver: local
+
+networks:
+  flowtrack:
+    external: true
+  flowtrack-monitoring:
+    external: true
