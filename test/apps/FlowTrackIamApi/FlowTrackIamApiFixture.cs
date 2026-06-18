@@ -63,8 +63,7 @@ public class FlowTrackIamApiFixture : WebApplicationFactory<Program>, IAsyncLife
     {
         var env = new Dictionary<string, string>()
         {
-            [IamEnvironmentKeysEnum.IAM_URL_OF_ACTIVATION.ToString()] =
-                "http://localhost/activate",
+            [IamEnvironmentKeysEnum.IAM_URL_OF_ACTIVATION.ToString()] = "http://localhost/activate",
             [IamEnvironmentKeysEnum.ACTIVATE_TOKEN_SECRET.ToString()] =
                 "access_token_secret_super_ultra_mega_strong",
             [IamEnvironmentKeysEnum.ACCESS_TOKEN_SECRET.ToString()] =
