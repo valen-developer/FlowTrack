@@ -3,8 +3,6 @@ using FlowTrack.WorkManagement.Shared.Infrastructure;
 using Serilog;
 using ApplicationBuilder = FlowTrack.Shared.Infrastructure.ApplicationBuilder;
 
-Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
-
 try
 {
     new DotEnvCharger().Load(["../../../.env"]);
