@@ -1,0 +1,21 @@
+info:
+  name: User Activation
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{base_url}}/iam/user-activation"
+  body:
+    type: json
+    data: |-
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA2NjFkNGQ0LThmNzQtNDljMi1iZjZlLTIzMjZiMDA4ZTYzNiIsImV4cCI6MTc4MjQxOTQ5MH0.dzAEyO4FYUj_xITZ4WQhguDPnTiqQ1AosLTaeUcIYLI"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

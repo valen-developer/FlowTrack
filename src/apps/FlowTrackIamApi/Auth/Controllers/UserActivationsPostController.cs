@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FlowTrackIamApi.Auth.Controllers;
 
-[Route("user-activations")]
+[Route("user-activation")]
 public sealed class UserActivationsPostController(ICommandBus commandBus) : IController
 {
     [AllowAnonymous]

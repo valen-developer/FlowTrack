@@ -1,0 +1,23 @@
+info:
+  name: Signup
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}/iam/auth/signup"
+  body:
+    type: json
+    data: |-
+      {
+        "id": "eb890620-2dbf-40e3-b903-61f4fd0a4bd6",
+        "email": "email@email.com",
+        "password": "Password1"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
