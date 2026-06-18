@@ -1,0 +1,14 @@
+include:
+  - path: ./src/apps/Shared/docker-compose.local.yml
+  - path: ./src/apps/FlowTrackIamApi/docker-compose.local.yml
+  - path: ./src/apps/FlowTrackWorkManagementApi/docker-compose.local.yml
+
+networks:
+  flowtrack:
+    name: flowtrack
+    driver: bridge
+    external: false
+  flowtrack-monitoring:
+    name: flowtrack-monitoring
+    driver: bridge
+    external: false

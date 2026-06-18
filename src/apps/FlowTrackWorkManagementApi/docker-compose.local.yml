@@ -15,7 +15,7 @@ services:
     volumes:
       - flowtrack-workmanagement-db:/var/lib/postgresql
 
-  filebeat:
+  filebeat-workmanagement:
     image: elastic/filebeat:9.4.2
     container_name: flowtrack-workmanagement-filebeat
     environment:
@@ -49,7 +49,7 @@ services:
         aliases:
           - flowtrack-elasticsearch
     volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
+      - elasticsearch-data-workmanagement:/usr/share/elasticsearch/data
 
   elasticvue:
     image: cars10/elasticvue
@@ -64,7 +64,7 @@ services:
 volumes:
   flowtrack-workmanagement-db:
     driver: local
-  elasticsearch-data:
+  elasticsearch-data-workmanagement:
     driver: local
 
 networks:
