@@ -30,5 +30,8 @@
     // Archivos temporales
     "**/*.tmp": true,
     "**/temp": true
+  },
+  "yaml.schemas": {
+    "kubernetes": "*.yaml"
   }
 }
