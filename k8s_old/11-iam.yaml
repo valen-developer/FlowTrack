@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flowtrack-iam
+  namespace: flowtrack
+spec:
+  ports:
+  - port: 5002
+    targetPort: 5002
+    name: http
+  selector:
+    app: flowtrack-iam
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flowtrack-iam
+  namespace: flowtrack
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: flowtrack-iam
+  template:
+    metadata:
+      labels:
+        app: flowtrack-iam
+    spec:
+      containers:
+      - name: iam
+        image: localhost:5000/flowtrack-iam:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5002
+        envFrom:
+        - configMapRef:
+            name: flowtrack-config
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"

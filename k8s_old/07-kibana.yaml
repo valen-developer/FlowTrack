@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+  namespace: flowtrack
+spec:
+  ports:
+  - port: 5601
+    name: http
+  selector:
+    app: kibana
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  namespace: flowtrack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: kibana:9.4.2
+        ports:
+        - containerPort: 5601
+        env:
+        - name: ELASTICSEARCH_HOSTS
+          value: "http://elasticsearch-monitoring:9200"
+        - name: XPACK_FLEET_ENABLED
+          value: "false"
+        - name: SERVER_BASEPATH
+          value: /kibana
+        - name: SERVER_REWRITEBASEPATH
+          value: "true"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"

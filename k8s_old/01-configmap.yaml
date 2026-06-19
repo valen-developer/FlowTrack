@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flowtrack-config
+  namespace: flowtrack
+data:
+  IAM_URL_OF_ACTIVATION: http://192.168.0.29/activate
+  IAM_DB_CONNECTION_STRING: "Host=postgres-iam;Port=5432;Database=flowtrack;Username=flowtrack;Password=flowtrack"
+  WORK_MANAGEMENT_DB_CONNECTION_STRING: "Host=postgres-workmanagement;Port=5432;Database=flowtrack;Username=flowtrack;Password=flowtrack"
+  WORK_MANAGEMENT_ELASTICSEARCH_URL: "http://elasticsearch-workmanagement:9200"
+  RABBITMQ_HOST: rabbitmq
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_USERNAME: flowtrack
+  RABBITMQ_PASSWORD: flowtrack
+  RABBITMQ_CLIENT_PROVIDED_NAME: FlowTrackApp
+  EXTERNAL_EVENT_EXCHANGE_NAME: domain_events
+  ACCESS_TOKEN_SECRET: super_ultra_mega_strong_secret_for_access_token
+  ACCESS_TOKEN_EXPIRE_MINUTES: "60"
+  REFRESH_TOKEN_SECRET: super_ultra_mega_strong_secret_for_refresh_token
+  REFRESH_TOKEN_EXPIRE_MINUTES: "43200"
+  ACTIVATE_TOKEN_SECRET: super_ultra_mega_strong_secret_for_activate_token
+  ASPNETCORE_ENVIRONMENT: Development
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-config
+  namespace: flowtrack
+data:
+  appsettings.json: |
+    {
+      "Logging": {
+        "LogLevel": {
+          "Default": "Information",
+          "Microsoft.AspNetCore": "Warning",
+          "Yarp": "Information"
+        }
+      },
+      "AllowedHosts": "*",
+      "ReverseProxy": {
+        "Routes": {
+          "iam": {
+            "ClusterId": "iam",
+            "Match": {
+              "Path": "/iam/{**catch-all}"
+            },
+            "Transforms": [
+              {
+                "PathRemovePrefix": "/iam"
+              }
+            ]
+          },
+          "workmanagement": {
+            "ClusterId": "workmanagement",
+            "Match": {
+              "Path": "/work/{**catch-all}"
+            },
+            "Transforms": [
+              {
+                "PathRemovePrefix": "/work"
+              }
+            ]
+          }
+        },
+        "Clusters": {
+          "iam": {
+            "Destinations": {
+              "iam": {
+                "Address": "http://flowtrack-iam:5002/"
+              }
+            }
+          },
+          "workmanagement": {
+            "Destinations": {
+              "workmanagement": {
+                "Address": "http://flowtrack-workmanagement:5003/"
+              }
+            }
+          }
+        }
+      }
+    }
