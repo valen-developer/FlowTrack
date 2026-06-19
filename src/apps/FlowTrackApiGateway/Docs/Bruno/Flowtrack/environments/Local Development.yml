@@ -1,0 +1,4 @@
+name: Local Development
+variables:
+  - name: base_url
+    value: http://192.168.0.29

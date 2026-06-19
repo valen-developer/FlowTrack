@@ -24,7 +24,7 @@ public sealed class AuthCookieSetter(
             new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
+                Secure = false,
                 SameSite = SameSiteMode.Strict,
                 Expires = now.AddMinutes(60),
             }
@@ -36,7 +36,7 @@ public sealed class AuthCookieSetter(
             new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
+                Secure = false,
                 SameSite = SameSiteMode.Strict,
                 Expires = now.AddMinutes(60 * 24 * 30),
             }
