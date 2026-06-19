@@ -34,19 +34,32 @@ public sealed class RequestLoggingMiddleware
 
         try
         {
+            var originalBody = context.Response.Body;
+            using var responseBody = new MemoryStream();
+            context.Response.Body = responseBody;
+
             await _next(context);
+
+            context.Response.Body = originalBody;
+            responseBody.Seek(0, SeekOrigin.Begin);
+            var bodyText = new StreamReader(responseBody).ReadToEnd();
+            await responseBody.CopyToAsync(originalBody);
 
             sw.Stop();
             logger.Info(
                 new LogMessage(
-                    Action: "Http Request",
+                    Action: "Http Response",
                     Message: $"{context.Response.StatusCode} {method} {path} completed in {sw.ElapsedMilliseconds}ms",
                     Attributes: new
                     {
-                        Method = method,
-                        Path = path,
-                        StatusCode = context.Response.StatusCode,
-                        ElapsedMs = sw.ElapsedMilliseconds,
+                        HttpResponse = new
+                        {
+                            StatusCode = context.Response.StatusCode,
+                            Method = method,
+                            Path = path,
+                            ElapsedMs = sw.ElapsedMilliseconds,
+                            Body = bodyText,
+                        },
                     }
                 )
             );
