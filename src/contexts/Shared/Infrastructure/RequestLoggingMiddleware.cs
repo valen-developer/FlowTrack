@@ -43,6 +43,7 @@ public sealed class RequestLoggingMiddleware
             context.Response.Body = originalBody;
             responseBody.Seek(0, SeekOrigin.Begin);
             var bodyText = new StreamReader(responseBody).ReadToEnd();
+            responseBody.Seek(0, SeekOrigin.Begin);
             await responseBody.CopyToAsync(originalBody);
 
             sw.Stop();
