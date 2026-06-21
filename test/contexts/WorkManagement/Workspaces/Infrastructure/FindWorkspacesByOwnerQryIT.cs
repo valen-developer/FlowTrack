@@ -27,9 +27,9 @@ public class FindWorkspacesByOwnerQryIT : WorkManagementIntegrationTestCase
             .. expectedWorkspaces.Select(WorkspaceSearchDocument.FromDomain),
         ];
 
-        await _fixture.IndexDocs("workspaces", indexedDocs);
+        await _fixture.Containers.IndexDocs("workspaces", indexedDocs);
         var elasticQuery = new { query = new { match = new { ownerId } } };
-        var internalResult = await _fixture.ExecuteQueryOnSearchEngine<WorkspaceSearchDocument>(
+        var internalResult = await _fixture.Containers.ExecuteQueryOnSearchEngine<WorkspaceSearchDocument>(
             "workspaces",
             elasticQuery
         );

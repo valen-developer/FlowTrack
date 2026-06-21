@@ -4,7 +4,7 @@ using FlowTrack.WorkManagement.Workspaces.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace FlowTrack.WorkManagement.Workspaces.Test;
+namespace FlowTrack.WorkManagement.Workspaces.Test.Application;
 
 public class FindWorkspacesByOwnerQryTest
 {

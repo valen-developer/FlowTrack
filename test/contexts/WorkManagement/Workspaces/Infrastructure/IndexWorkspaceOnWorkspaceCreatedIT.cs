@@ -56,7 +56,7 @@ public class IndexWorkspaceOnWorkspaceCreatedIT : WorkManagementIntegrationTestC
                 try
                 {
                     searchEngineResponse =
-                        await _fixture.ExecuteQueryOnSearchEngine<WorkspaceSearchDocument>(
+                        await _fixture.Containers.ExecuteQueryOnSearchEngine<WorkspaceSearchDocument>(
                             "workspaces",
                             elasticQuery
                         );

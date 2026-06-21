@@ -31,7 +31,7 @@ namespace FlowTrack.WorkManagement.Workspaces.Test.Infrastructure
             List<WorkspaceEntity> workspaces = [];
             await WaitForAsync(async () =>
             {
-                workspaces = await _fixture.ExecuteQueryAsync<WorkspaceEntity>(
+                workspaces = await _fixture.Containers.ExecuteQueryAsync<WorkspaceEntity>(
                     $"SELECT * FROM workspaces WHERE \"OwnerId\" = '{userCreatedEvent.UserId}'"
                 );
 
