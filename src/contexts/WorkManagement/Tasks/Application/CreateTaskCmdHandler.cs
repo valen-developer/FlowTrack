@@ -3,7 +3,8 @@ using FlowTrack.WorkManagement.Tasks.Domain;
 
 namespace FlowTrack.WorkManagement.Tasks.Application;
 
-internal sealed class CreateTaskCmdHandler : ICommandHandler<CreateTaskCmd>
+internal sealed class CreateTaskCmdHandler(ITaskRepository repository)
+    : ICommandHandler<CreateTaskCmd>
 {
     public async Task Handle(CreateTaskCmd command)
     {
@@ -11,7 +12,9 @@ internal sealed class CreateTaskCmdHandler : ICommandHandler<CreateTaskCmd>
             Id: new(command.Id),
             Title: new(command.Title),
             Description: new(command.Description),
-            State: new(command.State)
+            State: TaskState.FromString(command.State)
         );
+
+        await repository.Save(task);
     }
 }

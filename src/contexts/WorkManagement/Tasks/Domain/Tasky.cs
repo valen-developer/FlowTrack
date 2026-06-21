@@ -11,12 +11,12 @@ internal sealed class Tasky(
     DateTime updatedAt
 ) : AggregatedRoot
 {
-    private TaskId _id = id;
-    private TaskTitle _title = title;
-    private TaskDescription _description = description;
-    private TaskState _state = state;
-    private DateTime _createdAt = createdAt;
-    private DateTime _updatedAt = updatedAt;
+    public TaskId Id { get; } = id;
+    public TaskTitle Title { get; } = title;
+    public TaskDescription Description { get; } = description;
+    public TaskState State { get; } = state;
+    public DateTime CreatedAt { get; } = createdAt;
+    public DateTime UpdatedAt { get; } = updatedAt;
 
     public static Tasky Create(
         TaskId Id,

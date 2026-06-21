@@ -1,24 +1,28 @@
 using FlowTrack.WorkManagement.Tasks.Application;
 using FlowTrack.WorkManagement.Tasks.Domain;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace FlowTrack.WorkManagement.Tasks.Test.Application;
 
 /*
 * [] Should throw Task Name Too Long Exception
   [] Should throw TaskNameNull Exception
+  [] Should throw InvalidTaskState Exception
   [] Should save task in repository
   [] Should emit TaskCreated Event
 */
 
 public class CreateTaskCmdTest
 {
+    private readonly Mock<ITaskRepository> _repositoryMock = new();
     private readonly CreateTaskCmdHandler _handler;
 
     public CreateTaskCmdTest()
     {
         var services = new ServiceCollection();
 
+        services.AddSingleton(_repositoryMock.Object);
         services.AddScoped<CreateTaskCmdHandler>();
 
         var serviceProvider = services.BuildServiceProvider();
@@ -57,5 +61,67 @@ public class CreateTaskCmdTest
         {
             await _handler.Handle(command);
         });
+    }
+
+    [Fact]
+    public async Task Should_Throw_InvalidTaskState_Exception()
+    {
+        var command = new CreateTaskCmd(
+            Id: Guid.NewGuid().ToString(),
+            Title: "Test Task",
+            Description: "Test Description",
+            State: "INVALID_STATE"
+        );
+
+        await Assert.ThrowsAsync<InvalidTaskState>(async () =>
+        {
+            await _handler.Handle(command);
+        });
+    }
+
+    [Theory]
+    [InlineData("TODO")]
+    [InlineData("IN_PROGRESS")]
+    [InlineData("DONE")]
+    public async Task Should_Not_Throw_InvalidTaskState_Exception(string state)
+    {
+        var command = new CreateTaskCmd(
+            Id: Guid.NewGuid().ToString(),
+            Title: "Test Task",
+            Description: "Test Description",
+            State: state
+        );
+
+        var exception = await Record.ExceptionAsync(async () =>
+        {
+            await _handler.Handle(command);
+        });
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public async Task Should_Save_Task_In_Repository()
+    {
+        var command = new CreateTaskCmd(
+            Id: Guid.NewGuid().ToString(),
+            Title: "Test Task",
+            Description: "Test Description",
+            State: TaskStateEnum.TODO.ToString()
+        );
+
+        await _handler.Handle(command);
+
+        _repositoryMock.Verify(
+            repo =>
+                repo.Save(
+                    It.Is<Tasky>(task =>
+                        task.Title.Value == command.Title
+                        && task.Description.Value == command.Description
+                        && task.State.Value.ToString() == command.State
+                    )
+                ),
+            Times.Once
+        );
     }
 }
