@@ -1,3 +1,4 @@
+using FlowTrack.Shared.Infrastructure.Auth;
 using FlowTrack.WorkManagement.Test;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -14,6 +15,11 @@ public class FlowTrackWorkManagementApiFixture : WebApplicationFactory<Program>,
     public async Task InitializeAsync()
     {
         await _containers.StartAsync();
+
+        Environment.SetEnvironmentVariable(
+            AuthEnvironmentKeysEnum.ACCESS_TOKEN_SECRET.ToString(),
+            "super_ultra_mega_strong_secret_for_access_token"
+        );
 
         // Set env vars so the real Program.cs can connect to the containers
         Environment.SetEnvironmentVariable(

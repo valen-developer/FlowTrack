@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../../src/apps/FlowTrackWorkManagementApi/FlowTrackWorkManagementApi.csproj" />
+    <ProjectReference Include="../../../src/contexts/Shared/FlowTrack.Shared.csproj" />
     <ProjectReference Include="../../../src/contexts/WorkManagement/FlowTrack.WorkManagement.csproj" />
     <ProjectReference Include="../../contexts/Shared/FlowTrack.Shared.Test.csproj" />
     <ProjectReference Include="../../contexts/WorkManagement/FlowTrack.WorkManagement.Test.csproj" />
