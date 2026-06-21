@@ -2,6 +2,7 @@ using Elastic.Clients.Elasticsearch;
 using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Dic;
 using FlowTrack.Shared.Domain.Exception;
+using FlowTrack.Shared.Domain.FilterCriterias;
 using FlowTrack.WorkManagement.Shared.Domain;
 using FlowTrack.WorkManagement.Workspaces.Domain;
 
@@ -19,6 +20,11 @@ internal class ElasticSearchWorkspaceSearchEngine : IWorkspaceSearchEngine
 
         var elasticSearchUrl = envStore.Get(urlKey) ?? throw new EnvVariableMissed(urlKey);
         _client = new(new ElasticsearchClientSettings(new Uri(elasticSearchUrl)));
+    }
+
+    public Task<List<Workspace>> Find(FilterCriteria criteria)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task Index(Workspace workspace)

@@ -1,7 +1,9 @@
-namespace FlowTrack.WorkManagement.Workspaces.Domain
+using FlowTrack.Shared.Domain.FilterCriterias;
+
+namespace FlowTrack.WorkManagement.Workspaces.Domain;
+
+internal interface IWorkspaceSearchEngine
 {
-    internal interface IWorkspaceSearchEngine
-    {
-        Task Index(Workspace workspace);
-    }
+    Task Index(Workspace workspace);
+    Task<List<Workspace>> Find(FilterCriteria criteria);
 }
