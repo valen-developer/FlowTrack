@@ -15,6 +15,7 @@
   <Folder Name="/test/" />
   <Folder Name="/test/apps/">
     <Project Path="test/apps/FlowTrackIamApi/FlowTrackIamApiTest.csproj" />
+    <Project Path="test/apps/FlowTrackWorkManagementApiTest/FlowTrackWorkManagementApiTest.csproj" />
   </Folder>
   <Folder Name="/test/contexts/">
     <Project Path="test/contexts/Iam/FlowTrack.Iam.Test.csproj" />

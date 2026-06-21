@@ -13,4 +13,10 @@
     <ProjectReference Include="../../contexts/Shared/FlowTrack.Shared.csproj" />
     <ProjectReference Include="../../contexts/WorkManagement/FlowTrack.WorkManagement.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>FlowTrackWorkManagementApiTest</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>

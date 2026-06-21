@@ -24,6 +24,9 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>FlowTrackWorkManagementApi</_Parameter1>
     </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>FlowTrackWorkManagementApiTest</_Parameter1>
+    </AssemblyAttribute>
 
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>FlowTrack.WorkManagement.Test</_Parameter1>
