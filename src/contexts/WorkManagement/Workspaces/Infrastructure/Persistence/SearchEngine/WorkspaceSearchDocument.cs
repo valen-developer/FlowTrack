@@ -16,4 +16,13 @@ internal record WorkspaceSearchDocument(string Id, string OwnerId, string Name)
             Name: workspace.Name.Value
         );
     }
+
+    public Workspace ToDomain()
+    {
+        return new Workspace(
+            Id: new WorkspaceId(Id),
+            OwnerId: new WorkspaceOwnerId(OwnerId),
+            Name: new WorkspaceName(Name)
+        );
+    }
 }

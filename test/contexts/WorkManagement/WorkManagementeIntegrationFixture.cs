@@ -7,6 +7,7 @@ using FlowTrack.Shared.Infrastructure.Transactions;
 using FlowTrack.Shared.Test;
 using FlowTrack.WorkManagement.Shared.Domain;
 using FlowTrack.WorkManagement.Shared.Infrastructure;
+using FlowTrack.WorkManagement.Workspaces.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -200,6 +201,35 @@ namespace FlowTrack.WorkManagement.Test
             var dbContext = scope.ServiceProvider.GetRequiredService<WorkManagementDbContext>();
 
             return await dbContext.Set<T>().FromSqlRaw(sqlQuery).AsNoTracking().ToListAsync();
+        }
+
+        public async Task IndexDocs(string indexName, IEnumerable<object> documents)
+        {
+            var elasticsearchUri = new Uri(
+                $"http://{_elasticsearchContainer.Hostname}:{_elasticsearchContainer.GetMappedPublicPort(9200)}"
+            );
+            using var client = new HttpClient { BaseAddress = elasticsearchUri };
+
+            var jsonOptions = new System.Text.Json.JsonSerializerOptions
+            {
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+            };
+
+            foreach (var doc in documents)
+            {
+                var jsonContent = new StringContent(
+                    System.Text.Json.JsonSerializer.Serialize(doc, jsonOptions),
+                    System.Text.Encoding.UTF8,
+                    "application/json"
+                );
+
+                var response = await client.PostAsync($"/{indexName}/_doc", jsonContent);
+                response.EnsureSuccessStatusCode();
+            }
+
+            // Refresh the index to make the documents searchable immediately
+            var refreshResponse = await client.PostAsync($"/{indexName}/_refresh", null);
+            refreshResponse.EnsureSuccessStatusCode();
         }
 
         public async Task<List<T>> ExecuteQueryOnSearchEngine<T>(string indexName, object query)

@@ -1,9 +1,11 @@
 using FlowTrack.Shared.Domain.Bus.Query;
+using FlowTrack.Shared.Domain.Dic;
 using FlowTrack.Shared.Domain.FilterCriterias;
 using FlowTrack.WorkManagement.Workspaces.Domain;
 
 namespace FlowTrack.WorkManagement.Workspaces.Application;
 
+[Service]
 internal class FindWorkspacesByOwnerQryHandler(IWorkspaceSearchEngine searchEngine)
     : IQueryHandler<FindWorkspacesByOwnerQry, List<Workspace>>
 {

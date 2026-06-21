@@ -3,6 +3,7 @@ using FlowTrack.Shared.Domain;
 using FlowTrack.Shared.Domain.Dic;
 using FlowTrack.Shared.Domain.Exception;
 using FlowTrack.Shared.Domain.FilterCriterias;
+using FlowTrack.Shared.Infrastructure.Persistence;
 using FlowTrack.WorkManagement.Shared.Domain;
 using FlowTrack.WorkManagement.Workspaces.Domain;
 
@@ -22,9 +23,20 @@ internal class ElasticSearchWorkspaceSearchEngine : IWorkspaceSearchEngine
         _client = new(new ElasticsearchClientSettings(new Uri(elasticSearchUrl)));
     }
 
-    public Task<List<Workspace>> Find(FilterCriteria criteria)
+    public async Task<List<Workspace>> Find(FilterCriteria criteria)
     {
-        throw new NotImplementedException();
+        var query = ElasticFilterCriteriaConverter.Apply<WorkspaceSearchDocument>(criteria);
+
+        var response = await _client.SearchAsync(IndexName, query);
+
+        if (!response.IsValidResponse)
+        {
+            throw new Exception(
+                $"Elasticsearch search failed: {response.ElasticsearchServerError?.Error.Reason}"
+            );
+        }
+
+        return [.. response.Documents.Select(doc => doc.ToDomain())];
     }
 
     public async Task Index(Workspace workspace)
