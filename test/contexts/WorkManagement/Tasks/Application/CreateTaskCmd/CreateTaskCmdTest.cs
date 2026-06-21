@@ -1,3 +1,4 @@
+using FlowTrack.Shared.Domain.Bus.Event;
 using FlowTrack.WorkManagement.Tasks.Application;
 using FlowTrack.WorkManagement.Tasks.Domain;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,13 +17,18 @@ namespace FlowTrack.WorkManagement.Tasks.Test.Application;
 public class CreateTaskCmdTest
 {
     private readonly Mock<ITaskRepository> _repositoryMock = new();
+    private readonly Mock<IDomainEventBus> _internalEventBusMock = new();
+    private readonly Mock<IExternalEventBus> _externalEventBusMock = new();
     private readonly CreateTaskCmdHandler _handler;
 
     public CreateTaskCmdTest()
     {
         var services = new ServiceCollection();
 
+        services.AddSingleton(_internalEventBusMock.Object);
+        services.AddSingleton(_externalEventBusMock.Object);
         services.AddSingleton(_repositoryMock.Object);
+        services.AddSingleton<EventBus>();
         services.AddScoped<CreateTaskCmdHandler>();
 
         var serviceProvider = services.BuildServiceProvider();
@@ -36,6 +42,7 @@ public class CreateTaskCmdTest
 
         var command = new CreateTaskCmd(
             Id: Guid.NewGuid().ToString(),
+            OwnerId: Guid.NewGuid().ToString(),
             Title: new string('A', maxNameLength + 1),
             Description: "Test Description",
             State: TaskStateEnum.TODO.ToString()
@@ -52,6 +59,7 @@ public class CreateTaskCmdTest
     {
         var command = new CreateTaskCmd(
             Id: Guid.NewGuid().ToString(),
+            OwnerId: Guid.NewGuid().ToString(),
             Title: null!,
             Description: "Test Description",
             State: TaskStateEnum.TODO.ToString()
@@ -68,6 +76,7 @@ public class CreateTaskCmdTest
     {
         var command = new CreateTaskCmd(
             Id: Guid.NewGuid().ToString(),
+            OwnerId: Guid.NewGuid().ToString(),
             Title: "Test Task",
             Description: "Test Description",
             State: "INVALID_STATE"
@@ -87,6 +96,7 @@ public class CreateTaskCmdTest
     {
         var command = new CreateTaskCmd(
             Id: Guid.NewGuid().ToString(),
+            OwnerId: Guid.NewGuid().ToString(),
             Title: "Test Task",
             Description: "Test Description",
             State: state
@@ -105,6 +115,7 @@ public class CreateTaskCmdTest
     {
         var command = new CreateTaskCmd(
             Id: Guid.NewGuid().ToString(),
+            OwnerId: Guid.NewGuid().ToString(),
             Title: "Test Task",
             Description: "Test Description",
             State: TaskStateEnum.TODO.ToString()
@@ -123,5 +134,41 @@ public class CreateTaskCmdTest
                 ),
             Times.Once
         );
+    }
+
+    [Fact]
+    public async Task Should_Emit_TaskCreated_Event()
+    {
+        IEnumerable<DomainEvent> capturedEvents = null!;
+
+        _internalEventBusMock
+            .Setup(bus => bus.Publish(It.IsAny<IEnumerable<DomainEvent>>()))
+            .Callback<IEnumerable<DomainEvent>>(events => capturedEvents = events);
+
+        var command = new CreateTaskCmd(
+            Id: Guid.NewGuid().ToString(),
+            OwnerId: Guid.NewGuid().ToString(),
+            Title: "Test Task",
+            Description: "Test Description",
+            State: TaskStateEnum.TODO.ToString()
+        );
+
+        await _handler.Handle(command);
+
+        TaskCreated expectedEvent = new(
+            Id: command.Id,
+            OwnerId: command.OwnerId,
+            Title: command.Title,
+            Description: command.Description,
+            State: command.State
+        );
+
+        await WaitForAsync(async () =>
+        {
+            return capturedEvents != null;
+        });
+
+        Assert.NotNull(capturedEvents);
+        Assert.Equal(expectedEvent.Id, ((TaskCreated)capturedEvents.First()).Id);
     }
 }
