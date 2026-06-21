@@ -14,9 +14,14 @@ internal sealed record TaskTitle : ValueObject<string>
 
     private static void EnsureTitle(string value)
     {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new NullTaskTitle();
+        }
+
         if (value.Length > MAX_LENGTH)
         {
-            throw new TasktitleTooLong();
+            throw new TaskTitleTooLong();
         }
     }
 }
