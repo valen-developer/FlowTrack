@@ -105,10 +105,7 @@ public class WorkManagementTestContainers : IAsyncDisposable
         refreshResponse.EnsureSuccessStatusCode();
     }
 
-    public async Task<List<T>> ExecuteQueryOnSearchEngine<T>(
-        string indexName,
-        object query
-    )
+    public async Task<List<T>> ExecuteQueryOnSearchEngine<T>(string indexName, object query)
     {
         using var client = new HttpClient { BaseAddress = new Uri(ElasticsearchUrl) };
 

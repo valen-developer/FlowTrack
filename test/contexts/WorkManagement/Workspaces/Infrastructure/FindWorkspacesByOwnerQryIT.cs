@@ -29,10 +29,11 @@ public class FindWorkspacesByOwnerQryIT : WorkManagementIntegrationTestCase
 
         await _fixture.Containers.IndexDocs("workspaces", indexedDocs);
         var elasticQuery = new { query = new { match = new { ownerId } } };
-        var internalResult = await _fixture.Containers.ExecuteQueryOnSearchEngine<WorkspaceSearchDocument>(
-            "workspaces",
-            elasticQuery
-        );
+        var internalResult =
+            await _fixture.Containers.ExecuteQueryOnSearchEngine<WorkspaceSearchDocument>(
+                "workspaces",
+                elasticQuery
+            );
 
         var query = new FindWorkspacesByOwnerQry(ownerId);
         var result = await _handler.Handle(query);

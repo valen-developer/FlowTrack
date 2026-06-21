@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace FlowTrackWorkManagementApiTest;
 
-public class FlowTrackWorkManagementApiFixture
-    : WebApplicationFactory<Program>,
-        IAsyncLifetime
+public class FlowTrackWorkManagementApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly WorkManagementTestContainers _containers = new();
 
@@ -27,10 +25,7 @@ public class FlowTrackWorkManagementApiFixture
             _containers.ElasticsearchUrl
         );
         Environment.SetEnvironmentVariable("RABBITMQ_HOST", _containers.RabbitMqHost);
-        Environment.SetEnvironmentVariable(
-            "RABBITMQ_PORT",
-            _containers.RabbitMqPort.ToString()
-        );
+        Environment.SetEnvironmentVariable("RABBITMQ_PORT", _containers.RabbitMqPort.ToString());
         Environment.SetEnvironmentVariable("RABBITMQ_USERNAME", "guest");
         Environment.SetEnvironmentVariable("RABBITMQ_PASSWORD", "guest");
         Environment.SetEnvironmentVariable("EXTERNAL_EVENT_EXCHANGE_NAME", "domain_events");
