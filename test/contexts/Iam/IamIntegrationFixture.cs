@@ -1,4 +1,7 @@
 using FlowTrack.Shared.Domain.Iam.Users;
+using FlowTrack.Shared.Infrastructure.Bus.Event;
+using FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus;
+using FlowTrack.Shared.Infrastructure.RabbitMq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -97,6 +100,31 @@ namespace FlowTrack.Iam.Test
             Environment.SetEnvironmentVariable("RABBITMQ_PASSWORD", "guest");
             Environment.SetEnvironmentVariable("EXTERNAL_EVENT_EXCHANGE_NAME", "domain_events");
 
+            await WaitForAsync(
+                async () =>
+                {
+                    try
+                    {
+                        var factory = new RabbitMQ.Client.ConnectionFactory
+                        {
+                            HostName = _rabbitMqContainer.Hostname,
+                            Port = _rabbitMqContainer.GetMappedPublicPort(5672),
+                            UserName = "guest",
+                            Password = "guest",
+                        };
+                        var connection = await factory.CreateConnectionAsync();
+                        await connection.DisposeAsync();
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                },
+                timeoutMs: 15000,
+                pollIntervalMs: 500
+            );
+
             serviceCollection.AddSingleton<JsonToDomainEventMapper>(
                 _ => new TestJsonToDomainEventMapper()
             );
@@ -141,7 +169,41 @@ namespace FlowTrack.Iam.Test
                 var hostedServices = serviceProvider.GetServices<IHostedService>();
                 foreach (var hs in hostedServices)
                     await hs.StartAsync(CancellationToken.None);
-                await Task.Delay(100);
+
+                var externalEventInfo =
+                    serviceProvider.GetService<ExternalEventSubscriberInformation>();
+                var rabbitConnection = serviceProvider.GetService<RabbitMqConnection>();
+
+                if (externalEventInfo?.Subscribers.Count > 0 && rabbitConnection is not null)
+                {
+                    await WaitForAsync(
+                        async () =>
+                        {
+                            try
+                            {
+                                await using var channel =
+                                    await rabbitConnection.CreateChannelAsync();
+
+                                foreach (var subscriber in externalEventInfo.Subscribers)
+                                {
+                                    var queueDeclare = await channel.QueueDeclarePassiveAsync(
+                                        subscriber.QueueName
+                                    );
+                                    if (queueDeclare.ConsumerCount == 0)
+                                        return false;
+                                }
+
+                                return true;
+                            }
+                            catch
+                            {
+                                return false;
+                            }
+                        },
+                        timeoutMs: 10000,
+                        pollIntervalMs: 500
+                    );
+                }
             }
         }
 

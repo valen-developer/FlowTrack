@@ -19,12 +19,13 @@ public class UserMeControllerE2E(FlowTrackIamApiFixture fixture) : FlowTrackIamA
 
         var signinSuccess = authTokenGenerator.Generate(user);
 
-        HttpClient.DefaultRequestHeaders.Add(
+        var request = new HttpRequestMessage(HttpMethod.Get, "/user/me");
+        request.Headers.Add(
             "Cookie",
             $"ACCESS_TOKEN={signinSuccess.AccessToken}; REFRESH_TOKEN={signinSuccess.RefreshToken}"
         );
 
-        var response = await HttpClient.GetAsync("/user/me");
+        var response = await HttpClient.SendAsync(request);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var userInfo = await response.Content.ReadFromJsonAsync<UserMeResponse>();

@@ -29,7 +29,7 @@ public class FlowTrackIamApiFixture : WebApplicationFactory<Program>, IAsyncLife
         var httpClientOptions = new WebApplicationFactoryClientOptions
         {
             BaseAddress = new Uri("http://localhost"),
-            HandleCookies = true,
+            HandleCookies = false,
         };
 
         HttpClient = CreateClient(httpClientOptions);
