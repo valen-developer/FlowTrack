@@ -43,6 +43,7 @@ public class CreateTaskCmdTest
         var command = new CreateTaskCmd(
             Id: Guid.NewGuid().ToString(),
             OwnerId: Guid.NewGuid().ToString(),
+            WorkspaceId: Guid.NewGuid().ToString(),
             Title: new string('A', maxNameLength + 1),
             Description: "Test Description",
             State: TaskStateEnum.TODO.ToString()
@@ -60,6 +61,7 @@ public class CreateTaskCmdTest
         var command = new CreateTaskCmd(
             Id: Guid.NewGuid().ToString(),
             OwnerId: Guid.NewGuid().ToString(),
+            WorkspaceId: Guid.NewGuid().ToString(),
             Title: null!,
             Description: "Test Description",
             State: TaskStateEnum.TODO.ToString()
@@ -77,6 +79,7 @@ public class CreateTaskCmdTest
         var command = new CreateTaskCmd(
             Id: Guid.NewGuid().ToString(),
             OwnerId: Guid.NewGuid().ToString(),
+            WorkspaceId: Guid.NewGuid().ToString(),
             Title: "Test Task",
             Description: "Test Description",
             State: "INVALID_STATE"
@@ -97,6 +100,7 @@ public class CreateTaskCmdTest
         var command = new CreateTaskCmd(
             Id: Guid.NewGuid().ToString(),
             OwnerId: Guid.NewGuid().ToString(),
+            WorkspaceId: Guid.NewGuid().ToString(),
             Title: "Test Task",
             Description: "Test Description",
             State: state
@@ -116,6 +120,7 @@ public class CreateTaskCmdTest
         var command = new CreateTaskCmd(
             Id: Guid.NewGuid().ToString(),
             OwnerId: Guid.NewGuid().ToString(),
+            WorkspaceId: Guid.NewGuid().ToString(),
             Title: "Test Task",
             Description: "Test Description",
             State: TaskStateEnum.TODO.ToString()
@@ -148,6 +153,7 @@ public class CreateTaskCmdTest
         var command = new CreateTaskCmd(
             Id: Guid.NewGuid().ToString(),
             OwnerId: Guid.NewGuid().ToString(),
+            WorkspaceId: Guid.NewGuid().ToString(),
             Title: "Test Task",
             Description: "Test Description",
             State: TaskStateEnum.TODO.ToString()
@@ -158,6 +164,7 @@ public class CreateTaskCmdTest
         TaskCreated expectedEvent = new(
             Id: command.Id,
             OwnerId: command.OwnerId,
+            WorkspaceId: command.WorkspaceId,
             Title: command.Title,
             Description: command.Description,
             State: command.State

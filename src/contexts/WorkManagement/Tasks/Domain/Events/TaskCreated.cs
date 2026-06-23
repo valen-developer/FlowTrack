@@ -5,6 +5,7 @@ namespace FlowTrack.WorkManagement.Tasks.Domain;
 internal sealed record TaskCreated(
     string Id,
     string OwnerId,
+    string WorkspaceId,
     string Title,
     string Description,
     string State

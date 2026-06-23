@@ -5,6 +5,7 @@ namespace FlowTrack.WorkManagement.Tasks.Application;
 internal sealed record CreateTaskCmd(
     string Id,
     string OwnerId,
+    string WorkspaceId,
     string Title,
     string Description,
     string State

@@ -29,7 +29,6 @@ namespace FlowTrack.WorkManagement.Workspaces.Test.Application
         public async Task Should_Index_In_Search_Engine()
         {
             var workspace = WorkspaceMother.WithId(Guid.NewGuid().ToString());
-            var otherWorkspace = WorkspaceMother.WithId(Guid.NewGuid().ToString());
 
             var @event = new WorkspaceCreated(
                 Id: workspace.Id.Value,

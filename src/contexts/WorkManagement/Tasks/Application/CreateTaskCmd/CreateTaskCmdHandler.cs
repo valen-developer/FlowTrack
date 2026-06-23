@@ -12,6 +12,7 @@ internal sealed class CreateTaskCmdHandler(ITaskRepository repository, EventBus 
         var task = Tasky.Create(
             Id: new(command.Id),
             OwnerId: new(command.OwnerId),
+            WorkspaceId: new(command.WorkspaceId),
             Title: new(command.Title),
             Description: new(command.Description),
             State: TaskState.FromString(command.State)

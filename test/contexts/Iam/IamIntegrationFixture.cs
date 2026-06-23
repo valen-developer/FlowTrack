@@ -1,6 +1,4 @@
 using FlowTrack.Shared.Domain.Iam.Users;
-using FlowTrack.Shared.Infrastructure.Bus.Event;
-using FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus;
 using FlowTrack.Shared.Infrastructure.RabbitMq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

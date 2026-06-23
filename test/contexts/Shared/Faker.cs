@@ -15,6 +15,11 @@ namespace FlowTrack.Shared.Test
             return xeger.Generate();
         }
 
+        public static string uuid()
+        {
+            return Guid.NewGuid().ToString();
+        }
+
         public string Words(int count)
         {
             return string.Join(

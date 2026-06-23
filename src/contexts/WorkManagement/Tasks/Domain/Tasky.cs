@@ -5,6 +5,7 @@ namespace FlowTrack.WorkManagement.Tasks.Domain;
 internal sealed class Tasky(
     TaskId id,
     TaskOwnerId ownerId,
+    TaskWorkspaceId workspaceId,
     TaskTitle title,
     TaskDescription description,
     TaskState state,
@@ -14,6 +15,7 @@ internal sealed class Tasky(
 {
     public TaskId Id { get; } = id;
     public TaskOwnerId OwnerId { get; } = ownerId;
+    public TaskWorkspaceId WorkspaceId { get; } = workspaceId;
     public TaskTitle Title { get; } = title;
     public TaskDescription Description { get; } = description;
     public TaskState State { get; } = state;
@@ -23,6 +25,7 @@ internal sealed class Tasky(
     public static Tasky Create(
         TaskId Id,
         TaskOwnerId OwnerId,
+        TaskWorkspaceId WorkspaceId,
         TaskTitle Title,
         TaskDescription Description,
         TaskState State
@@ -30,10 +33,11 @@ internal sealed class Tasky(
     {
         var now = DateTime.UtcNow;
 
-        var task = new Tasky(Id, OwnerId, Title, Description, State, now, now);
+        var task = new Tasky(Id, OwnerId, WorkspaceId, Title, Description, State, now, now);
         var taskCreatedEvent = new TaskCreated(
             Id: Id.Value,
             OwnerId: OwnerId.Value,
+            WorkspaceId: WorkspaceId.Value,
             Title: Title.Value,
             Description: Description.Value,
             State: State.Value.ToString()
