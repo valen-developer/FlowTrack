@@ -15,7 +15,7 @@ internal sealed class DomainLogger(ILogger<DomainLogger> logger) : IDomainLogger
 
     private void Log(LogLevel level, LogMessage message, Exception? exception)
     {
-        using var actionScope = LogContext.PushProperty("action", message.Action);
+        using var actionScope = LogContext.PushProperty("Action", message.Action);
         using var attrScope = LogContext.PushProperty(
             "Attributes",
             message.Attributes ?? new { },
