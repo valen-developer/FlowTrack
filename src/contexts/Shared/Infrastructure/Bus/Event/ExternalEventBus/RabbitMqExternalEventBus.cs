@@ -10,7 +10,7 @@ namespace FlowTrack.Shared.Infrastructure.Bus.Event.ExternalEventBus
         public async Task Publish<T>(T @event)
             where T : DomainEvent
         {
-            var channel = await rabbitConnection.CreateChannelAsync();
+            await using var channel = await rabbitConnection.CreateChannelAsync();
             var exchangeName = env.Get("EXTERNAL_EVENT_EXCHANGE_NAME") ?? "domain_events";
 
             await channel.ExchangeDeclareAsync(exchangeName, ExchangeType.Topic, durable: true);
